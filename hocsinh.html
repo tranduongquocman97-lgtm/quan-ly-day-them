@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cổng Khảo Thí Học Sinh</title>
+    <title>Cổng Khảo Thí & Học Phí Học Sinh</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
@@ -21,7 +21,7 @@
         <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
             <div class="flex items-center space-x-2.5">
                 <div class="bg-indigo-700 p-2 rounded-xl"><i data-lucide="book-open" class="w-5 h-5 text-amber-400"></i></div>
-                <div><h1 class="font-bold text-sm leading-tight">CỔNG HỌC SINH</h1><p class="text-[10px] text-indigo-200">Azota Mobile Pro</p></div>
+                <div><h1 class="font-bold text-sm leading-tight">CỔNG HỌC SINH</h1><p class="text-[10px] text-indigo-200">Tra cứu học phí & Thi trực tuyến</p></div>
             </div>
             <button onclick="loadDataFromCloud()" class="bg-indigo-800 text-white text-xs px-3 py-1.5 rounded-lg font-bold">Tải lại</button>
         </div>
@@ -35,33 +35,51 @@
 
         <nav id="mainNavTabs" class="flex items-center space-x-2 border-b pb-2 overflow-x-auto">
             <button onclick="switchTab('attendance')" id="tab-btn-attendance" class="tab-btn px-4 py-2 rounded-xl font-bold text-xs text-indigo-600 bg-indigo-50 whitespace-nowrap">Điểm Danh</button>
-            <button onclick="switchTab('tuition')" id="tab-btn-tuition" class="tab-btn px-4 py-2 rounded-xl font-bold text-xs text-slate-500 whitespace-nowrap">Học Phí</button>
+            <button onclick="switchTab('tuition')" id="tab-btn-tuition" class="tab-btn px-4 py-2 rounded-xl font-bold text-xs text-slate-500 whitespace-nowrap">Học Phí Chi Tiết</button>
             <button onclick="switchTab('exams')" id="tab-btn-exams" class="tab-btn px-4 py-2 rounded-xl font-bold text-xs text-slate-500 whitespace-nowrap">Phòng Thi</button>
         </nav>
 
+        <!-- TAB ĐIỂM DANH -->
         <section id="tab-attendance" class="tab-content space-y-4">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border"><h2 class="font-bold text-sm mb-3">Sổ Điểm Danh</h2><div class="overflow-x-auto border rounded-xl"><table class="w-full text-left text-xs whitespace-nowrap"><thead><tr id="matrixTableHeaderRow" class="bg-slate-100 font-bold border-b"></tr></thead><tbody id="matrixAttendanceBody" class="divide-y"></tbody></table></div></div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border"><h2 class="font-bold text-sm mb-3">Sổ Điểm Danh Lưới 8 Buổi</h2><div class="overflow-x-auto border rounded-xl"><table class="w-full text-left text-xs whitespace-nowrap"><thead><tr id="matrixTableHeaderRow" class="bg-slate-100 font-bold border-b"></tr></thead><tbody id="matrixAttendanceBody" class="divide-y"></tbody></table></div></div>
         </section>
 
+        <!-- TAB HỌC PHÍ (HIỂN THỊ ĐỦ SỐ TIỀN, NỢ, NGÀY VÀ HÌNH THỨC) -->
         <section id="tab-tuition" class="tab-content hidden space-y-4">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border"><h2 class="font-bold text-sm mb-3">Học Phí</h2><div class="overflow-x-auto border rounded-xl"><table class="w-full text-left text-xs whitespace-nowrap"><thead><tr class="bg-slate-100 font-bold border-b"><th class="p-3 border-r">Học Sinh</th><th class="p-3 text-center border-r">T8</th><th class="p-3 text-center border-r">T9</th><th class="p-3 text-center border-r">T10</th><th class="p-3 text-center border-r">T11</th></tr></thead><tbody id="tuitionTableBody" class="divide-y"></tbody></table></div></div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border space-y-3">
+                <h2 class="font-bold text-sm">Tình Trạng & Lịch Sử Đóng Học Phí</h2>
+                <div class="overflow-x-auto border rounded-xl">
+                    <table class="w-full text-left text-xs whitespace-nowrap">
+                        <thead>
+                            <tr class="bg-slate-100 font-bold border-b uppercase">
+                                <th class="p-3 border-r min-w-[140px]">Học Sinh</th>
+                                <th class="p-3 text-center border-r min-w-[130px]" id="cycleTitle0">Tháng 8</th>
+                                <th class="p-3 text-center border-r min-w-[130px]" id="cycleTitle1">Tháng 9</th>
+                                <th class="p-3 text-center border-r min-w-[130px]" id="cycleTitle2">Tháng 10</th>
+                                <th class="p-3 text-center border-r min-w-[130px]" id="cycleTitle3">Tháng 11</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tuitionTableBody" class="divide-y"></tbody>
+                    </table>
+                </div>
+            </div>
         </section>
 
+        <!-- TAB PHÒNG THI -->
         <section id="tab-exams" class="tab-content hidden space-y-4">
             <div class="bg-white p-4 rounded-2xl shadow-sm border space-y-3"><h2 class="font-bold text-sm">Đề Thi Trực Tuyến</h2><div id="studentExamListContainer" class="space-y-3"></div></div>
         </section>
 
-        <!-- PHÒNG THI MOBILE (CHIA LƯỚI / XEM PDF HOẶC CÂU HỎI) -->
+        <!-- PHÒNG THI ONLINE -->
         <section id="examRoomSection" class="hidden space-y-4">
             <div class="bg-white p-3 rounded-2xl shadow-md border flex items-center justify-between sticky top-2 z-30">
                 <div><h2 id="roomExamTitle" class="font-black text-sm text-indigo-900">Đề thi</h2><p class="text-[10px] text-slate-500 font-bold"><span id="roomStudentName"></span></p></div>
                 <div class="flex items-center space-x-2"><div class="bg-rose-50 text-rose-700 px-3 py-1 rounded-xl font-mono font-black text-xs border border-rose-200"><span id="roomCountdown">00:00</span></div><button onclick="confirmSubmitExam()" class="bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-xl shadow">Nộp</button></div>
             </div>
-            <div id="tabSwitchAlert" class="hidden bg-amber-50 text-amber-800 p-2.5 rounded-xl text-xs font-bold flex justify-between items-center"><span>Cảnh báo chuyển tab!</span><span id="roomTabSwitchBadge" class="bg-amber-200 px-2 py-0.5 rounded text-[10px]">1</span></div>
-            
             <div id="roomQuestionsContainer" class="space-y-4"></div>
         </section>
 
+        <!-- KẾT QUẢ THI -->
         <section id="examResultSection" class="hidden bg-white p-6 rounded-3xl shadow-xl border text-center space-y-4">
             <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto"><i data-lucide="award" class="w-8 h-8"></i></div>
             <h2 class="text-xl font-black">Nộp Bài Thành Công!</h2>
@@ -70,6 +88,7 @@
         </section>
     </main>
 
+    <!-- MODAL CHỌN TÊN THÍ SINH -->
     <div id="modalStudentAuth" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4 text-center">
             <h3 class="font-black text-lg">Chọn Tên Thí Sinh</h3>
@@ -78,10 +97,11 @@
         </div>
     </div>
 
+    <!-- JS SCRIPT -->
     <script>
         const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbxMq1_ScgRw6582Kxz-L3xmKNifAmAyRHJSWJcxiiUy4xRIxL3FrUDMQpbHdyvuu2QPhQ/exec";
-        let appData = { classes: [], students: [], attendance: [], payments: [], exams: [] };
-        let currentClassId = '', currentExam = null, currentStudent = null, examTimer = null, timeLeft = 0, tabSwitchCount = 0, userAnswers = {};
+        let appData = { classes: [], students: [], attendance: [], payments: [], exams: [], cycleTitles: ['Tháng 8/2026', 'Tháng 9/2026', 'Tháng 10/2026', 'Tháng 11/2026'] };
+        let currentClassId = '', currentExam = null, currentStudent = null, examTimer = null, timeLeft = 0, userAnswers = {};
 
         window.addEventListener('DOMContentLoaded', () => { if(window.lucide) lucide.createIcons(); if(CLOUD_API_URL) loadDataFromCloud(); });
 
@@ -89,9 +109,9 @@
             try {
                 const r = await fetch(CLOUD_API_URL); const j = await r.json();
                 if(j.Classes) appData.classes = j.Classes.slice(1).map(x=>({id:String(x[0]||''), name:String(x[1]||''), fee:parseFloat(x[2])||0}));
-                if(j.Students) appData.students = j.Students.slice(1).map(x=>({id:String(x[0]||''), classId:String(x[1]||''), code:String(x[2]||''), name:String(x[3]||''), joinDate:String(x[5]||'')}));
+                if(j.Students) appData.students = j.Students.slice(1).map(x=>({id:String(x[0]||''), classId:String(x[1]||''), code:String(x[2]||''), name:String(x[3]||''), joinDate:String(x[5]||''), customFee:x[6]!==''?parseFloat(x[6]):null}));
                 if(j.Attendance) appData.attendance = j.Attendance.slice(1).map(x=>({studentId:String(x[0]||''), date:String(x[1]||''), status:String(x[2]||'')}));
-                if(j.Payments) appData.payments = j.Payments.slice(1).map(x=>({studentId:String(x[1]||''), cycleIndex:parseInt(x[3]), amount:parseFloat(x[4])||0, status:String(x[5]||''), date:String(x[8]||'')}));
+                if(j.Payments) appData.payments = j.Payments.slice(1).map(x=>({id:String(x[0]||''), studentId:String(x[1]||''), classId:String(x[2]||''), cycleIndex:parseInt(x[3]), amount:parseFloat(x[4])||0, status:String(x[5]||''), method:String(x[6]||''), note:String(x[7]||''), date:String(x[8]||'')}));
                 if(j.Exams) appData.exams = j.Exams.slice(1).map(x=>({id:String(x[0]||''), title:String(x[1]||''), classId:String(x[2]||''), duration:parseInt(x[3])||45, questions:JSON.parse(x[5]||'[]'), matrix:JSON.parse(x[6]||'{}'), status:String(x[7]||'OPEN')}));
                 renderGlobalClassSelect();
             } catch(e) {}
@@ -129,17 +149,42 @@
                     let b = '-'; if(r) { if(r.status==='PRESENT') b='✓'; else if(r.status==='ABSENT_PERM') b='P'; else if(r.status==='ABSENT_NO_PERM') b='KP'; else if(r.status==='LATE') b='T'; }
                     return `<td class="p-2 text-center border-l">${b}</td>`;
                 }).join('');
-                return `<tr><td class="p-3 sticky-col-1 border-r font-bold text-xs">${s.name}</td>${slots}<td class="p-2 text-center bg-slate-50 font-bold text-xs">${Math.floor(cnt/8)+1} (${cnt%8}/8)</td></tr>`;
+                return `<tr><td class="p-3 sticky-col-1 border-r font-bold text-xs">${s.name}</td>${slots}<td class="p-2 text-center bg-slate-50 font-bold text-xs">Kỳ ${Math.floor(cnt/8)+1} (${cnt%8}/8)</td></tr>`;
             }).join('');
         }
 
+        function calculateProratedFeeCycle1(student) {
+            const c = appData.classes.find(x => x.id === student.classId), stdFee = student.customFee!==null?student.customFee:(c?c.fee:0);
+            if (!student.joinDate) return stdFee;
+            const skip = [...new Set(appData.attendance.filter(a=>appData.students.some(cs=>cs.classId===student.classId&&cs.id===a.studentId)).map(a=>a.date))].sort().filter(d=>d<student.joinDate).length;
+            return skip===0 ? stdFee : Math.round((stdFee/8)*Math.max(1, 8-(skip%8)));
+        }
+
+        // BẢNG HỌC PHÍ CHI TIẾT DÀNH CHO HỌC SINH
         function renderTuitionTable() {
             const stds = appData.students.filter(s=>s.classId===currentClassId), tb = document.getElementById('tuitionTableBody');
+            for(let i=0; i<4; i++) { const el=document.getElementById(`cycleTitle${i}`); if(el) el.innerText = appData.cycleTitles[i] || `Tháng ${i+1}`; }
             if(!stds.length) { tb.innerHTML=`<tr><td colspan="5" class="p-4 text-center italic text-slate-400">Trống</td></tr>`; return; }
+
             tb.innerHTML = stds.map(s => {
-                let cells=''; for(let i=0; i<4; i++) {
+                const c = appData.classes.find(x=>x.id===s.classId), stdFee = s.customFee!==null?s.customFee:(c?c.fee:0);
+                const aIdx = Math.floor(appData.attendance.filter(a=>a.studentId===s.id && (!s.joinDate||a.date>=s.joinDate) && a.status!=='none').length/8);
+                let cells='', debt=0;
+                for(let i=0; i<4; i++) {
                     const p = appData.payments.find(x=>x.studentId===s.id && x.cycleIndex===i);
-                    cells += `<td class="p-2 border-r text-center text-xs font-bold">${p&&p.status==='PAID'?'Đã nộp':'Chưa'}</td>`;
+                    let stC='bg-slate-50 text-slate-400', txt='Chưa đến', eff=i===0?calculateProratedFeeCycle1(s):stdFee;
+                    
+                    if(p && p.status==='PAID') {
+                        stC='bg-emerald-50 text-emerald-700 border-emerald-200';
+                        txt = `Đã nộp: ${p.amount.toLocaleString()}đ<br><span class="text-[9px] text-slate-500 font-normal">${p.method || 'CK'} • ${p.date ? p.date.split('T')[0] : ''}</span>`;
+                    } else if(i<aIdx) {
+                        debt+=eff; stC='bg-rose-50 text-rose-700 border-rose-200';
+                        txt = `Nợ: ${eff.toLocaleString()}đ`;
+                    } else if(i===aIdx) {
+                        stC='bg-amber-50 text-amber-700 border-amber-200';
+                        txt = `Cần nộp: ${(eff+debt).toLocaleString()}đ`;
+                    }
+                    cells += `<td class="p-2 border-r text-center"><div class="p-2 rounded-xl border text-[10px] font-bold ${stC}">${txt}</div></td>`;
                 }
                 return `<tr><td class="p-3 sticky-col-1 border-r font-bold text-xs">${s.name}</td>${cells}</tr>`;
             }).join('');

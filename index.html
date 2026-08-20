@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phần Mềm Quản Lý Dạy Thêm & Khảo Thí Pro</title>
+    <title>Phần Mềm Quản Lý Dạy Thêm & Khảo Thí Pro v46</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
@@ -42,8 +42,9 @@
             <button onclick="switchTab('attendance-matrix')" id="tab-btn-attendance-matrix" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="calendar" class="w-5 h-5 shrink-0 text-indigo-400"></i><span class="sidebar-text">Sổ Điểm Danh (8B)</span></button>
             <button onclick="switchTab('tuition')" id="tab-btn-tuition" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="badge-dollar-sign" class="w-5 h-5 shrink-0 text-indigo-400"></i><span class="sidebar-text">Theo Dõi Học Phí</span></button>
             <button onclick="switchTab('history')" id="tab-btn-history" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="receipt" class="w-5 h-5 shrink-0 text-indigo-400"></i><span class="sidebar-text">Nhật Ký Thu Tiền</span></button>
-            <button onclick="switchTab('qbank')" id="tab-btn-qbank" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="pen-tool" class="w-5 h-5 shrink-0 text-amber-400"></i><span class="sidebar-text">Ngân Hàng Đề Thi</span></button>
-            <button onclick="switchTab('documents')" id="tab-btn-documents" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="folder-git-2" class="w-5 h-5 shrink-0 text-indigo-400"></i><span class="sidebar-text">Kho Tài Liệu</span></button>
+            <button onclick="switchTab('qbank')" id="tab-btn-qbank" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="pen-tool" class="w-5 h-5 shrink-0 text-amber-400"></i><span class="sidebar-text">Ngân Hàng & Khảo Thí</span></button>
+            <button onclick="switchTab('analytics')" id="tab-btn-analytics" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="bar-chart-3" class="w-5 h-5 shrink-0 text-emerald-400"></i><span class="sidebar-text">Phổ Điểm Thi</span></button>
+            <button onclick="switchTab('documents')" id="tab-btn-documents" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="folder-git-2" class="w-5 h-5 shrink-0 text-indigo-400"></i><span class="sidebar-text">Kho Tài Liệu (25MB+)</span></button>
             <button onclick="switchTab('settings')" id="tab-btn-settings" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="cloud-cog" class="w-5 h-5 shrink-0 text-indigo-400"></i><span class="sidebar-text">Cấu Hình Cloud</span></button>
         </nav>
 
@@ -174,7 +175,7 @@
                 </div>
             </section>
 
-            <!-- TAB 8: NGÂN HÀNG ĐỀ THI -->
+            <!-- TAB 8: NGÂN HÀNG ĐỀ THI & KHẢO THÍ -->
             <section id="tab-qbank" class="tab-content hidden space-y-6">
                 <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4 h-fit">
@@ -191,21 +192,41 @@
                         </div>
                     </div>
                     <div class="xl:col-span-2 space-y-6">
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4"><h2 class="font-bold text-base border-b pb-3">Đề Đang Mở</h2><div id="examListContainer" class="space-y-3"></div></div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
+                            <div class="flex justify-between items-center border-b pb-3"><h2 class="font-bold text-base">Đề Đang Mở</h2></div>
+                            <div id="examListContainer" class="space-y-3"></div>
+                        </div>
                         <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4"><h2 class="font-bold text-base border-b pb-3">Kho Câu Hỏi</h2><div id="questionBankList" class="space-y-3 max-h-96 overflow-y-auto"></div></div>
                     </div>
                 </div>
             </section>
 
-            <!-- TAB 9: TÀI LIỆU -->
+            <!-- TAB 9: PHỔ ĐIỂM THI -->
+            <section id="tab-analytics" class="tab-content hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border space-y-5">
+                    <div class="flex flex-wrap items-center justify-between gap-4 border-b pb-4">
+                        <div>
+                            <h2 class="font-bold text-lg text-slate-800 flex items-center space-x-2"><i data-lucide="bar-chart-3" class="w-5 h-5 text-emerald-600"></i><span>Thống Kê Phổ Điểm & Kết Quả Thi</span></h2>
+                            <p class="text-xs text-slate-500 mt-1">Phân tích kết quả làm bài của học sinh theo từng đề thi</p>
+                        </div>
+                        <div>
+                            <select id="analyticsExamSelect" onchange="renderAnalyticsReport()" class="bg-slate-50 border border-slate-300 font-bold text-xs p-2.5 rounded-xl outline-none"></select>
+                        </div>
+                    </div>
+                    <div id="analyticsContent" class="space-y-6"></div>
+                </div>
+            </section>
+
+            <!-- TAB 10: KHO TÀI LIỆU -->
             <section id="tab-documents" class="tab-content hidden space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4 h-fit">
-                        <h2 class="font-bold text-base border-b pb-3">Tải Tài Liệu</h2>
+                        <h2 class="font-bold text-base border-b pb-3">Tải Tài Liệu (Hỗ trợ 25MB+)</h2>
                         <form id="formAddDoc" onsubmit="handleAddDocument(event)" class="space-y-3">
                             <select id="inputDocClassId" class="w-full text-xs p-2.5 border rounded-xl outline-none font-bold"></select>
                             <input type="text" id="inputDocName" placeholder="Tên tài liệu" required class="w-full text-xs p-2.5 border rounded-xl outline-none">
                             <input type="file" id="inputDocFile" required class="w-full text-xs p-2 border rounded-xl bg-slate-50 cursor-pointer">
+                            <p class="text-[10px] text-slate-400">Hỗ trợ file nặng tối đa 30MB (PDF, Word, Video...)</p>
                             <button type="submit" id="btnUploadDoc" class="w-full bg-indigo-600 text-white font-bold text-xs py-3 rounded-xl shadow">Tải Lên Mây</button>
                         </form>
                     </div>
@@ -213,7 +234,7 @@
                 </div>
             </section>
 
-            <!-- TAB 10: CẤU HÌNH -->
+            <!-- TAB 11: CẤU HÌNH -->
             <section id="tab-settings" class="tab-content hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border max-w-xl mx-auto space-y-4"><h2 class="font-bold text-base border-b pb-3">Cấu Hình Cloud</h2><input type="url" id="inputApiUrl" placeholder="Web App URL..." class="w-full text-xs p-3 border rounded-xl font-mono outline-none"><button onclick="saveApiUrlSetting()" class="w-full bg-indigo-600 text-white font-bold text-xs py-3 rounded-xl shadow">Lưu Cấu Hình</button></div>
             </section>
@@ -247,7 +268,7 @@
         </div>
     </div>
 
-    <!-- MODAL XÓA ĐIỂM DANH THEO NGÀY -->
+    <!-- MODAL XÓA ĐIỂM DANH -->
     <div id="modalDeleteByDate" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
             <div class="flex justify-between border-b pb-3"><h3 class="font-bold">Xóa Điểm Danh Ngày</h3><button onclick="closeDeleteByDateModal()"><i data-lucide="x" class="w-5 h-5"></i></button></div>
@@ -256,28 +277,42 @@
         </div>
     </div>
 
-    <!-- MODAL THU TIỀN -->
+    <!-- MODAL THU TIỀN (CÓ NÚT X ĐÓNG CỬA SỔ & TIỀN MẶT/CK) -->
     <div id="modalPayTuition" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-md space-y-4">
-            <div class="flex justify-between border-b pb-3"><h3 class="font-bold text-emerald-700">Thu Học Phí</h3><button onclick="closePayModal()"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-bold text-emerald-700 flex items-center"><i data-lucide="banknote" class="w-5 h-5 mr-2"></i>Thu Học Phí</h3>
+                <button onclick="closePayModal()" class="text-slate-400 hover:text-slate-600 bg-slate-100 p-1.5 rounded-lg"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
             <form id="formPayTuition" onsubmit="handleSavePayment(event)" class="space-y-3">
                 <input type="hidden" id="payStudentId"><input type="hidden" id="payCycleIndex">
                 <input type="text" id="payStudentInfo" readonly class="w-full p-2.5 border bg-slate-50 text-xs font-bold outline-none rounded-xl">
-                <input type="date" id="payDate" required class="w-full p-2.5 border rounded-xl text-sm font-bold outline-none">
-                <input type="number" id="payAmount" step="any" class="w-full p-3 border rounded-xl text-lg font-black text-emerald-600 outline-none">
-                <select id="payStatusSelect" class="w-full p-2.5 border rounded-xl text-xs font-bold outline-none"><option value="PAID">Đã Nộp</option><option value="DUE">Cần Nộp</option><option value="UNPAID">Chưa Nộp</option><option value="EXEMPT">Miễn Giảm</option></select>
-                <input type="text" id="payNote" placeholder="Ghi chú" class="w-full p-2.5 border rounded-xl text-xs outline-none">
-                <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl shadow">Xác Nhận</button>
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block text-[10px] font-bold text-slate-500 mb-1">Ngày Thu</label><input type="date" id="payDate" required class="w-full p-2.5 border rounded-xl text-xs font-bold outline-none"></div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 mb-1">Hình Thức</label>
+                        <select id="payMethod" class="w-full p-2.5 border rounded-xl text-xs font-bold outline-none">
+                            <option value="Chuyển khoản">Chuyển khoản</option>
+                            <option value="Tiền mặt">Tiền mặt</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div><label class="block text-[10px] font-bold text-slate-500 mb-1">Số Tiền</label><input type="number" id="payAmount" step="any" class="w-full p-3 border rounded-xl text-lg font-black text-emerald-600 outline-none"></div>
+                <div><label class="block text-[10px] font-bold text-slate-500 mb-1">Trạng Thái</label><select id="payStatusSelect" class="w-full p-2.5 border rounded-xl text-xs font-bold outline-none"><option value="PAID">Đã Nộp</option><option value="DUE">Cần Nộp</option><option value="UNPAID">Chưa Nộp</option><option value="EXEMPT">Miễn Giảm</option></select></div>
+                <div><label class="block text-[10px] font-bold text-slate-500 mb-1">Ghi Chú</label><input type="text" id="payNote" placeholder="Ghi chú thêm..." class="w-full p-2.5 border rounded-xl text-xs outline-none"></div>
+                <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl shadow">Xác Nhận Thu Tiền</button>
             </form>
         </div>
     </div>
 
     <!-- JS LOGIC -->
     <script>
-        const STORAGE_KEY = 'TUTORING_PRO_FINAL_MOBILE_FIXED';
+        const STORAGE_KEY = 'TUTORING_PRO_FINAL_V46';
         const API_URL_KEY = 'TUTORING_APP_API_URL';
         let cloudApiUrl = localStorage.getItem(API_URL_KEY) || '';
-        let appData = { classes: [], students: [], attendance: [], payments: [], documents: [], questionBank: [], exams: [], cycleTitles: ['Tháng 8/2026','Tháng 9/2026','Tháng 10/2026','Tháng 11/2026'] };
+        let appData = { classes: [], students: [], attendance: [], payments: [], documents: [], questionBank: [], exams: [], examResults: [], cycleTitles: ['Tháng 8/2026','Tháng 9/2026','Tháng 10/2026','Tháng 11/2026'] };
         let currentClassId = 'ALL', currentTab = 'dashboard', isSidebarOpen = false;
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -324,6 +359,7 @@
                 if(j.Documents) appData.documents = j.Documents.slice(1).map(r=>({id:String(r[0]||''),classId:String(r[1]||''),name:String(r[2]||''),type:String(r[3]||''),url:String(r[4]||'')}));
                 if(j.QuestionBank) appData.questionBank = j.QuestionBank.slice(1).map(r=>({id:String(r[0]||''),part:parseInt(r[1])||1,topic:String(r[2]||''),level:String(r[3]||'NB'),content:String(r[4]||''),options:JSON.parse(r[5]||'[]'),answer:String(r[6]||''),explain:String(r[7]||'')}));
                 if(j.Exams) appData.exams = j.Exams.slice(1).map(r=>({id:String(r[0]||''),title:String(r[1]||''),classId:String(r[2]||''),duration:parseInt(r[3])||45,questions:JSON.parse(r[5]||'[]'),matrix:JSON.parse(r[6]||'{}'),status:String(r[7]||'OPEN')}));
+                if(j.ExamResults) appData.examResults = j.ExamResults.slice(1).map(r=>({id:String(r[0]||''),examId:String(r[1]||''),studentId:String(r[2]||''),score:parseFloat(r[3])||0,details:JSON.parse(r[4]||'{}'),tabSwitchCount:parseInt(r[5])||0,submittedAt:String(r[6]||'')}));
                 saveToStorage(); refreshCurrentTab(); updateSyncStatus('success', 'Đồng bộ 100%');
             } catch(e) { updateSyncStatus('error', 'Lỗi kết nối'); }
         }
@@ -338,7 +374,8 @@
                     Payments: [['id','studentId','classId','cycleIndex','amount','status','method','note','date'], ...appData.payments.map(p=>[p.id,p.studentId,p.classId,p.cycleIndex,p.amount,p.status,p.method,p.note||'',p.date])],
                     Documents: [['id','classId','name','type','url'], ...appData.documents.map(d=>[d.id,d.classId,d.name,d.type,d.url])],
                     QuestionBank: [['id','part','topic','level','content','optionsJson','answer','explain'], ...appData.questionBank.map(q=>[q.id,q.part,q.topic,q.level,q.content,JSON.stringify(q.options||[]),q.answer,q.explain||''])],
-                    Exams: [['id','title','classId','duration','deadline','questionsJson','matrixJson','status','viewSolution'], ...appData.exams.map(e=>[e.id,e.title,e.classId,e.duration,e.deadline,JSON.stringify(e.questions||[]),JSON.stringify(e.matrix||{}),e.status,e.viewSolution?'1':'0'])]
+                    Exams: [['id','title','classId','duration','deadline','questionsJson','matrixJson','status','viewSolution'], ...appData.exams.map(e=>[e.id,e.title,e.classId,e.duration,e.deadline,JSON.stringify(e.questions||[]),JSON.stringify(e.matrix||{}),e.status,e.viewSolution?'1':'0'])],
+                    ExamResults: [['id','examId','studentId','score','detailsJson','tabSwitchCount','submittedAt'], ...appData.examResults.map(r=>[r.id,r.examId,r.studentId,r.score,JSON.stringify(r.details||{}),r.tabSwitchCount,r.submittedAt])]
                 };
                 await fetch(cloudApiUrl, { method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({action: 'saveAll', payload}), redirect: "follow" });
                 updateSyncStatus('success', 'Đã lưu');
@@ -387,6 +424,7 @@
             if(currentTab==='tuition') renderTuitionTable();
             if(currentTab==='history') renderPaymentHistory();
             if(currentTab==='qbank') renderQBankTab();
+            if(currentTab==='analytics') renderAnalyticsReport();
             if(window.lucide) lucide.createIcons();
         }
 
@@ -422,6 +460,13 @@
             });
             document.getElementById('dashDueStudents').innerText = `${dueC} HS`;
             document.getElementById('dashDueListContainer').innerHTML = dueHtml || `<div class="text-xs font-bold text-emerald-600 bg-emerald-50 p-3 rounded-xl text-center">Đã hoàn thành học phí!</div>`;
+
+            const reminders = [
+                `Tổng số lớp hiện tại: <b>${appData.classes.length} lớp</b>`,
+                `Chế độ xem: <b>${currentClassId === 'ALL' ? 'Tất cả các lớp' : getClassName(currentClassId)}</b>`,
+                `Hệ thống điểm danh tự động cộng dồn trạng thái Vắng không phép (KP).`
+            ];
+            document.getElementById('dashRemindersList').innerHTML = reminders.map(r => `<li class="p-2 bg-slate-50 rounded-xl border flex items-start space-x-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5"></i><span>${r}</span></li>`).join('');
         }
 
         function initScheduleRows() { const c = document.getElementById('scheduleRowsContainer'); if(c) { c.innerHTML=''; addScheduleRow('Thứ 3','17:30','19:00'); addScheduleRow('Thứ 6','17:30','19:00'); } }
@@ -567,6 +612,7 @@
             document.getElementById('payStudentId').value=sId; document.getElementById('payCycleIndex').value=cIdx;
             document.getElementById('payStudentInfo').value=`${s.name} - ${appData.cycleTitles[cIdx]||'Kỳ '+(cIdx+1)}`;
             document.getElementById('payAmount').value=p?p.amount:effFee; document.getElementById('payStatusSelect').value=p?p.status:'PAID';
+            document.getElementById('payMethod').value=p&&p.method?p.method:'Chuyển khoản';
             document.getElementById('payDate').value=p&&p.date?p.date.split('T')[0]:getTodayVNString();
             document.getElementById('payNote').value=p?p.note:'';
             document.getElementById('modalPayTuition').classList.remove('hidden');
@@ -574,8 +620,8 @@
         function closePayModal() { document.getElementById('modalPayTuition').classList.add('hidden'); }
         function handleSavePayment(e) {
             e.preventDefault(); const sId=document.getElementById('payStudentId').value, cIdx=parseInt(document.getElementById('payCycleIndex').value);
-            const amt=parseFloat(document.getElementById('payAmount').value)||0, st=document.getElementById('payStatusSelect').value, d=document.getElementById('payDate').value, n=document.getElementById('payNote').value;
-            appData.payments=appData.payments.filter(p=>!(p.studentId===sId&&p.cycleIndex===cIdx)); appData.payments.push({id:'p_'+Date.now(), studentId:sId, classId:appData.students.find(x=>x.id===sId).classId, cycleIndex:cIdx, amount:amt, status:st, method:'Chuyển khoản', note:n, date:d});
+            const amt=parseFloat(document.getElementById('payAmount').value)||0, st=document.getElementById('payStatusSelect').value, d=document.getElementById('payDate').value, m=document.getElementById('payMethod').value, n=document.getElementById('payNote').value;
+            appData.payments=appData.payments.filter(p=>!(p.studentId===sId&&p.cycleIndex===cIdx)); appData.payments.push({id:'p_'+Date.now(), studentId:sId, classId:appData.students.find(x=>x.id===sId).classId, cycleIndex:cIdx, amount:amt, status:st, method:m, note:n, date:d});
             saveDataToCloud(); closePayModal(); refreshCurrentTab();
         }
 
@@ -585,7 +631,7 @@
             if(!tbody) return; if(pays.length===0) { tbody.innerHTML=`<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Trống</td></tr>`; return; }
             tbody.innerHTML = pays.map(p => {
                 const s = appData.students.find(x=>x.id===p.studentId)||{name:'Đã xóa',code:''};
-                return `<tr><td class="p-3 text-xs">${getClassName(p.classId)}</td><td class="p-3 font-mono text-xs">${formatDateVN(p.date)}</td><td class="p-3 font-bold text-xs">${s.name}</td><td class="p-3 text-xs">Kỳ ${p.cycleIndex+1}</td><td class="p-3 font-bold text-emerald-600 text-xs">${p.amount.toLocaleString()}đ</td><td class="p-3 text-xs">${p.method}</td><td class="p-3 text-center"><button onclick="appData.payments=appData.payments.filter(x=>x.id!=='${p.id}');saveDataToCloud();refreshCurrentTab();" class="text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`;
+                return `<tr><td class="p-3 text-xs">${getClassName(p.classId)}</td><td class="p-3 font-mono text-xs">${formatDateVN(p.date)}</td><td class="p-3 font-bold text-xs">${s.name}</td><td class="p-3 text-xs">Kỳ ${p.cycleIndex+1}</td><td class="p-3 font-bold text-emerald-600 text-xs">${p.amount.toLocaleString()}đ</td><td class="p-3 text-xs">${p.method||'Chuyển khoản'}</td><td class="p-3 text-center"><button onclick="appData.payments=appData.payments.filter(x=>x.id!=='${p.id}');saveDataToCloud();refreshCurrentTab();" class="text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`;
             }).join('');
         }
 
@@ -599,9 +645,12 @@
             e.preventDefault(); const fileInput = document.getElementById('inputDocFile'); if(!fileInput.files.length) return;
             const file = fileInput.files[0], reader = new FileReader();
             reader.onload = async function() {
-                const res = await fetch(cloudApiUrl, { method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: 'uploadFile', filename: file.name, mimeType: file.type, base64: reader.result.split(',')[1] }) });
-                const json = await res.json();
-                if(json.status==='success') { appData.documents.push({id:'d_'+Date.now(), classId:document.getElementById('inputDocClassId').value, name:document.getElementById('inputDocName').value, type:'PDF', url:json.url}); saveDataToCloud(); e.target.reset(); refreshCurrentTab(); alert('Tải lên thành công!'); }
+                try {
+                    const res = await fetch(cloudApiUrl, { method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: 'uploadFile', filename: file.name, mimeType: file.type, base64: reader.result.split(',')[1] }) });
+                    const json = await res.json();
+                    if(json.status==='success') { appData.documents.push({id:'d_'+Date.now(), classId:document.getElementById('inputDocClassId').value, name:document.getElementById('inputDocName').value, type:'PDF', url:json.url}); saveDataToCloud(); e.target.reset(); refreshCurrentTab(); alert('Tải lên thành công!'); }
+                    else { alert('Lỗi tải file: ' + json.error); }
+                } catch(err) { alert('Lỗi kết nối khi tải file!'); }
             }; reader.readAsDataURL(file);
         }
 
@@ -631,6 +680,49 @@
             document.getElementById('badgeQuestionCount').innerText = `${appData.questionBank.length} câu`;
             document.getElementById('examListContainer').innerHTML = appData.exams.length===0?'<div class="text-xs text-slate-400 italic text-center">Trống</div>' : appData.exams.map(e=>`<div class="p-3 bg-slate-50 border rounded-xl flex justify-between items-center text-xs"><div><b>${e.title}</b> (${e.questions.length||e.matrix.answerString.length} câu)</div><button onclick="appData.exams=appData.exams.filter(x=>x.id!=='${e.id}');saveDataToCloud();refreshCurrentTab();" class="text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join('');
             document.getElementById('questionBankList').innerHTML = appData.questionBank.length===0?'<div class="text-xs text-slate-400 italic text-center">Trống</div>' : appData.questionBank.map((q,i)=>`<div class="p-3 bg-slate-50 border rounded-xl text-xs space-y-1"><div class="font-bold text-indigo-700">Câu ${i+1} [${q.level}]</div><div>${q.content}</div></div>`).join('');
+        }
+
+        function renderAnalyticsReport() {
+            const sel = document.getElementById('analyticsExamSelect');
+            const container = document.getElementById('analyticsContent');
+            if(!sel || !container) return;
+
+            sel.innerHTML = appData.exams.map(e => `<option value="${e.id}">Đề: ${e.title} (${getClassName(e.classId)})</option>`).join('');
+            const selectedExamId = sel.value;
+            const exam = appData.exams.find(e => e.id === selectedExamId);
+
+            if(!exam) { container.innerHTML = `<div class="text-xs text-slate-400 italic text-center py-6">Chưa có đề thi nào để thống kê.</div>`; return; }
+
+            const results = appData.examResults.filter(r => r.examId === exam.id);
+            if(results.length === 0) {
+                container.innerHTML = `<div class="p-6 bg-slate-50 border rounded-2xl text-center text-xs text-slate-500">Chưa có học sinh nào nộp bài cho đề thi này.</div>`;
+                return;
+            }
+
+            const scores = results.map(r => r.score);
+            const avgScore = scores.reduce((a,b)=>a+b,0) / scores.length;
+            const maxScore = Math.max(...scores);
+            const minScore = Math.min(...scores);
+
+            const countG = scores.filter(s => s >= 8).length;
+            const countK = scores.filter(s => s >= 6.5 && s < 8).length;
+            const countTB = scores.filter(s => s >= 5 && s < 6.5).length;
+            const countY = scores.filter(s => s < 5).length;
+
+            container.innerHTML = `
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl text-center"><span class="text-xs text-indigo-700 font-bold block mb-1">ĐIỂM TRUNG BÌNH</span><span class="text-3xl font-black text-indigo-900">${avgScore.toFixed(1)}</span></div>
+                    <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl text-center"><span class="text-xs text-emerald-700 font-bold block mb-1">ĐIỂM CAO NHẤT</span><span class="text-3xl font-black text-emerald-900">${maxScore.toFixed(1)}</span></div>
+                    <div class="p-4 bg-amber-50 border border-amber-100 rounded-2xl text-center"><span class="text-xs text-amber-700 font-bold block mb-1">ĐIỂM THẤP NHẤT</span><span class="text-3xl font-black text-amber-900">${minScore.toFixed(1)}</span></div>
+                    <div class="p-4 bg-blue-50 border border-blue-100 rounded-2xl text-center"><span class="text-xs text-blue-700 font-bold block mb-1">TỔNG BÀI NỘP</span><span class="text-3xl font-black text-blue-900">${results.length}</span></div>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-bold text-center">
+                    <div class="p-3 bg-slate-50 border rounded-xl">Giỏi (8-10đ): <span class="text-indigo-600">${countG} HS</span></div>
+                    <div class="p-3 bg-slate-50 border rounded-xl">Khá (6.5-7.9đ): <span class="text-emerald-600">${countK} HS</span></div>
+                    <div class="p-3 bg-slate-50 border rounded-xl">Trung bình (5-6.4đ): <span class="text-amber-600">${countTB} HS</span></div>
+                    <div class="p-3 bg-slate-50 border rounded-xl">Dưới TB (&lt;5đ): <span class="text-rose-600">${countY} HS</span></div>
+                </div>
+            `;
         }
     </script>
 </body>
