@@ -12,15 +12,11 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .sticky-col-1 { position: sticky; left: 0; z-index: 25; background-color: white; }
-        .sticky-col-2 { position: sticky; left: 65px; z-index: 25; background-color: white; }
-        @media (max-width: 768px) {
-            .sticky-col-2 { left: 55px; }
-            input, select, button { font-size: 14px !important; } /* Chống phóng trang trên iOS */
-        }
+        .sticky-col-2 { position: sticky; left: 70px; z-index: 25; background-color: white; }
     </style>
 </head>
 <body class="text-slate-800 flex flex-col md:flex-row h-screen overflow-hidden">
@@ -45,9 +41,9 @@
             <button onclick="switchTab('attendance-session')" id="tab-btn-attendance-session" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="check-square" class="w-5 h-5 shrink-0 text-indigo-400"></i><span class="sidebar-text">Điểm Danh Buổi</span></button>
             <button onclick="switchTab('attendance-matrix')" id="tab-btn-attendance-matrix" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="calendar" class="w-5 h-5 shrink-0 text-indigo-400"></i><span class="sidebar-text">Sổ Điểm Danh (8B)</span></button>
             <button onclick="switchTab('tuition')" id="tab-btn-tuition" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="badge-dollar-sign" class="w-5 h-5 shrink-0 text-indigo-400"></i><span class="sidebar-text">Theo Dõi Học Phí</span></button>
+            <button onclick="switchTab('history')" id="tab-btn-history" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="receipt" class="w-5 h-5 shrink-0 text-indigo-400"></i><span class="sidebar-text">Nhật Ký Thu Tiền</span></button>
             <button onclick="switchTab('qbank')" id="tab-btn-qbank" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="pen-tool" class="w-5 h-5 shrink-0 text-amber-400"></i><span class="sidebar-text">Ngân Hàng Đề Thi</span></button>
             <button onclick="switchTab('documents')" id="tab-btn-documents" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="folder-git-2" class="w-5 h-5 shrink-0 text-indigo-400"></i><span class="sidebar-text">Kho Tài Liệu</span></button>
-            <button onclick="switchTab('history')" id="tab-btn-history" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="history" class="w-5 h-5 shrink-0 text-indigo-400"></i><span class="sidebar-text">Nhật Ký Thu Tiền</span></button>
             <button onclick="switchTab('settings')" id="tab-btn-settings" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="cloud-cog" class="w-5 h-5 shrink-0 text-indigo-400"></i><span class="sidebar-text">Cấu Hình Cloud</span></button>
         </nav>
 
@@ -90,7 +86,7 @@
                 </div>
             </section>
 
-            <!-- CÁC TAB KHÁC DÙNG CHUNG HỆ THỐNG -->
+            <!-- TAB 2: LỚP & HỌC SINH -->
             <section id="tab-classes" class="tab-content hidden space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4 h-fit">
@@ -103,9 +99,9 @@
                                 <div id="scheduleRowsContainer" class="space-y-2"></div>
                             </div>
                             <div id="scheduleConflictAlert" class="hidden bg-rose-50 border text-rose-700 text-xs p-3 rounded-xl flex items-start space-x-2"><i data-lucide="alert-triangle" class="w-4 h-4 shrink-0 text-amber-500"></i><span id="conflictAlertText" class="font-medium">Trùng lịch!</span></div>
-                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm py-3 rounded-xl shadow transition">Thêm Lớp Học</button>
+                            <button type="submit" class="w-full bg-indigo-600 text-white font-bold text-sm py-3 rounded-xl shadow">Thêm Lớp Học</button>
                         </form>
-                        <div class="pt-4 border-t"><h3 class="text-xs font-bold text-slate-500 uppercase mb-3">Danh Sách Lớp</h3><div id="classListContainer" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div></div>
+                        <div class="pt-4 border-t"><h3 class="text-xs font-bold text-slate-500 uppercase mb-3">Danh Sách Lớp</h3><div id="classListContainer" class="space-y-2.5 max-h-48 overflow-y-auto pr-1"></div></div>
                     </div>
                     <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                         <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
@@ -122,10 +118,12 @@
                 </div>
             </section>
 
+            <!-- TAB 3: LỊCH DẠY -->
             <section id="tab-schedule" class="tab-content hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4"><h2 class="font-bold text-slate-800 text-base border-b pb-3">Thời Khóa Biểu Tuần</h2><div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="weekScheduleCardsContainer"></div></div>
             </section>
 
+            <!-- TAB 4: ĐIỂM DANH BUỔI -->
             <section id="tab-attendance-session" class="tab-content hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex justify-between items-center border-b pb-3"><h2 class="font-bold text-base">Điểm Danh Buổi</h2><input type="date" id="sessionDatePicker" onchange="loadSessionAttendance()" class="bg-slate-50 border p-2 rounded-xl text-xs font-bold text-indigo-700 outline-none"></div>
@@ -134,6 +132,7 @@
                 </div>
             </section>
 
+            <!-- TAB 5: SỔ 8 BUỔI -->
             <section id="tab-attendance-matrix" class="tab-content hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2"><h2 class="font-bold text-base">Sổ Điểm Danh 8 Buổi</h2><button onclick="openDeleteByDateModal()" class="bg-rose-50 text-rose-700 border border-rose-200 px-3 py-1.5 rounded-xl text-xs font-bold">Xóa Theo Ngày</button></div>
@@ -142,6 +141,7 @@
                 </div>
             </section>
 
+            <!-- TAB 6: HỌC PHÍ -->
             <section id="tab-tuition" class="tab-content hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex justify-between items-center border-b pb-3"><h2 class="font-bold text-base">Theo Dõi Học Phí</h2><button onclick="exportTuitionCSV()" class="bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-xl shadow">Xuất Excel</button></div>
@@ -163,6 +163,18 @@
                 </div>
             </section>
 
+            <!-- TAB 7: NHẬT KÝ THU TIỀN -->
+            <section id="tab-history" class="tab-content hidden space-y-6">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
+                    <div class="flex justify-between items-center border-b pb-3">
+                        <h2 class="font-bold text-base">Nhật Ký Thu Tiền</h2>
+                        <div class="text-right bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100"><span class="text-[10px] font-bold text-emerald-800 block">Tổng doanh thu</span><span id="textTotalClassRevenue" class="text-sm font-black text-emerald-600">0 đ</span></div>
+                    </div>
+                    <div class="overflow-x-auto border rounded-xl"><table class="w-full text-left text-sm whitespace-nowrap"><thead><tr class="bg-slate-100 text-xs font-bold"><th class="p-3">Lớp</th><th class="p-3">Ngày</th><th class="p-3">Học Sinh</th><th class="p-3">Chu Kỳ</th><th class="p-3">Số Tiền</th><th class="p-3">Hình Thức</th><th class="p-3 text-center">Xóa</th></tr></thead><tbody id="paymentHistoryBody" class="divide-y"></tbody></table></div>
+                </div>
+            </section>
+
+            <!-- TAB 8: NGÂN HÀNG ĐỀ THI -->
             <section id="tab-qbank" class="tab-content hidden space-y-6">
                 <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4 h-fit">
@@ -185,12 +197,13 @@
                 </div>
             </section>
 
+            <!-- TAB 9: TÀI LIỆU -->
             <section id="tab-documents" class="tab-content hidden space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4 h-fit">
                         <h2 class="font-bold text-base border-b pb-3">Tải Tài Liệu</h2>
                         <form id="formAddDoc" onsubmit="handleAddDocument(event)" class="space-y-3">
-                            <select id="inputDocClassId" class="w-full text-xs p-2.5 border rounded-xl outline-none"></select>
+                            <select id="inputDocClassId" class="w-full text-xs p-2.5 border rounded-xl outline-none font-bold"></select>
                             <input type="text" id="inputDocName" placeholder="Tên tài liệu" required class="w-full text-xs p-2.5 border rounded-xl outline-none">
                             <input type="file" id="inputDocFile" required class="w-full text-xs p-2 border rounded-xl bg-slate-50 cursor-pointer">
                             <button type="submit" id="btnUploadDoc" class="w-full bg-indigo-600 text-white font-bold text-xs py-3 rounded-xl shadow">Tải Lên Mây</button>
@@ -200,10 +213,7 @@
                 </div>
             </section>
 
-            <section id="tab-history" class="tab-content hidden space-y-6">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4"><h2 class="font-bold text-base border-b pb-3">Nhật Ký Thu Tiền</h2><div class="overflow-x-auto border rounded-xl"><table class="w-full text-left text-sm whitespace-nowrap"><thead><tr class="bg-slate-100 text-xs font-bold"><th class="p-3">Lớp</th><th class="p-3">Ngày</th><th class="p-3">Học Sinh</th><th class="p-3">Chu Kỳ</th><th class="p-3">Số Tiền</th><th class="p-3 text-center">Xóa</th></tr></thead><tbody id="paymentHistoryBody" class="divide-y"></tbody></table></div></div>
-            </section>
-
+            <!-- TAB 10: CẤU HÌNH -->
             <section id="tab-settings" class="tab-content hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border max-w-xl mx-auto space-y-4"><h2 class="font-bold text-base border-b pb-3">Cấu Hình Cloud</h2><input type="url" id="inputApiUrl" placeholder="Web App URL..." class="w-full text-xs p-3 border rounded-xl font-mono outline-none"><button onclick="saveApiUrlSetting()" class="w-full bg-indigo-600 text-white font-bold text-xs py-3 rounded-xl shadow">Lưu Cấu Hình</button></div>
             </section>
@@ -225,6 +235,7 @@
         </div>
     </div>
 
+    <!-- MODAL SỬA ĐIỂM DANH -->
     <div id="modalEditAttendanceCell" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
             <div class="flex justify-between border-b pb-3"><h3 class="font-bold">Sửa Điểm Danh</h3><button onclick="closeEditAttendanceCellModal()"><i data-lucide="x" class="w-5 h-5"></i></button></div>
@@ -236,6 +247,7 @@
         </div>
     </div>
 
+    <!-- MODAL XÓA ĐIỂM DANH THEO NGÀY -->
     <div id="modalDeleteByDate" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
             <div class="flex justify-between border-b pb-3"><h3 class="font-bold">Xóa Điểm Danh Ngày</h3><button onclick="closeDeleteByDateModal()"><i data-lucide="x" class="w-5 h-5"></i></button></div>
@@ -244,6 +256,7 @@
         </div>
     </div>
 
+    <!-- MODAL THU TIỀN -->
     <div id="modalPayTuition" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-md space-y-4">
             <div class="flex justify-between border-b pb-3"><h3 class="font-bold text-emerald-700">Thu Học Phí</h3><button onclick="closePayModal()"><i data-lucide="x" class="w-5 h-5"></i></button></div>
@@ -261,7 +274,7 @@
 
     <!-- JS LOGIC -->
     <script>
-        const STORAGE_KEY = 'TUTORING_PRO_FINAL_MOBILE';
+        const STORAGE_KEY = 'TUTORING_PRO_FINAL_MOBILE_FIXED';
         const API_URL_KEY = 'TUTORING_APP_API_URL';
         let cloudApiUrl = localStorage.getItem(API_URL_KEY) || '';
         let appData = { classes: [], students: [], attendance: [], payments: [], documents: [], questionBank: [], exams: [], cycleTitles: ['Tháng 8/2026','Tháng 9/2026','Tháng 10/2026','Tháng 11/2026'] };
@@ -346,10 +359,6 @@
         function updateClassBadges() {
             const stds = getFilteredStudents();
             const cEl = document.getElementById('badgeStudentCount'); if(cEl) cEl.innerText = `${stds.length} HS`;
-            const rEl = document.getElementById('badgeTuitionRate'); if(rEl) {
-                if(currentClassId==='ALL') rEl.innerText = `Tổng: ${appData.classes.length} lớp`;
-                else { const c = appData.classes.find(x=>x.id===currentClassId); rEl.innerText = `HP Chuẩn: ${c?c.fee.toLocaleString():0} đ`; }
-            }
         }
 
         function copyStudentLink() {
@@ -476,13 +485,50 @@
                 const cIdx = Math.floor(cnt/8), prog = cnt%8;
                 const slots = Array.from({length:8}, (_,i)=>{
                     const d = l8[i], r = d ? appData.attendance.find(a=>a.studentId===s.id&&a.date===d) : null;
-                    let b = '<span class="text-slate-300">-</span>';
+                    let b = '<span class="text-slate-300">-</span>', cAttr = '';
                     if(d && s.joinDate && d<s.joinDate) b = '⚪';
-                    else if(r) { if(r.status==='PRESENT') b='<span class="text-emerald-600 font-bold">✓</span>'; else if(r.status==='ABSENT_PERM') b='<span class="text-amber-600 font-bold">P</span>'; else if(r.status==='ABSENT_NO_PERM') b='<span class="text-rose-600 font-bold">KP</span>'; else if(r.status==='LATE') b='<span class="text-blue-600 font-bold">T</span>'; }
-                    return `<td class="p-2 text-center border-r">${b}</td>`;
+                    else if(r) { 
+                        if(r.status==='PRESENT') b='<span class="text-emerald-600 font-bold">✓</span>'; else if(r.status==='ABSENT_PERM') b='<span class="text-amber-600 font-bold">P</span>'; else if(r.status==='ABSENT_NO_PERM') b='<span class="text-rose-600 font-bold">KP</span>'; else if(r.status==='LATE') b='<span class="text-blue-600 font-bold">T</span>';
+                        cAttr = `onclick="openAttendanceCellModal('${s.id}','${d}')" class="cursor-pointer hover:bg-indigo-50"`;
+                    } else if (d) cAttr = `onclick="openAttendanceCellModal('${s.id}','${d}')" class="cursor-pointer hover:bg-slate-100"`;
+                    return `<td class="p-2 text-center border-r" ${cAttr}>${b}</td>`;
                 }).join('');
                 return `<tr><td class="p-2.5 sticky-col-1 border-r font-bold text-[10px]"><span class="bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded">${getClassName(s.classId)}</span></td><td class="p-2.5 sticky-col-2 border-r font-bold text-xs">${s.name}</td>${slots}<td class="p-2 text-center bg-slate-50 font-bold text-xs">Kỳ ${cIdx+1} (${prog}/8)</td></tr>`;
             }).join('');
+
+            const listC = document.getElementById('allSessionsHistoryContainer');
+            if(listC) {
+                listC.innerHTML = uD.length===0 ? '<div class="col-span-3 text-center italic text-xs text-slate-400">Trống</div>' : [...uD].reverse().map(d => `<div class="p-2.5 bg-white border rounded-xl flex justify-between items-center text-xs"><div><b>${formatDateVN(d)}</b></div><button onclick="quickDeleteSessionByDate('${d}')" class="text-rose-500 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join('');
+            }
+        }
+
+        function openAttendanceCellModal(sId, d) {
+            const s = appData.students.find(x=>x.id===sId); if(!s||!d) return;
+            const r = appData.attendance.find(a=>a.studentId===sId&&a.date===d)||{status:'PRESENT',note:''};
+            document.getElementById('cellStudentId').value=sId; document.getElementById('cellDate').value=d;
+            document.getElementById('cellStudentName').innerText=`${s.name} (${s.code})`; document.getElementById('cellDisplayDate').innerText=formatDateVN(d);
+            document.getElementById('cellStatusSelect').value=r.status; document.getElementById('cellNoteInput').value=r.note||'';
+            document.getElementById('modalEditAttendanceCell').classList.remove('hidden');
+        }
+        function closeEditAttendanceCellModal() { document.getElementById('modalEditAttendanceCell').classList.add('hidden'); }
+        function saveAttendanceCell() {
+            const sId=document.getElementById('cellStudentId').value, d=document.getElementById('cellDate').value, st=document.getElementById('cellStatusSelect').value, nt=document.getElementById('cellNoteInput').value;
+            appData.attendance=appData.attendance.filter(a=>!(a.studentId===sId&&a.date===d)); appData.attendance.push({studentId:sId,date:d,status:st,note:nt});
+            saveDataToCloud(); closeEditAttendanceCellModal(); refreshCurrentTab();
+        }
+        function deleteAttendanceCell() {
+            const sId=document.getElementById('cellStudentId').value, d=document.getElementById('cellDate').value;
+            if(confirm('Xóa?')) { appData.attendance=appData.attendance.filter(a=>!(a.studentId===sId&&a.date===d)); saveDataToCloud(); closeEditAttendanceCellModal(); refreshCurrentTab(); }
+        }
+        function openDeleteByDateModal() { document.getElementById('inputDeleteDate').value=getTodayVNString(); document.getElementById('modalDeleteByDate').classList.remove('hidden'); }
+        function closeDeleteByDateModal() { document.getElementById('modalDeleteByDate').classList.add('hidden'); }
+        function executeDeleteByDate() {
+            const d=document.getElementById('inputDeleteDate').value; if(!d) return; const sIds=getFilteredStudents().map(s=>s.id);
+            if(confirm(`Xóa điểm danh ngày ${formatDateVN(d)}?`)) { appData.attendance=appData.attendance.filter(a=>!(a.date===d&&sIds.includes(a.studentId))); saveDataToCloud(); closeDeleteByDateModal(); refreshCurrentTab(); }
+        }
+        function quickDeleteSessionByDate(d) {
+            const sIds=getFilteredStudents().map(s=>s.id);
+            if(confirm(`Xóa điểm danh ngày ${formatDateVN(d)}?`)) { appData.attendance=appData.attendance.filter(a=>!(a.date===d&&sIds.includes(a.studentId))); saveDataToCloud(); refreshCurrentTab(); }
         }
 
         function calculateProratedFeeCycle1(student) {
@@ -494,9 +540,11 @@
 
         function renderTuitionTable() {
             const stds = getFilteredStudents(), tb = document.getElementById('tuitionTableBody');
+            for(let i=0; i<4; i++) { const el=document.getElementById(`cycleTitle${i}`); if(el) el.innerText = appData.cycleTitles[i] || `Tháng ${i+1}`; }
             if(!tb) return; if(stds.length===0) { tb.innerHTML=`<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Trống</td></tr>`; return; }
+
             tb.innerHTML = stds.map(s => {
-                const c = appData.classes.find(x=>x.id===s.classId), stdFee = studentCustomFee = s.customFee!==null?s.customFee:(c?c.fee:0);
+                const c = appData.classes.find(x=>x.id===s.classId), stdFee = s.customFee!==null?s.customFee:(c?c.fee:0);
                 const aIdx = Math.floor(appData.attendance.filter(a=>a.studentId===s.id && (!s.joinDate||a.date>=s.joinDate) && a.status!=='none').length/8);
                 let cells='', tot=0, debt=0;
                 for(let i=0; i<4; i++) {
@@ -505,9 +553,39 @@
                     if(p && p.status==='PAID') { tot+=p.amount; stC='bg-emerald-50 text-emerald-700'; txt=`${p.amount.toLocaleString()}đ`; }
                     else if(i<aIdx) { debt+=eff; stC='bg-rose-50 text-rose-700'; txt='Nợ'; }
                     else if(i===aIdx) { stC='bg-amber-50 text-amber-700'; txt=`Cần nộp ${(eff+debt).toLocaleString()}đ`; }
-                    cells += `<td class="p-2 border-r text-center"><div class="p-2 rounded-xl border text-[10px] font-bold ${stC}">${txt}</div></td>`;
+                    cells += `<td class="p-2 border-r text-center cursor-pointer" onclick="openPayModal('${s.id}', ${i})"><div class="p-2 rounded-xl border text-[10px] font-bold ${stC}">${txt}</div></td>`;
                 }
                 return `<tr><td class="p-3 sticky-col-1 border-r text-[10px]"><span class="bg-indigo-100 px-1.5 py-0.5 rounded font-bold">${getClassName(s.classId)}</span></td><td class="p-3 sticky-col-2 border-r font-bold text-xs">${s.name}</td>${cells}<td class="p-3 text-center bg-slate-50 font-black text-emerald-600 text-xs">${tot.toLocaleString()}đ</td></tr>`;
+            }).join('');
+        }
+        function editCycleTitle(i) { const n=prompt('Tên chu kỳ:', appData.cycleTitles[i]); if(n) { appData.cycleTitles[i]=n.trim(); saveDataToCloud(); renderTuitionTable(); } }
+
+        function openPayModal(sId, cIdx) {
+            const s = appData.students.find(x=>x.id===sId); const c = appData.classes.find(x=>x.id===s.classId);
+            const p = appData.payments.find(x=>x.studentId===sId && x.cycleIndex===cIdx);
+            const stdFee = s.customFee!==null?s.customFee:(c?c.fee:0); const effFee = cIdx===0?calculateProratedFeeCycle1(s):stdFee;
+            document.getElementById('payStudentId').value=sId; document.getElementById('payCycleIndex').value=cIdx;
+            document.getElementById('payStudentInfo').value=`${s.name} - ${appData.cycleTitles[cIdx]||'Kỳ '+(cIdx+1)}`;
+            document.getElementById('payAmount').value=p?p.amount:effFee; document.getElementById('payStatusSelect').value=p?p.status:'PAID';
+            document.getElementById('payDate').value=p&&p.date?p.date.split('T')[0]:getTodayVNString();
+            document.getElementById('payNote').value=p?p.note:'';
+            document.getElementById('modalPayTuition').classList.remove('hidden');
+        }
+        function closePayModal() { document.getElementById('modalPayTuition').classList.add('hidden'); }
+        function handleSavePayment(e) {
+            e.preventDefault(); const sId=document.getElementById('payStudentId').value, cIdx=parseInt(document.getElementById('payCycleIndex').value);
+            const amt=parseFloat(document.getElementById('payAmount').value)||0, st=document.getElementById('payStatusSelect').value, d=document.getElementById('payDate').value, n=document.getElementById('payNote').value;
+            appData.payments=appData.payments.filter(p=>!(p.studentId===sId&&p.cycleIndex===cIdx)); appData.payments.push({id:'p_'+Date.now(), studentId:sId, classId:appData.students.find(x=>x.id===sId).classId, cycleIndex:cIdx, amount:amt, status:st, method:'Chuyển khoản', note:n, date:d});
+            saveDataToCloud(); closePayModal(); refreshCurrentTab();
+        }
+
+        function renderPaymentHistory() {
+            const pays = getFilteredPayments().sort((a,b)=>b.date.localeCompare(a.date)); const tbody = document.getElementById('paymentHistoryBody');
+            document.getElementById('textTotalClassRevenue').innerText = pays.reduce((s,p)=>s+(p.status==='PAID'?p.amount:0),0).toLocaleString() + ' đ';
+            if(!tbody) return; if(pays.length===0) { tbody.innerHTML=`<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Trống</td></tr>`; return; }
+            tbody.innerHTML = pays.map(p => {
+                const s = appData.students.find(x=>x.id===p.studentId)||{name:'Đã xóa',code:''};
+                return `<tr><td class="p-3 text-xs">${getClassName(p.classId)}</td><td class="p-3 font-mono text-xs">${formatDateVN(p.date)}</td><td class="p-3 font-bold text-xs">${s.name}</td><td class="p-3 text-xs">Kỳ ${p.cycleIndex+1}</td><td class="p-3 font-bold text-emerald-600 text-xs">${p.amount.toLocaleString()}đ</td><td class="p-3 text-xs">${p.method}</td><td class="p-3 text-center"><button onclick="appData.payments=appData.payments.filter(x=>x.id!=='${p.id}');saveDataToCloud();refreshCurrentTab();" class="text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`;
             }).join('');
         }
 
@@ -518,9 +596,7 @@
         function getFilteredDocs() { return currentClassId==='ALL'?appData.documents:appData.documents.filter(d=>d.classId===currentClassId); }
 
         async function handleAddDocument(e) {
-            e.preventDefault();
-            const fileInput = document.getElementById('inputDocFile');
-            if(!fileInput.files.length) return;
+            e.preventDefault(); const fileInput = document.getElementById('inputDocFile'); if(!fileInput.files.length) return;
             const file = fileInput.files[0], reader = new FileReader();
             reader.onload = async function() {
                 const res = await fetch(cloudApiUrl, { method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: 'uploadFile', filename: file.name, mimeType: file.type, base64: reader.result.split(',')[1] }) });
