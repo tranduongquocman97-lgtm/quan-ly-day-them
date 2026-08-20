@@ -21,7 +21,7 @@
         <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
             <div class="flex items-center space-x-2.5">
                 <div class="bg-indigo-700 p-2 rounded-xl"><i data-lucide="book-open" class="w-5 h-5 text-amber-400"></i></div>
-                <div><h1 class="font-bold text-sm leading-tight">CỔNG HỌC SINH</h1><p class="text-[10px] text-indigo-200">Tra cứu học phí & Thi trực tuyến</p></div>
+                <div><h1 class="font-bold text-sm leading-tight">CỔNG HỌC SINH</h1><p class="text-[10px] text-indigo-200">Tra cứu & Phòng thi trực tuyến</p></div>
             </div>
             <button onclick="loadDataFromCloud()" class="bg-indigo-800 text-white text-xs px-3 py-1.5 rounded-lg font-bold">Tải lại</button>
         </div>
@@ -35,19 +35,19 @@
 
         <nav id="mainNavTabs" class="flex items-center space-x-2 border-b pb-2 overflow-x-auto">
             <button onclick="switchTab('attendance')" id="tab-btn-attendance" class="tab-btn px-4 py-2 rounded-xl font-bold text-xs text-indigo-600 bg-indigo-50 whitespace-nowrap">Điểm Danh</button>
-            <button onclick="switchTab('tuition')" id="tab-btn-tuition" class="tab-btn px-4 py-2 rounded-xl font-bold text-xs text-slate-500 whitespace-nowrap">Học Phí Chi Tiết</button>
+            <button onclick="switchTab('tuition')" id="tab-btn-tuition" class="tab-btn px-4 py-2 rounded-xl font-bold text-xs text-slate-500 whitespace-nowrap">Học Phí</button>
             <button onclick="switchTab('exams')" id="tab-btn-exams" class="tab-btn px-4 py-2 rounded-xl font-bold text-xs text-slate-500 whitespace-nowrap">Phòng Thi</button>
         </nav>
 
         <!-- TAB ĐIỂM DANH -->
         <section id="tab-attendance" class="tab-content space-y-4">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border"><h2 class="font-bold text-sm mb-3">Sổ Điểm Danh Lưới 8 Buổi</h2><div class="overflow-x-auto border rounded-xl"><table class="w-full text-left text-xs whitespace-nowrap"><thead><tr id="matrixTableHeaderRow" class="bg-slate-100 font-bold border-b"></tr></thead><tbody id="matrixAttendanceBody" class="divide-y"></tbody></table></div></div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border"><h2 class="font-bold text-sm mb-3">Sổ Điểm Danh 8 Buổi</h2><div class="overflow-x-auto border rounded-xl"><table class="w-full text-left text-xs whitespace-nowrap"><thead><tr id="matrixTableHeaderRow" class="bg-slate-100 font-bold border-b"></tr></thead><tbody id="matrixAttendanceBody" class="divide-y"></tbody></table></div></div>
         </section>
 
-        <!-- TAB HỌC PHÍ (HIỂN THỊ ĐỦ SỐ TIỀN, NỢ, NGÀY VÀ HÌNH THỨC) -->
+        <!-- TAB HỌC PHÍ -->
         <section id="tab-tuition" class="tab-content hidden space-y-4">
             <div class="bg-white p-4 rounded-2xl shadow-sm border space-y-3">
-                <h2 class="font-bold text-sm">Tình Trạng & Lịch Sử Đóng Học Phí</h2>
+                <h2 class="font-bold text-sm">Tình Trạng Học Phí</h2>
                 <div class="overflow-x-auto border rounded-xl">
                     <table class="w-full text-left text-xs whitespace-nowrap">
                         <thead>
@@ -70,21 +70,24 @@
             <div class="bg-white p-4 rounded-2xl shadow-sm border space-y-3"><h2 class="font-bold text-sm">Đề Thi Trực Tuyến</h2><div id="studentExamListContainer" class="space-y-3"></div></div>
         </section>
 
-        <!-- PHÒNG THI ONLINE -->
+        <!-- PHÒNG THI ONLINE 3 PHẦN -->
         <section id="examRoomSection" class="hidden space-y-4">
             <div class="bg-white p-3 rounded-2xl shadow-md border flex items-center justify-between sticky top-2 z-30">
                 <div><h2 id="roomExamTitle" class="font-black text-sm text-indigo-900">Đề thi</h2><p class="text-[10px] text-slate-500 font-bold"><span id="roomStudentName"></span></p></div>
-                <div class="flex items-center space-x-2"><div class="bg-rose-50 text-rose-700 px-3 py-1 rounded-xl font-mono font-black text-xs border border-rose-200"><span id="roomCountdown">00:00</span></div><button onclick="confirmSubmitExam()" class="bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-xl shadow">Nộp</button></div>
+                <div class="flex items-center space-x-2"><div class="bg-rose-50 text-rose-700 px-3 py-1 rounded-xl font-mono font-black text-xs border border-rose-200"><span id="roomCountdown">00:00</span></div><button onclick="confirmSubmitExam()" class="bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-xl shadow">Nộp Bài</button></div>
             </div>
             <div id="roomQuestionsContainer" class="space-y-4"></div>
         </section>
 
-        <!-- KẾT QUẢ THI -->
+        <!-- KẾT QUẢ THI & XEM LỜI GIẢI -->
         <section id="examResultSection" class="hidden bg-white p-6 rounded-3xl shadow-xl border text-center space-y-4">
             <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto"><i data-lucide="award" class="w-8 h-8"></i></div>
             <h2 class="text-xl font-black">Nộp Bài Thành Công!</h2>
             <div class="bg-indigo-50 p-4 rounded-2xl max-w-xs mx-auto"><span class="text-xs text-indigo-700 font-bold block">ĐIỂM SỐ</span><span id="resultScoreDisplay" class="text-4xl font-black text-indigo-900 font-mono">0.0</span></div>
-            <button onclick="backToExamList()" class="bg-indigo-800 text-white text-xs font-bold px-6 py-2.5 rounded-xl shadow">Quay lại</button>
+            <div class="flex justify-center space-x-3 pt-2">
+                <button onclick="backToExamList()" class="bg-slate-200 text-slate-700 text-xs font-bold px-5 py-2.5 rounded-xl">Quay lại</button>
+                <a id="btnViewSolution" href="#" target="_blank" class="hidden bg-amber-600 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow flex items-center"><i data-lucide="file-text" class="w-4 h-4 mr-1.5"></i>Xem Lời Giải Chi Tiết</a>
+            </div>
         </section>
     </main>
 
@@ -160,7 +163,6 @@
             return skip===0 ? stdFee : Math.round((stdFee/8)*Math.max(1, 8-(skip%8)));
         }
 
-        // BẢNG HỌC PHÍ CHI TIẾT DÀNH CHO HỌC SINH
         function renderTuitionTable() {
             const stds = appData.students.filter(s=>s.classId===currentClassId), tb = document.getElementById('tuitionTableBody');
             for(let i=0; i<4; i++) { const el=document.getElementById(`cycleTitle${i}`); if(el) el.innerText = appData.cycleTitles[i] || `Tháng ${i+1}`; }
@@ -173,7 +175,6 @@
                 for(let i=0; i<4; i++) {
                     const p = appData.payments.find(x=>x.studentId===s.id && x.cycleIndex===i);
                     let stC='bg-slate-50 text-slate-400', txt='Chưa đến', eff=i===0?calculateProratedFeeCycle1(s):stdFee;
-                    
                     if(p && p.status==='PAID') {
                         stC='bg-emerald-50 text-emerald-700 border-emerald-200';
                         txt = `Đã nộp: ${p.amount.toLocaleString()}đ<br><span class="text-[9px] text-slate-500 font-normal">${p.method || 'CK'} • ${p.date ? p.date.split('T')[0] : ''}</span>`;
@@ -195,7 +196,7 @@
                 <div class="p-4 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-2">
                     <h3 class="font-bold text-slate-800 text-sm">${e.title}</h3>
                     <p class="text-xs text-slate-500">${e.duration} phút</p>
-                    <button onclick="promptStudentAuth('${e.id}')" class="w-full bg-indigo-600 text-white font-bold text-xs py-2.5 rounded-xl">Vào Thi</button>
+                    <button onclick="promptStudentAuth('${e.id}')" class="w-full bg-indigo-600 text-white font-bold text-xs py-2.5 rounded-xl">Vào Thi Ngay</button>
                 </div>
             `).join('') || '<div class="text-xs text-slate-400 italic text-center">Trống</div>';
         }
@@ -214,30 +215,80 @@
             document.getElementById('examRoomSection').classList.remove('hidden');
             document.getElementById('roomExamTitle').innerText = currentExam.title; document.getElementById('roomStudentName').innerText = currentStudent.name;
             
-            const isPdf = currentExam.matrix && currentExam.matrix.type === 'pdf';
             const container = document.getElementById('roomQuestionsContainer');
+            const m = currentExam.matrix;
 
-            if(isPdf) {
-                const ansCount = currentExam.matrix.answerString.length;
-                container.innerHTML = `<div class="bg-slate-200 rounded-xl h-72 overflow-hidden mb-4"><iframe src="${currentExam.matrix.pdfUrl.replace(/\/view.*$/, '/preview')}" class="w-full h-full border-0"></iframe></div><div class="grid grid-cols-2 gap-2">${Array.from({length: ansCount}, (_, i) => `<div class="flex justify-between items-center p-2 bg-white border rounded-xl"><span class="font-bold text-xs">${i+1}.</span><div class="flex space-x-1">${['A','B','C','D'].map(o=>`<button onclick="userAnswers[${i}]='${o}';this.parentElement.querySelectorAll('button').forEach(b=>b.className='w-6 h-6 rounded-full border text-[10px] font-bold text-slate-600');this.className='w-6 h-6 rounded-full bg-indigo-600 text-white text-[10px] font-bold';" class="w-6 h-6 rounded-full border text-[10px] font-bold text-slate-600">${o}</button>`).join('')}</div></div>`).join('')}</div>`;
-            } else {
-                container.innerHTML = currentExam.questions.map((q, i) => `<div class="bg-white p-4 rounded-2xl border space-y-2"><div class="font-bold text-xs text-indigo-900">Câu ${i+1}</div><div class="text-xs text-slate-800">${q.content}</div><div class="grid grid-cols-2 gap-1.5 font-mono text-xs">${q.options.map(o=>`<label class="p-2 rounded-xl border flex items-center space-x-2"><input type="radio" name="q_${q.id}" value="${o.charAt(0)}" onchange="userAnswers['${q.id}']='${o.charAt(0)}'"><span class="text-xs">${o}</span></label>`).join('')}</div></div>`).join('');
+            let html = `<div class="bg-slate-200 rounded-xl h-80 overflow-hidden mb-4"><iframe src="${m.pdfUrl.replace(/\/view.*$/, '/preview')}" class="w-full h-full border-0"></iframe></div>`;
+            
+            // Phần 1
+            if(m.part1) {
+                const count1 = m.part1.length;
+                html += `<div class="bg-white p-4 rounded-2xl border space-y-3"><h3 class="font-bold text-xs text-indigo-900 border-b pb-2">PHẦN I. Trắc nghiệm nhiều lựa chọn (${count1} câu)</h3><div class="space-y-2">`;
+                for(let i=0; i<count1; i++) {
+                    html += `<div class="flex items-center justify-between p-2 bg-slate-50 border rounded-xl"><span class="font-bold text-xs">Câu ${i+1}:</span><div class="flex space-x-2">${['A','B','C','D'].map(o=>`<button type="button" onclick="userAnswers['p1_${i}']='${o}';this.parentElement.querySelectorAll('button').forEach(b=>b.className='w-7 h-7 rounded-full border text-xs font-bold text-slate-600');this.className='w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-bold';" class="w-7 h-7 rounded-full border text-xs font-bold text-slate-600">${o}</button>`).join('')}</div></div>`;
+                }
+                html += `</div></div>`;
             }
+
+            // Phần 2 (Đúng / Sai)
+            if(m.part2) {
+                html += `<div class="bg-white p-4 rounded-2xl border space-y-3"><h3 class="font-bold text-xs text-indigo-900 border-b pb-2">PHẦN II. Trắc nghiệm Đúng / Sai</h3><div class="space-y-3">`;
+                const p2Lines = m.part2.split(',');
+                p2Lines.forEach((line, idx) => {
+                    html += `<div class="p-3 bg-slate-50 border rounded-xl space-y-2"><span class="font-bold text-xs">Câu ${idx+1}:</span><div class="grid grid-cols-4 gap-2">${['a','b','c','d'].map(sub=>`<div class="text-center"><span class="text-[10px] block font-bold text-slate-500">Ý ${sub}</span><select id="p2_${idx}_${sub}" onchange="userAnswers['p2_${idx}_${sub}']=this.value" class="w-full p-1.5 border rounded-lg text-xs font-bold bg-white"><option value="">--</option><option value="Đ">Đúng</option><option value="S">Sai</option></select></div>`).join('')}</div></div>`;
+                });
+                html += `</div></div>`;
+            }
+
+            // Phần 3 (Trả lời ngắn)
+            if(m.part3) {
+                const count3 = m.part3.split(',').length;
+                html += `<div class="bg-white p-4 rounded-2xl border space-y-3"><h3 class="font-bold text-xs text-indigo-900 border-b pb-2">PHẦN III. Trả lời ngắn (${count3} câu)</h3><div class="grid grid-cols-2 sm:grid-cols-3 gap-3">`;
+                for(let i=0; i<count3; i++) {
+                    html += `<div class="p-2 bg-slate-50 border rounded-xl"><label class="block text-[10px] font-bold text-slate-500 mb-1">Câu ${i+1}</label><input type="text" oninput="userAnswers['p3_${i}']=this.value.trim()" placeholder="Đáp án..." class="w-full p-2 border rounded-lg text-xs font-mono font-bold bg-white outline-none"></div>`;
+                }
+                html += `</div></div>`;
+            }
+
+            container.innerHTML = html;
             timeLeft = currentExam.duration * 60;
             clearInterval(examTimer);
-            examTimer = setInterval(()=>{ timeLeft--; document.getElementById('roomCountdown').innerText=`${Math.floor(timeLeft/60)}:${timeLeft%60}`; if(timeLeft<=0) { clearInterval(examTimer); submitExamData(); } }, 1000);
+            examTimer = setInterval(()=>{ timeLeft--; document.getElementById('roomCountdown').innerText=`${Math.floor(timeLeft/60)}:${timeLeft%60}`; if(timeLeft<=0) { clearInterval(examTimer); confirmSubmitExam(); } }, 1000);
         }
 
+        function confirmSubmitExam() { if(confirm('Bạn có chắc chắn muốn nộp bài?')) submitExamData(); }
+
         async function submitExamData() {
-            let correct = 0; const isPdf = currentExam.matrix && currentExam.matrix.type === 'pdf'; let total = isPdf ? currentExam.matrix.answerString.length : currentExam.questions.length;
-            if(isPdf) { for(let i=0; i<total; i++) if(currentExam.matrix.answerString[i] === userAnswers[i]) correct++; }
-            else { currentExam.questions.forEach(q => { if(q.answer === userAnswers[q.id]) correct++; }); }
-            const score = Math.round((correct/total)*100)/10;
-            await fetch(CLOUD_API_URL, { method:'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body:JSON.stringify({action:'submitExam', payload:{id:'res_'+Date.now(), examId:currentExam.id, studentId:currentStudent.id, score, details:{}, tabSwitchCount:0, submittedAt:new Date().toISOString()}}) });
+            const m = currentExam.matrix;
+            let score = 0; let totalPossible = 0;
+
+            if(m.part1) {
+                m.part1.split('').forEach((ans, i) => {
+                    totalPossible += 0.25;
+                    if(userAnswers[`p1_${i}`] === ans) score += 0.25;
+                });
+            }
+            if(m.part3) {
+                m.part3.split(',').map(x=>x.trim()).forEach((ans, i) => {
+                    totalPossible += 0.5;
+                    if(userAnswers[`p3_${i}`] && userAnswers[`p3_${i}`].toLowerCase() === ans.toLowerCase()) score += 0.5;
+                });
+            }
+
+            if(totalPossible === 0) totalPossible = 10;
+            let finalScore = Math.round((score / totalPossible) * 10 * 10) / 10;
+
+            await fetch(CLOUD_API_URL, { method:'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body:JSON.stringify({action:'submitExam', payload:{id:'res_'+Date.now(), examId:currentExam.id, studentId:currentStudent.id, score: finalScore, details:{}, tabSwitchCount:0, submittedAt:new Date().toISOString()}}) });
+            
             document.getElementById('examRoomSection').classList.add('hidden');
-            document.getElementById('resultScoreDisplay').innerText = score.toFixed(1);
+            document.getElementById('resultScoreDisplay').innerText = finalScore.toFixed(1);
+            
+            const btnSol = document.getElementById('btnViewSolution');
+            if(m.solutionUrl) { btnSol.href = m.solutionUrl; btnSol.classList.remove('hidden'); } else { btnSol.classList.add('hidden'); }
+
             document.getElementById('examResultSection').classList.remove('hidden');
         }
+
         function backToExamList() { document.getElementById('examResultSection').classList.add('hidden'); document.getElementById('classSelectorCard').classList.remove('hidden'); document.getElementById('mainNavTabs').classList.remove('hidden'); switchTab('exams'); }
     </script>
 </body>
