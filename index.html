@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Phần Mềm Quản Lý Dạy Thêm & Khảo Thí Pro v46</title>
+    <title>Phần Mềm Quản Lý Dạy Thêm & Khảo Thí Pro v47</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
@@ -44,7 +44,7 @@
             <button onclick="switchTab('history')" id="tab-btn-history" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="receipt" class="w-5 h-5 shrink-0 text-indigo-400"></i><span class="sidebar-text">Nhật Ký Thu Tiền</span></button>
             <button onclick="switchTab('qbank')" id="tab-btn-qbank" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="pen-tool" class="w-5 h-5 shrink-0 text-amber-400"></i><span class="sidebar-text">Ngân Hàng & Khảo Thí</span></button>
             <button onclick="switchTab('analytics')" id="tab-btn-analytics" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="bar-chart-3" class="w-5 h-5 shrink-0 text-emerald-400"></i><span class="sidebar-text">Phổ Điểm Thi</span></button>
-            <button onclick="switchTab('documents')" id="tab-btn-documents" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="folder-git-2" class="w-5 h-5 shrink-0 text-indigo-400"></i><span class="sidebar-text">Kho Tài Liệu (25MB+)</span></button>
+            <button onclick="switchTab('documents')" id="tab-btn-documents" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="folder-git-2" class="w-5 h-5 shrink-0 text-indigo-400"></i><span class="sidebar-text">Kho Tài Liệu (Drive)</span></button>
             <button onclick="switchTab('settings')" id="tab-btn-settings" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="cloud-cog" class="w-5 h-5 shrink-0 text-indigo-400"></i><span class="sidebar-text">Cấu Hình Cloud</span></button>
         </nav>
 
@@ -217,17 +217,17 @@
                 </div>
             </section>
 
-            <!-- TAB 10: KHO TÀI LIỆU -->
+            <!-- TAB 10: KHO TÀI LIỆU (DÙNG LINK DRIVE ỔN ĐỊNH) -->
             <section id="tab-documents" class="tab-content hidden space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4 h-fit">
-                        <h2 class="font-bold text-base border-b pb-3">Tải Tài Liệu (Hỗ trợ 25MB+)</h2>
-                        <form id="formAddDoc" onsubmit="handleAddDocument(event)" class="space-y-3">
+                        <h2 class="font-bold text-base border-b pb-3">Thêm Tài Liệu (Google Drive)</h2>
+                        <form id="formAddDoc" onsubmit="handleAddDocumentLink(event)" class="space-y-3">
                             <select id="inputDocClassId" class="w-full text-xs p-2.5 border rounded-xl outline-none font-bold"></select>
-                            <input type="text" id="inputDocName" placeholder="Tên tài liệu" required class="w-full text-xs p-2.5 border rounded-xl outline-none">
-                            <input type="file" id="inputDocFile" required class="w-full text-xs p-2 border rounded-xl bg-slate-50 cursor-pointer">
-                            <p class="text-[10px] text-slate-400">Hỗ trợ file nặng tối đa 30MB (PDF, Word, Video...)</p>
-                            <button type="submit" id="btnUploadDoc" class="w-full bg-indigo-600 text-white font-bold text-xs py-3 rounded-xl shadow">Tải Lên Mây</button>
+                            <input type="text" id="inputDocName" placeholder="Tên tài liệu (VD: Đề cương Toán)" required class="w-full text-xs p-2.5 border rounded-xl outline-none">
+                            <input type="url" id="inputDocUrl" placeholder="Dán link Google Drive vào đây..." required class="w-full text-xs p-2.5 border rounded-xl outline-none font-mono">
+                            <p class="text-[10px] text-slate-400">Thầy upload file lên Drive cá nhân $\rightarrow$ Lấy link chia sẻ $\rightarrow$ Dán vào đây (Dung lượng bao nhiêu cũng được).</p>
+                            <button type="submit" class="w-full bg-indigo-600 text-white font-bold text-xs py-3 rounded-xl shadow">Lưu Tài Liệu</button>
                         </form>
                     </div>
                     <div class="md:col-span-2 bg-white p-5 rounded-2xl shadow-sm border"><h2 class="font-bold text-base border-b pb-3">Danh Sách File</h2><div class="overflow-x-auto border rounded-xl"><table class="w-full text-left text-sm whitespace-nowrap"><thead><tr class="bg-slate-100 text-xs font-bold"><th class="p-3">Lớp</th><th class="p-3">Tên</th><th class="p-3 text-center">Xóa</th></tr></thead><tbody id="documentTableBody" class="divide-y"></tbody></table></div></div>
@@ -277,11 +277,11 @@
         </div>
     </div>
 
-    <!-- MODAL THU TIỀN (CÓ NÚT X ĐÓNG CỬA SỔ & TIỀN MẶT/CK) -->
+    <!-- MODAL THU TIỀN -->
     <div id="modalPayTuition" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-md space-y-4">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="font-bold text-emerald-700 flex items-center"><i data-lucide="banknote" class="w-5 h-5 mr-2"></i>Thu Học Phí</h3>
+                <h3 class="font-bold text-emerald-700 flex items-center">Thu Học Phí</h3>
                 <button onclick="closePayModal()" class="text-slate-400 hover:text-slate-600 bg-slate-100 p-1.5 rounded-lg"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <form id="formPayTuition" onsubmit="handleSavePayment(event)" class="space-y-3">
@@ -309,7 +309,7 @@
 
     <!-- JS LOGIC -->
     <script>
-        const STORAGE_KEY = 'TUTORING_PRO_FINAL_V46';
+        const STORAGE_KEY = 'TUTORING_PRO_FINAL_V47';
         const API_URL_KEY = 'TUTORING_APP_API_URL';
         let cloudApiUrl = localStorage.getItem(API_URL_KEY) || '';
         let appData = { classes: [], students: [], attendance: [], payments: [], documents: [], questionBank: [], exams: [], examResults: [], cycleTitles: ['Tháng 8/2026','Tháng 9/2026','Tháng 10/2026','Tháng 11/2026'] };
@@ -635,23 +635,25 @@
             }).join('');
         }
 
+        // TÀI LIỆU (DÙNG LINK DRIVE AN TOÀN 100%)
         function renderDocumentsTab() {
             populateClassSelectModal();
             document.getElementById('documentTableBody').innerHTML = getFilteredDocs().length===0 ? `<tr><td colspan="3" class="p-4 text-center text-slate-400 italic">Trống</td></tr>` : getFilteredDocs().map(d=>`<tr><td class="p-3 text-xs">${getClassName(d.classId)}</td><td class="p-3 font-bold text-xs"><a href="${d.url}" target="_blank" class="text-indigo-600 underline">${d.name}</a></td><td class="p-3 text-center"><button onclick="appData.documents=appData.documents.filter(x=>x.id!=='${d.id}');saveDataToCloud();refreshCurrentTab();" class="text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`).join('');
         }
         function getFilteredDocs() { return currentClassId==='ALL'?appData.documents:appData.documents.filter(d=>d.classId===currentClassId); }
 
-        async function handleAddDocument(e) {
-            e.preventDefault(); const fileInput = document.getElementById('inputDocFile'); if(!fileInput.files.length) return;
-            const file = fileInput.files[0], reader = new FileReader();
-            reader.onload = async function() {
-                try {
-                    const res = await fetch(cloudApiUrl, { method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: 'uploadFile', filename: file.name, mimeType: file.type, base64: reader.result.split(',')[1] }) });
-                    const json = await res.json();
-                    if(json.status==='success') { appData.documents.push({id:'d_'+Date.now(), classId:document.getElementById('inputDocClassId').value, name:document.getElementById('inputDocName').value, type:'PDF', url:json.url}); saveDataToCloud(); e.target.reset(); refreshCurrentTab(); alert('Tải lên thành công!'); }
-                    else { alert('Lỗi tải file: ' + json.error); }
-                } catch(err) { alert('Lỗi kết nối khi tải file!'); }
-            }; reader.readAsDataURL(file);
+        function handleAddDocumentLink(e) {
+            e.preventDefault();
+            const name = document.getElementById('inputDocName').value.trim();
+            const url = document.getElementById('inputDocUrl').value.trim();
+            const classId = document.getElementById('inputDocClassId').value;
+            
+            if(!name || !url) return;
+            appData.documents.push({ id: 'd_'+Date.now(), classId, name, type: 'Drive', url });
+            saveDataToCloud();
+            e.target.reset();
+            refreshCurrentTab();
+            alert('Đã thêm tài liệu thành công!');
         }
 
         function parseAndSaveRawQuestions() {
