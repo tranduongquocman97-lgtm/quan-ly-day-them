@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Phần Mềm Quản Lý Dạy Thêm & Khảo Thí Pro v47</title>
+
+    <!-- ================= CẤU HÌNH WEB APP (PWA) ================= -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="QL Dạy Thêm">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3135/3135810.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135810.png">
+
+    <!-- ================= THƯ VIỆN GIAO DIỆN & TOÁN HỌC ================= -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
@@ -679,7 +691,8 @@
         }
 
         function renderQBankTab() {
-            document.getElementById('badgeQuestionCount').innerText = `${appData.questionBank.length} câu`;
+            const bqc = document.getElementById('badgeQuestionCount');
+            if(bqc) bqc.innerText = `${appData.questionBank.length} câu`;
             document.getElementById('examListContainer').innerHTML = appData.exams.length===0?'<div class="text-xs text-slate-400 italic text-center">Trống</div>' : appData.exams.map(e=>`<div class="p-3 bg-slate-50 border rounded-xl flex justify-between items-center text-xs"><div><b>${e.title}</b> (${e.questions.length||e.matrix.answerString.length} câu)</div><button onclick="appData.exams=appData.exams.filter(x=>x.id!=='${e.id}');saveDataToCloud();refreshCurrentTab();" class="text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join('');
             document.getElementById('questionBankList').innerHTML = appData.questionBank.length===0?'<div class="text-xs text-slate-400 italic text-center">Trống</div>' : appData.questionBank.map((q,i)=>`<div class="p-3 bg-slate-50 border rounded-xl text-xs space-y-1"><div class="font-bold text-indigo-700">Câu ${i+1} [${q.level}]</div><div>${q.content}</div></div>`).join('');
         }
@@ -725,6 +738,17 @@
                     <div class="p-3 bg-slate-50 border rounded-xl">Dưới TB (&lt;5đ): <span class="text-rose-600">${countY} HS</span></div>
                 </div>
             `;
+        }
+    </script>
+
+    <!-- ================= ĐĂNG KÝ SERVICE WORKER PWA ================= -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('PWA Service Worker đã đăng ký thành công!'))
+                    .catch(err => console.log('Lỗi đăng ký Service Worker:', err));
+            });
         }
     </script>
 </body>
