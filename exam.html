@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Phòng Thi Trực Tuyến Độc Lập</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; user-select: none; -webkit-user-select: none; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col" oncontextmenu="return false;">
+
+    <!-- MÀN HÌNH 1: ĐĂNG NHẬP (NẾU CHƯA ĐĂNG NHẬP Ở CỔNG HS) -->
+    <div id="screen-login" class="flex-1 flex items-center justify-center p-4">
+        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-xl border w-full max-w-sm text-center space-y-4">
+            <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto"><i data-lucide="shield-check" class="w-7 h-7"></i></div>
+            <h1 class="text-xl font-black text-slate-800">VÀO PHÒNG THI</h1>
+            <input type="text" id="inputAuthCode" placeholder="Nhập Mã HS hoặc Username..." class="w-full p-3 border rounded-xl font-bold text-xs text-center outline-none focus:border-indigo-600">
+            <button onclick="handleStudentLogin()" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl text-xs shadow">Bắt Đầu</button>
+            <p id="loginErrorMsg" class="text-rose-600 text-xs font-bold hidden"></p>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH 2: PHÒNG CHỜ (CHỌN ĐỀ) -->
+    <div id="screen-lobby" class="hidden flex-1 max-w-4xl w-full mx-auto p-4 space-y-4">
+        <div class="bg-white p-4 rounded-2xl border flex justify-between items-center shadow-sm">
+            <div>
+                <h2 class="font-bold text-sm" id="lobbyStudentName">---</h2>
+                <p class="text-[11px] text-indigo-600 font-bold" id="lobbyStudentClass">---</p>
+            </div>
+            <button onclick="location.reload()" class="text-xs bg-slate-100 p-2 rounded-xl text-slate-600 font-bold">Thoát</button>
+        </div>
+        <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs text-amber-800">
+            <b>Lưu ý:</b> Hệ thống tự động ghi nhận số lần chuyển tab hoặc thoát màn hình trong lúc làm bài.
+        </div>
+        <div>
+            <h3 class="font-bold text-sm mb-2">Đề Thi Đang Mở</h3>
+            <div id="lobbyExamList" class="grid gap-3"></div>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH 3: LÀM BÀI TRỰC TIẾP -->
+    <div id="screen-exam" class="hidden h-screen flex flex-col bg-slate-100 overflow-hidden">
+        <header class="bg-white border-b px-4 py-2.5 flex justify-between items-center shrink-0 z-20">
+            <h2 id="examTitleHeader" class="font-bold text-xs sm:text-sm text-indigo-900 truncate">Đề Thi</h2>
+            <div class="flex items-center space-x-3">
+                <div class="bg-rose-50 text-rose-700 px-3 py-1 rounded-xl font-mono font-black text-xs border border-rose-200">
+                    <span id="countdownTimer">45:00</span>
+                </div>
+                <button onclick="confirmSubmitExam()" class="bg-emerald-600 text-white font-bold text-xs px-4 py-1.5 rounded-xl shadow">Nộp Bài</button>
+            </div>
+        </header>
+
+        <div class="flex-1 flex overflow-hidden">
+            <main class="flex-1 overflow-y-auto p-4 space-y-4" id="questionsContainer"></main>
+            <aside class="w-64 bg-white border-l hidden md:flex flex-col shrink-0 p-3">
+                <h4 class="font-bold text-xs uppercase text-slate-500 mb-2">Danh Sách Câu</h4>
+                <div id="navGrid" class="grid grid-cols-4 gap-2 overflow-y-auto flex-1"></div>
+                <div id="cheatWarningBadge" class="hidden mt-2 p-2 bg-rose-50 text-rose-700 text-center font-bold text-[11px] rounded-lg border border-rose-200">Rời tab 0 lần</div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH 4: KẾT QUẢ -->
+    <div id="screen-result" class="hidden flex-1 flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-3xl shadow-xl border max-w-sm w-full text-center space-y-4">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto"><i data-lucide="check" class="w-8 h-8"></i></div>
+            <h2 class="text-xl font-black">Nộp Bài Thành Công!</h2>
+            <div class="bg-indigo-50 p-4 rounded-2xl"><span class="text-xs text-indigo-600 font-bold block mb-1">ĐIỂM SỐ</span><span id="finalScoreVal" class="text-5xl font-black text-indigo-900 font-mono">0.0</span></div>
+            <p class="text-xs text-slate-500">Số lần rời tab: <b id="resultCheatCount" class="text-rose-600">0 lần</b></p>
+            <a id="btnExamSolution" href="#" target="_blank" class="hidden w-full bg-amber-500 text-white font-bold py-2.5 rounded-xl text-xs block">Xem Lời Giải Chi Tiết</a>
+            <button onclick="location.href='hocsinh.html'" class="w-full bg-slate-100 text-slate-700 font-bold py-2.5 rounded-xl text-xs">Về Trang Cá Nhân</button>
+        </div>
+    </div>
+
+    <script>
+        const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbznfqhckK2L97z427a50oLuZ0W0nLbtdDcJROOv6S2sGQL3_OGbK0Fs7Hd8wOi_or5cXA/exec";
+        const SESSION_KEY = 'ACTIVE_STUDENT_SESSION';
+
+        let appData = { classes: [], students: [], exams: [] };
+        let activeStudent = null, activeExam = null, examTimer = null, secondsLeft = 0, userResponses = {}, switchTabViolations = 0, isExamActive = false;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+            loadCloudData();
+            setupAntiCheat();
+        });
+
+        async function loadCloudData() {
+            try {
+                const res = await fetch(CLOUD_API_URL);
+                const j = await res.json();
+                if(j.Classes) appData.classes = j.Classes.slice(1).map(r=>({id:String(r[0]||''), name:String(r[1]||'')}));
+                if(j.Students) appData.students = j.Students.slice(1).map(r=>({id:String(r[0]||''), classId:String(r[1]||''), code:String(r[2]||''), name:String(r[3]||''), username:String(r[7]||'')}));
+                if(j.Exams) appData.exams = j.Exams.slice(1).map(r=>({id:String(r[0]||''), title:String(r[1]||''), classId:String(r[2]||''), duration:parseInt(r[3])||45, questions:JSON.parse(r[5]||'[]'), matrix:JSON.parse(r[6]||'{}'), status:String(r[7]||'OPEN')}));
+
+                // Tự động nhận diện nếu đã đăng nhập ở Cổng HS
+                const savedId = localStorage.getItem(SESSION_KEY);
+                if(savedId) {
+                    const s = appData.students.find(x => x.id === savedId);
+                    if(s) { activeStudent = s; openLobby(); }
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        function setupAntiCheat() {
+            document.addEventListener('visibilitychange', () => {
+                if (isExamActive && document.visibilityState === 'hidden') {
+                    switchTabViolations++;
+                    const b = document.getElementById('cheatWarningBadge');
+                    if(b) { b.classList.remove('hidden'); b.innerText = `Cảnh báo: Rời tab ${switchTabViolations} lần!`; }
+                }
+            });
+        }
+
+        function handleStudentLogin() {
+            const raw = document.getElementById('inputAuthCode').value.trim().toLowerCase();
+            const s = appData.students.find(x => x.code.toLowerCase() === raw || x.username.toLowerCase() === raw || x.name.toLowerCase() === raw);
+            if(!s) { document.getElementById('loginErrorMsg').innerText = "Không tìm thấy học sinh!"; document.getElementById('loginErrorMsg').classList.remove('hidden'); return; }
+            activeStudent = s;
+            openLobby();
+        }
+
+        function openLobby() {
+            document.getElementById('screen-login').classList.add('hidden');
+            document.getElementById('screen-lobby').classList.remove('hidden');
+            const c = appData.classes.find(x => x.id === activeStudent.classId);
+            document.getElementById('lobbyStudentName').innerText = activeStudent.name;
+            document.getElementById('lobbyStudentClass').innerText = `Lớp: ${c ? c.name : '---'} • Mã: ${activeStudent.code}`;
+
+            const list = appData.exams.filter(e => (e.classId === activeStudent.classId || e.classId === 'ALL') && e.status === 'OPEN');
+            const container = document.getElementById('lobbyExamList');
+            container.innerHTML = list.length === 0 ? '<div class="p-4 bg-white border rounded-xl text-center text-xs text-slate-400">Chưa có đề thi nào mở.</div>' : list.map(e => `
+                <div class="p-4 bg-white border rounded-xl flex justify-between items-center shadow-sm">
+                    <div><b>${e.title}</b><div class="text-xs text-slate-500">${e.duration} phút • ${e.questions ? e.questions.length : 0} câu</div></div>
+                    <button onclick="startExam('${e.id}')" class="bg-indigo-600 text-white font-bold text-xs px-4 py-2 rounded-xl shadow">Bắt Đầu Thi</button>
+                </div>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function startExam(eId) {
+            activeExam = appData.exams.find(e => e.id === eId);
+            userResponses = {};
+            switchTabViolations = 0;
+            isExamActive = true;
+
+            document.getElementById('screen-lobby').classList.add('hidden');
+            document.getElementById('screen-exam').classList.remove('hidden');
+            document.getElementById('examTitleHeader').innerText = activeExam.title;
+
+            renderQuestions();
+            renderNavGrid();
+
+            secondsLeft = activeExam.duration * 60;
+            clearInterval(examTimer);
+            examTimer = setInterval(() => {
+                secondsLeft--;
+                const m = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
+                const s = String(secondsLeft % 60).padStart(2, '0');
+                document.getElementById('countdownTimer').innerText = `${m}:${s}`;
+                if (secondsLeft <= 0) { clearInterval(examTimer); alert("Hết giờ làm bài!"); submitExamData(); }
+            }, 1000);
+        }
+
+        function renderQuestions() {
+            const c = document.getElementById('questionsContainer');
+            c.innerHTML = (activeExam.questions || []).map((q, idx) => {
+                let body = '';
+                if(q.part === 1) {
+                    body = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">${(q.options || []).map(o => `
+                        <button type="button" onclick="userResponses[${idx}]='${o.letter}';this.parentElement.querySelectorAll('button').forEach(b=>b.className='p-2.5 rounded-xl border text-left text-xs flex items-center space-x-2 bg-white');this.className='p-2.5 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-indigo-900 font-bold text-left text-xs flex items-center space-x-2';" class="p-2.5 rounded-xl border text-left text-xs flex items-center space-x-2 bg-white">
+                            <span class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600 shrink-0">${o.letter}</span>
+                            <span>${o.content}</span>
+                        </button>
+                    `).join('')}</div>`;
+                } else if(q.part === 2) {
+                    body = `<div class="space-y-1.5 pt-2">${(q.statements || []).map((st, sIdx) => `
+                        <div class="p-2.5 bg-slate-50 border rounded-xl flex justify-between items-center text-xs">
+                            <span><b>${st.letter})</b>${st.content}</span>
+                            <div class="space-x-1 shrink-0">
+                                <button type="button" onclick="if(!userResponses[${idx}])userResponses[${idx}]={};userResponses[${idx}][${sIdx}]='Đ';this.className='px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold text-xs';this.nextElementSibling.className='px-3 py-1 rounded-lg border bg-white text-xs';" class="px-3 py-1 rounded-lg border bg-white text-xs">Đúng</button>
+                                <button type="button" onclick="if(!userResponses[${idx}])userResponses[${idx}]={};userResponses[${idx}][${sIdx}]='S';this.className='px-3 py-1 rounded-lg bg-rose-600 text-white font-bold text-xs';this.previousElementSibling.className='px-3 py-1 rounded-lg border bg-white text-xs';" class="px-3 py-1 rounded-lg border bg-white text-xs">Sai</button>
+                            </div>
+                        </div>
+                    `).join('')}</div>`;
+                } else if(q.part === 3) {
+                    body = `<div class="pt-2"><input type="text" oninput="userResponses[${idx}]=this.value.trim()" placeholder="Điền đáp án số..." class="p-2.5 border rounded-xl text-xs font-bold w-full sm:w-60"></div>`;
+                }
+
+                return `
+                    <div id="qcard-${idx}" class="p-4 bg-white border rounded-2xl shadow-sm space-y-2">
+                        <div class="flex justify-between items-center text-xs border-b pb-1.5"><span class="font-bold text-indigo-700">Câu ${idx + 1}</span><span class="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-bold">Phần ${q.part}</span></div>
+                        <div class="text-xs">${q.prompt}</div>
+                        ${body}
+                    </div>
+                `;
+            }).join('');
+
+            if (window.renderMathInElement) {
+                renderMathInElement(c, { delimiters: [{left: '$', right: '$', display: false}], throwOnError: false });
+            }
+        }
+
+        function renderNavGrid() {
+            document.getElementById('navGrid').innerHTML = (activeExam.questions || []).map((_, idx) => `
+                <button type="button" onclick="document.getElementById('qcard-${idx}').scrollIntoView({behavior:'smooth',block:'center'})" class="p-2 border rounded-xl text-xs font-bold bg-slate-50">${idx + 1}</button>
+            `).join('');
+        }
+
+        function confirmSubmitExam() { if(confirm("Bạn có chắc chắn muốn nộp bài?")) submitExamData(); }
+
+        async function submitExamData() {
+            clearInterval(examTimer);
+            isExamActive = false;
+
+            const qs = activeExam.questions || [];
+            let score = 0, totalPossible = 0;
+
+            qs.forEach((q, idx) => {
+                const uAns = userResponses[idx];
+                if(q.part === 1) {
+                    totalPossible += 0.25;
+                    if(uAns && uAns === q.correct) score += 0.25;
+                } else if(q.part === 2) {
+                    totalPossible += 1.0;
+                    if(uAns && typeof uAns === 'object') {
+                        let c = 0;
+                        (q.statements || []).forEach((st, sIdx) => { if(uAns[sIdx] === st.correct) c++; });
+                        if(c === 1) score += 0.1; else if(c === 2) score += 0.25; else if(c === 3) score += 0.5; else if(c === 4) score += 1.0;
+                    }
+                } else if(q.part === 3) {
+                    totalPossible += 0.5;
+                    if(uAns && String(uAns).toLowerCase() === String(q.correct).trim().toLowerCase()) score += 0.5;
+                }
+            });
+
+            if(totalPossible === 0) totalPossible = 10;
+            const finalScore = Math.round((score / totalPossible) * 10 * 10) / 10;
+
+            try {
+                await fetch(CLOUD_API_URL, {
+                    method: 'POST',
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        action: 'submitExam',
+                        payload: {
+                            id: 'res_' + Date.now(),
+                            examId: activeExam.id,
+                            studentId: activeStudent.id,
+                            score: finalScore,
+                            details: userResponses,
+                            tabSwitchCount: switchTabViolations,
+                            submittedAt: new Date().toISOString()
+                        }
+                    })
+                });
+            } catch(e) { console.error(e); }
+
+            document.getElementById('screen-exam').classList.add('hidden');
+            document.getElementById('screen-result').classList.remove('hidden');
+            document.getElementById('finalScoreVal').innerText = finalScore.toFixed(1);
+            document.getElementById('resultCheatCount').innerText = `${switchTabViolations} lần`;
+
+            const btnSol = document.getElementById('btnExamSolution');
+            if(activeExam.matrix && activeExam.matrix.solutionUrl) {
+                btnSol.href = activeExam.matrix.solutionUrl;
+                btnSol.classList.remove('hidden');
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

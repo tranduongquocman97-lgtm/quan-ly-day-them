@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bộ Bóc Tách Đề Thi Siêu Cấp v2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .editor-box { min-height: 320px; max-height: 520px; outline: none; }
+        .editor-box:empty:before { content: attr(placeholder); color: #94a3b8; font-style: italic; }
+        .editor-box img { max-height: 220px; border-radius: 8px; border: 1px solid #e2e8f0; margin: 6px 0; display: inline-block; }
+    </style>
+</head>
+<body class="p-4 md:p-8 text-slate-800">
+
+    <div class="max-w-7xl mx-auto space-y-6">
+        <div class="bg-indigo-900 text-white p-5 rounded-2xl shadow-md flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-black">BỘ BÓC TÁCH ĐỀ THI 3 PHẦN & DÁN ẢNH (BẢN CHUẨN HOÁ V2)</h1>
+                <p class="text-xs text-indigo-200 mt-1">Hỗ trợ nhận diện tự động kể cả khi không viết hoa hoặc nằm cùng dòng</p>
+            </div>
+            <button onclick="insertSampleData()" class="bg-indigo-700 hover:bg-indigo-600 text-xs font-bold px-3 py-2 rounded-xl transition">
+                + Nạp Đề Mẫu Chuẩn
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- CỘT NHẬP LIỆU -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <h2 class="font-bold text-sm">Dán Đề Thi Từ Word Vào Đây</h2>
+                    <span class="text-[11px] bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded">Ctrl + V Dán Ảnh Trực Tiếp</span>
+                </div>
+
+                <div id="smartEditor" contenteditable="true" 
+                     placeholder="Dán nội dung từ file Word vào đây... Bấm Windows + Shift + S chụp ảnh rồi Ctrl + V vào vị trí bất kỳ."
+                     class="editor-box w-full p-4 border-2 border-dashed border-slate-300 rounded-xl overflow-y-auto text-sm focus:border-indigo-500 bg-slate-50/50 leading-relaxed font-mono">
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="parseExamContent()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow text-sm">
+                        ⚡ Bóc Tách Tự Động & Sửa Lỗi Toán
+                    </button>
+                    <button onclick="clearEditor()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 px-4 rounded-xl text-sm">
+                        Xóa
+                    </button>
+                </div>
+            </div>
+
+            <!-- CỘT XEM TRƯỚC -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4 flex flex-col h-[700px]">
+                <div class="flex justify-between items-center border-b pb-3 shrink-0">
+                    <h2 class="font-bold text-sm">Bản Xem Trước Của Thí Sinh</h2>
+                    <span id="questionCounter" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">0 câu hỏi</span>
+                </div>
+
+                <div id="previewContainer" class="flex-1 overflow-y-auto space-y-4 pr-1">
+                    <div class="h-full flex items-center justify-center text-slate-400 text-xs italic">
+                        Chưa có dữ liệu bóc tách.
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t shrink-0 flex justify-between items-center">
+                    <button onclick="exportJSON()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow">
+                        Xuất Cấu Trúc JSON
+                    </button>
+                    <span id="exportStatus" class="text-xs text-slate-500 font-mono"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let parsedQuestions = [];
+        const editor = document.getElementById('smartEditor');
+
+        // BẮT SỰ KIỆN DÁN ẢNH TỪ CLIPBOARD
+        editor.addEventListener('paste', function (e) {
+            const items = (e.clipboardData || window.clipboardData).items;
+            for (let item of items) {
+                if (item.type.indexOf('image') !== -1) {
+                    e.preventDefault();
+                    const blob = item.getAsFile();
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        document.execCommand('insertHTML', false, `<br><img src="${event.target.result}" alt="Ảnh câu hỏi" /><br>`);
+                    };
+                    reader.readAsDataURL(blob);
+                    break;
+                }
+            }
+        });
+
+        // HÀM CHUẨN HOÁ CÔNG THỨC TOÁN MATHTYPE / LATEX
+        function normalizeMathLatex(text) {
+            if(!text) return '';
+            return text
+                // Đổi \[...\] và \(...\) sang $...$ để KaTeX dễ render
+                .replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$')
+                .replace(/\\\(([\s\S]*?)\\\)/g, '$1$$')                 // Khắc phục lỗi gõ kẹp 2 lần $$
+                .replace(/\$\$/g, '$');
+        }
+
+        // THUẬT TOÁN BÓC TÁCH MỚI
+        function parseExamContent() {
+            let content = editor.innerHTML;
+            if(!content.trim()) { alert("Khung soạn thảo đang trống!"); return; }
+
+            // Giữ lại ảnh, chuyển các thẻ ngắt dòng thành ký tự xuống dòng
+            content = content.replace(/<div><br><\/div>/gi, '\n')
+                             .replace(/<div>/gi, '\n')
+                             .replace(/<\/div>/gi, '')
+                             .replace(/<p>/gi, '\n')
+                             .replace(/<\/p>/gi, '')
+                             .replace(/<br\s*[\/]?>/gi, '\n');
+
+            // Chuẩn hoá công thức
+            content = normalizeMathLatex(content);
+
+            // Chèn ký tự ngắt dòng trước các thẻ đánh dấu phần nếu bị dính liền
+            content = content.replace(/(\[(?:P1\vert{}P2\vert{}P3\vert{}PHẦN\s*[123I\vert{}V]+)\]|PHẦN\s+[123I|V]+[\s:.-])/gi, '\n$1\n');
+
+            // Chèn ngắt dòng trước "Câu 1:", "Câu 2:" để tách độc lập
+            content = content.replace(/(Câu\s+\d+[\s:.-])/gi, '\n$1');
+
+            const lines = content.split('\n').map(l => l.trim()).filter(l => l);
+
+            parsedQuestions = [];
+            let currentPart = 1; // Mặc định là phần 1
+            let currentQ = null;
+
+            lines.forEach(line => {
+                // 1. Kiểm tra chuyển đổi Phần
+                const partMatch = line.match(/(?:\[(?:P1\vert{}PHẦN\s*1\vert{}PHẦN\s*I)\]|^PHẦN\s*(?:1|I)[\s:.-])/i);
+                const part2Match = line.match(/(?:\[(?:P2\vert{}PHẦN\s*2\vert{}PHẦN\s*II)\]|^PHẦN\s*(?:2|II)[\s:.-])/i);
+                const part3Match = line.match(/(?:\[(?:P3\vert{}PHẦN\s*3\vert{}PHẦN\s*III)\]|^PHẦN\s*(?:3|III)[\s:.-])/i);
+
+                if (partMatch) { currentPart = 1; return; }
+                if (part2Match) { currentPart = 2; return; }
+                if (part3Match) { currentPart = 3; return; }
+
+                // 2. Phát hiện bắt đầu một câu hỏi mới
+                const qHeaderMatch = line.match(/^Câu\s+(\d+)[\s:.-]+([\s\S]*)$/i);
+                if (qHeaderMatch) {
+                    if (currentQ) finalizeQuestion(currentQ);
+                    currentQ = {
+                        rawIndex: qHeaderMatch[1],
+                        part: currentPart,
+                        prompt: qHeaderMatch[2] || '',
+                        lines: []
+                    };
+                    return;
+                }
+
+                // Nếu đang trong 1 câu hỏi, dồn các dòng vào
+                if (currentQ) {
+                    currentQ.lines.push(line);
+                }
+            });
+
+            // Đóng câu cuối cùng
+            if (currentQ) finalizeQuestion(currentQ);
+
+            renderPreview();
+        }
+
+        // HÀM XỬ LÝ CHI TIẾT NỘI DUNG 1 CÂU HỎI
+        function finalizeQuestion(q) {
+            const fullBody = q.lines.join(' ');
+            const fullText = (q.prompt + ' ' + fullBody).trim();
+
+            // Tự nhận diện thông minh lại Phần nếu câu hỏi chưa khớp
+            const hasABCD = /(?:\*?[A-D]\s*[\.:\)])/g.test(fullText);
+            const hasSmallABCD = /(?:\*?[a-d]\s*[\.:\)])/g.test(fullText);
+            const hasAnswerKeyword = /(?:Đáp án|ĐA|KQ)[\s:.-]+/i.test(fullText);
+
+            if (q.part === 1 && !hasABCD && hasSmallABCD) q.part = 2;
+            if (q.part === 1 && !hasABCD && hasAnswerKeyword) q.part = 3;
+
+            if (q.part === 1) {
+                // PHẦN 1: Bóc tách phương án A, B, C, D (Kể cả khi nằm ngang trên 1 dòng)
+                let prompt = q.prompt;
+                const options = [];
+                let correct = '';
+
+                // Tách nội dung câu hỏi trước lựa chọn đầu tiên
+                const splitFirstOpt = fullText.split(/(?=\*?[A-D]\s*[\.:\)])/);
+                prompt = splitFirstOpt[0].replace(/^Câu\s+\d+[\s:.-]*/i, '').trim();
+
+                const optRegex = /(\*?)([A-D])\s*[\.:\)]\s*([\s\S]*?)(?=(?:\*?[A-D]\s*[\.:\)])|$)/g;
+                let m;
+                const optString = fullText.substring(prompt.length);
+                while ((m = optRegex.exec(optString)) !== null) {
+                    const isCorrect = m[1] === '*';
+                    const letter = m[2].toUpperCase();
+                    const content = m[3].trim();
+                    options.push({ letter, content });
+                    if (isCorrect) correct = letter;
+                }
+
+                parsedQuestions.push({
+                    id: 'q_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                    part: 1,
+                    prompt: prompt || 'Nội dung câu hỏi',
+                    options: options,
+                    correct: correct
+                });
+
+            } else if (q.part === 2) {
+                // PHẦN 2: Bóc tách 4 ý a), b), c), d)
+                const splitFirstOpt = fullText.split(/(?=\*?[a-d]\s*[\.:\)])/);
+                const prompt = splitFirstOpt[0].replace(/^Câu\s+\d+[\s:.-]*/i, '').trim();
+
+                const statements = [];
+                const stRegex = /(\*?)([a-d])\s*[\.:\)]\s*([\s\S]*?)(?=(?:\*?[a-d]\s*[\.:\)])|$)/gi;
+                let m;
+                const stString = fullText.substring(prompt.length);
+                while ((m = stRegex.exec(stString)) !== null) {
+                    const isCorrect = m[1] === '*';
+                    statements.push({
+                        letter: m[2].toLowerCase(),
+                        content: m[3].trim(),
+                        correct: isCorrect ? 'Đ' : 'S'
+                    });
+                }
+
+                parsedQuestions.push({
+                    id: 'q_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                    part: 2,
+                    prompt: prompt,
+                    statements: statements
+                });
+
+            } else if (q.part === 3) {
+                // PHẦN 3: Bóc tách đáp án điền số
+                let correct = '';
+                const ansMatch = fullText.match(/(?:Đáp án|ĐA|KQ)[\s:.-]+([^\n]+)/i);
+                if (ansMatch) {
+                    correct = ansMatch[1].trim();
+                }
+                const prompt = fullText.replace(/(?:Đáp án|ĐA|KQ)[\s:.-]+[^\n]+/gi, '').replace(/^Câu\s+\d+[\s:.-]*/i, '').trim();
+
+                parsedQuestions.push({
+                    id: 'q_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                    part: 3,
+                    prompt: prompt,
+                    correct: correct
+                });
+            }
+        }
+
+        // RENDER KẾT QUẢ XEM TRƯỚC
+        function renderPreview() {
+            const container = document.getElementById('previewContainer');
+            document.getElementById('questionCounter').innerText = `${parsedQuestions.length} câu hỏi`;
+
+            if (parsedQuestions.length === 0) {
+                container.innerHTML = `<div class="p-4 bg-rose-50 text-rose-700 text-xs rounded-xl text-center">Không nhận diện được câu hỏi nào. Hãy kiểm tra chữ "Câu 1:", "Câu 2:"...</div>`;
+                return;
+            }
+
+            let html = '';
+            parsedQuestions.forEach((q, idx) => {
+                html += `<div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">`;
+                
+                // Header câu
+                html += `<div class="flex justify-between items-center text-xs">
+                            <span class="font-black text-indigo-700">CÂU ${idx + 1} (${q.part === 1 ? 'Trắc Nghiệm 4 Lựa Chọn' : (q.part === 2 ? 'Đúng / Sai' : 'Trả Lời Ngắn')})</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded ${q.part === 1 ? 'bg-blue-100 text-blue-700' : (q.part === 2 ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700')}">Phần ${q.part}</span>
+                         </div>`;
+                
+                // Nội dung câu
+                html += `<div class="text-sm font-medium text-slate-800 leading-relaxed">${q.prompt}</div>`;
+
+                // Render theo từng phần
+                if (q.part === 1) {
+                    html += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">`;
+                    q.options.forEach(opt => {
+                        const isRight = opt.letter === q.correct;
+                        html += `<div class="p-2.5 rounded-xl border flex items-center space-x-2 text-xs ${isRight ? 'bg-emerald-50 border-emerald-300 font-bold text-emerald-800' : 'bg-white border-slate-200'}">
+                                    <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 ${isRight ? 'bg-emerald-600 text-white' : 'bg-slate-100 font-bold'}">${opt.letter}</span>
+                                    <span class="flex-1">${opt.content}</span>
+                                    ${isRight ? '<span class="text-[9px] bg-emerald-600 text-white px-1.5 py-0.5 rounded uppercase font-black">Đáp án</span>' : ''}
+                                 </div>`;
+                    });
+                    html += `</div>`;
+                } 
+                else if (q.part === 2) {
+                    html += `<div class="space-y-1.5 pt-1">`;
+                    q.statements.forEach(st => {
+                        html += `<div class="p-2.5 rounded-xl bg-white border border-slate-200 flex justify-between items-center text-xs">
+                                    <div class="flex items-center space-x-2"><b class="text-indigo-600">${st.letter})</b> <span>${st.content}</span></div>
+                                    <span class="font-bold px-2 py-0.5 rounded text-[10px] ${st.correct === 'Đ' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">${st.correct === 'Đ' ? 'ĐÚNG' : 'SAI'}</span>
+                                 </div>`;
+                    });
+                    html += `</div>`;
+                } 
+                else if (q.part === 3) {
+                    html += `<div class="p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl text-xs flex justify-between items-center">
+                                <span class="text-slate-500 font-medium">Đáp án cần điền:</span>
+                                <span class="font-black text-indigo-700 font-mono text-sm">${q.correct || 'Chưa nhận diện'}</span>
+                             </div>`;
+                }
+
+                html += `</div>`;
+            });
+
+            container.innerHTML = html;
+
+            // Render công thức Toán KaTeX
+            if (window.renderMathInElement) {
+                renderMathInElement(container, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        // NẠP ĐỀ MẪU ĐỂ TEST
+        function insertSampleData() {
+            editor.innerHTML = `[P1]
+Câu 1: Cho hàm số $y = f(x)$ có bảng biến thiên trên $[-1; 3]$. Tìm giá trị lớn nhất của hàm số trên $[-1; 3]$.
+*A. $\\max f(x) = 5$   B. $\\max f(x) = 2$   C. $\\max f(x) = -1$   D. $\\max f(x) = 0$
+
+Câu 2: Nghiệm của phương trình $\\log_2(x - 1) = 3$ là:
+A. $x = 8$   B. $x = 7$   *C. $x = 9$   D. $x = 10$
+
+[P2]
+Câu 3: Cho tứ diện đều $ABCD$ có cạnh bằng $a$. Xét tính đúng sai của các khẳng định sau:
+*a) Thể tích khối tứ diện đều bằng $\\frac{a^3\\sqrt{2}}{12}$.
+b) Góc giữa hai đường thẳng $AB$ và $CD$ bằng $60^\\circ$.
+*c) Diện tích toàn phần của tứ diện bằng $a^2\\sqrt{3}$.
+d) Bán kính mặt cầu ngoại tiếp bằng $\\frac{a\\sqrt{6}}{2}$.
+
+[P3]
+Câu 4: Một tổ có 6 nam và 4 nữ. Chọn ngẫu nhiên 3 học sinh. Tính xác suất để có ít nhất 1 học sinh nữ.
+Đáp án: 0.8
+
+Câu 5: Các kí hiệu nào sau đây dùng để viết đúng mệnh đề "[7] là một số tự nhiên".
+*A. $\\{7\\} \\subset \\mathbb{N}$   B. $7 \\in \\mathbb{N}$   C. $7 < \\mathbb{N}$   D. $7 \\le \\mathbb{N}$`;
+            parseExamContent();
+        }
+
+        function clearEditor() {
+            editor.innerHTML = '';
+            parsedQuestions = [];
+            document.getElementById('previewContainer').innerHTML = `<div class="h-full flex items-center justify-center text-slate-400 text-xs italic">Chưa có dữ liệu bóc tách.</div>`;
+            document.getElementById('questionCounter').innerText = '0 câu hỏi';
+            document.getElementById('exportStatus').innerText = '';
+        }
+
+        function exportJSON() {
+            if(parsedQuestions.length === 0) { alert("Chưa có dữ liệu!"); return; }
+            console.log(JSON.stringify(parsedQuestions, null, 2));
+            alert(`Đã xuất thành công ${parsedQuestions.length} câu hỏi. Thầy bấm F12 -> Console để xem chi tiết.`);
+        }
+    </script>
+</body>
+</html>
