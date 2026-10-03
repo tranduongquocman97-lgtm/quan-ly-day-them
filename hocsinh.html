@@ -3,9 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cổng Thông Tin Học Sinh</title>
+    <title>Cổng Thông Tin Học Sinh - Học Phí & Khảo Thí</title>
+
+    <!-- CẤU HÌNH PWA & IPHONE (IOS) -->
+    <link rel="manifest" href="manifest-hocsinh.json">
+    <meta name="theme-color" content="#312e81">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Sổ Học Tập">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135755.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
@@ -15,32 +26,46 @@
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col">
 
-    <!-- ================= MÀN HÌNH ĐĂNG NHẬP ================= -->
+    <!-- MÀN HÌNH ĐĂNG NHẬP -->
     <div id="studentLoginScreen" class="flex-1 flex items-center justify-center p-4">
-        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-slate-200 w-full max-w-sm text-center space-y-5">
+        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-slate-200 w-full max-w-sm text-center space-y-4">
             <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
                 <i data-lucide="graduation-cap" class="w-8 h-8"></i>
             </div>
             <div>
                 <h1 class="text-xl font-black text-slate-800">CỔNG HỌC SINH</h1>
-                <p class="text-xs text-slate-500 mt-0.5">Tra cứu điểm danh, học phí & khảo thí</p>
+                <p class="text-xs text-slate-500 mt-0.5">Tra cứu học phí, chuyên cần & khảo thí</p>
             </div>
-            <form onsubmit="handleStudentLogin(event)" class="space-y-3 text-left">
+
+            <!-- Nút hướng dẫn cài App ngay trên màn hình đăng nhập -->
+            <button type="button" onclick="openInstallGuideModal()" class="w-full bg-slate-50 hover:bg-indigo-50 border border-slate-200 text-indigo-700 font-bold py-2 rounded-xl text-xs transition flex items-center justify-center space-x-1.5">
+                <i data-lucide="smartphone" class="w-4 h-4 text-indigo-600"></i>
+                <span>Cài App Ra Màn Hình Điện Thoại</span>
+            </button>
+
+            <form onsubmit="handleStudentLogin(event)" class="space-y-3 text-left pt-1">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Tên đăng nhập</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Tên đăng nhập / Mã HS</label>
                     <input type="text" id="loginUsername" placeholder="VD: nguyenthiutman.10n1" required class="w-full p-3 border rounded-xl text-xs font-bold font-mono outline-none focus:border-indigo-600">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Mật khẩu</label>
-                    <input type="password" id="loginPassword" placeholder="Nhập mật khẩu..." required class="w-full p-3 border rounded-xl text-xs font-bold outline-none focus:border-indigo-600">
+                    <div class="relative">
+                        <input type="password" id="loginPassword" placeholder="Nhập mật khẩu..." required class="w-full p-3 pr-10 border rounded-xl text-xs font-bold outline-none focus:border-indigo-600">
+                        <button type="button" onclick="togglePasswordVisibility('loginPassword', 'eyeIconLogin')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 p-1">
+                            <i data-lucide="eye" id="eyeIconLogin" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow transition text-xs">Đăng Nhập</button>
+                <button type="submit" id="btnLoginSubmit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow transition text-xs flex items-center justify-center space-x-1.5">
+                    <span>Đăng Nhập</span>
+                </button>
             </form>
             <p id="loginError" class="text-rose-600 text-xs font-bold hidden"></p>
         </div>
     </div>
 
-    <!-- ================= DASHBOARD CÁ NHÂN HỌC SINH ================= -->
+    <!-- MÀN HÌNH CHÍNH CỦA HỌC SINH -->
     <div id="studentDashboardScreen" class="hidden flex-1 flex flex-col">
         <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-30">
             <div class="max-w-5xl mx-auto px-4 py-3.5 flex items-center justify-between">
@@ -52,7 +77,11 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <button onclick="openChangePasswordModal()" class="bg-indigo-800 hover:bg-indigo-700 text-white text-xs px-2.5 py-1.5 rounded-xl font-bold transition flex items-center space-x-1" title="Đổi mật khẩu">
+                    <button onclick="openInstallGuideModal()" class="bg-indigo-800 hover:bg-indigo-700 text-amber-300 text-xs px-2.5 py-1.5 rounded-xl font-bold transition flex items-center space-x-1" title="Cài App">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                        <span class="hidden sm:inline">Cài App</span>
+                    </button>
+                    <button onclick="openChangePasswordModal()" class="bg-indigo-800 hover:bg-indigo-700 text-white text-xs px-2.5 py-1.5 rounded-xl font-bold transition flex items-center space-x-1">
                         <i data-lucide="key-round" class="w-3.5 h-3.5"></i>
                         <span class="hidden sm:inline">Đổi MK</span>
                     </button>
@@ -64,59 +93,151 @@
         </header>
 
         <main class="flex-1 max-w-5xl w-full mx-auto p-4 space-y-4">
-            <!-- BANNER VÀO THI ONLINE -->
+            <!-- BANNER VÀO PHÒNG THI ONLINE -->
             <div class="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 rounded-3xl p-5 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div class="space-y-1 text-center sm:text-left">
                     <span class="bg-amber-400 text-indigo-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Khảo thí trực tuyến</span>
                     <h3 class="text-base sm:text-lg font-black">Phòng Thi Trắc Nghiệm Online</h3>
-                    <p class="text-xs text-indigo-100">Bấm để vào làm bài kiểm tra đang mở của lớp.</p>
+                    <p class="text-xs text-indigo-100">Làm các bài thi GDPT mới 3 phần (Trắc nghiệm, Đúng/Sai, Trả lời ngắn).</p>
                 </div>
-                <button onclick="goToExamApp()" class="w-full sm:w-auto bg-amber-400 hover:bg-amber-300 text-indigo-950 font-black text-xs px-5 py-3 rounded-2xl shadow transition flex items-center justify-center space-x-1.5 shrink-0">
+                <button onclick="location.href='exam.html'" class="w-full sm:w-auto bg-amber-400 hover:bg-amber-300 text-indigo-950 font-black text-xs px-5 py-3 rounded-2xl shadow transition flex items-center justify-center space-x-1.5 shrink-0">
                     <span>Vào Phòng Thi</span>
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </div>
 
-            <!-- TABS ĐIỀU HƯỚNG -->
-            <nav class="flex items-center space-x-2 border-b pb-2">
-                <button onclick="switchStudentTab('tuition')" id="stab-btn-tuition" class="stab-btn px-4 py-2 rounded-xl font-bold text-xs text-indigo-600 bg-indigo-50">Học Phí</button>
-                <button onclick="switchStudentTab('attendance')" id="stab-btn-attendance" class="stab-btn px-4 py-2 rounded-xl font-bold text-xs text-slate-500 hover:bg-slate-100">Điểm Danh</button>
-                <button onclick="switchStudentTab('exams')" id="stab-btn-exams" class="stab-btn px-4 py-2 rounded-xl font-bold text-xs text-slate-500 hover:bg-slate-100">Lịch Sử Thi</button>
-                <button onclick="switchStudentTab('documents')" id="stab-btn-documents" class="stab-btn px-4 py-2 rounded-xl font-bold text-xs text-slate-500 hover:bg-slate-100">Tài Liệu</button>
+            <!-- THANH ĐIỀU HƯỚNG TABS -->
+            <nav class="flex items-center space-x-2 border-b pb-2 overflow-x-auto">
+                <button onclick="switchStudentTab('tuition')" id="stab-btn-tuition" class="stab-btn px-4 py-2 rounded-xl font-bold text-xs text-indigo-600 bg-indigo-50 shrink-0 transition">Học Phí & QR</button>
+                <button onclick="switchStudentTab('attendance')" id="stab-btn-attendance" class="stab-btn px-4 py-2 rounded-xl font-bold text-xs text-slate-500 hover:bg-slate-100 shrink-0 transition">Sổ Điểm Danh 8B</button>
+                <button onclick="switchStudentTab('analytics')" id="stab-btn-analytics" class="stab-btn px-4 py-2 rounded-xl font-bold text-xs text-slate-500 hover:bg-slate-100 shrink-0 transition">Tiến Độ & Năng Lực</button>
+                <button onclick="switchStudentTab('documents')" id="stab-btn-documents" class="stab-btn px-4 py-2 rounded-xl font-bold text-xs text-slate-500 hover:bg-slate-100 shrink-0 transition">Kho Chuyên Đề</button>
             </nav>
 
-            <!-- TAB 1: HỌC PHÍ MINH BẠCH (THEO KỲ CỦA LỚP) -->
+            <!-- TAB 1: HỌC PHÍ & VIETQR TỰ ĐỘNG -->
             <section id="stab-tuition" class="stab-content space-y-4">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
-                    <h3 class="font-bold text-sm text-slate-800 border-b pb-2">Trạng Thái Học Phí Các Kỳ</h3>
+                    <h3 class="font-bold text-sm text-slate-800 border-b pb-2 flex items-center space-x-2">
+                        <i data-lucide="qr-code" class="w-4 h-4 text-emerald-600"></i>
+                        <span>Tình Trạng Học Phí & Mã Thanh Toán VietQR</span>
+                    </h3>
                     <div id="studentTuitionCards" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3"></div>
                 </div>
             </section>
 
-            <!-- TAB 2: ĐIỂM DANH -->
+            <!-- TAB 2: ĐIỂM DANH KHOA HỌC THEO CHU KỲ (8 BUỔI) -->
             <section id="stab-attendance" class="stab-content hidden space-y-4">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
-                    <h3 class="font-bold text-sm text-slate-800 border-b pb-2">Nhật Ký Điểm Danh Cá Nhân</h3>
-                    <div id="studentAttendanceList" class="space-y-2"></div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-sm text-center">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase block">Tổng Buổi Học</span>
+                        <span class="text-xl font-black text-slate-800" id="attStatTotal">0</span>
+                    </div>
+                    <div class="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-sm text-center">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase block">Chuyên Cần</span>
+                        <span class="text-xl font-black text-emerald-600" id="attStatRate">0%</span>
+                    </div>
+                    <div class="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-sm text-center">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase block">Vắng Có Phép</span>
+                        <span class="text-xl font-black text-amber-500" id="attStatPerm">0</span>
+                    </div>
+                    <div class="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-sm text-center">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase block">Vắng K.Phép / Trễ</span>
+                        <span class="text-xl font-black text-rose-600" id="attStatNoPerm">0</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 space-y-3">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h3 class="font-bold text-sm text-slate-800 flex items-center space-x-2">
+                            <i data-lucide="calendar-check" class="w-4 h-4 text-indigo-600"></i>
+                            <span>Hồ Sơ Chuyên Cần Từng Kỳ (8 Buổi / Chu Kỳ)</span>
+                        </h3>
+                        <span class="text-[11px] text-slate-400">Đồng bộ nhịp học của lớp</span>
+                    </div>
+                    <div id="studentAttendanceCyclesContainer" class="space-y-3 pt-1"></div>
                 </div>
             </section>
 
-            <!-- TAB 3: LỊCH SỬ THI -->
-            <section id="stab-exams" class="stab-content hidden space-y-4">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
-                    <h3 class="font-bold text-sm text-slate-800 border-b pb-2">Kết Quả Các Bài Thi Đã Nộp</h3>
-                    <div id="studentExamResultsList" class="space-y-2"></div>
+            <!-- TAB 3: TIẾN ĐỘ CÁ NHÂN & PHÂN TÍCH 3 PHẦN -->
+            <section id="stab-analytics" class="stab-content hidden space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+                        <h3 class="font-bold text-sm text-slate-800 border-b pb-2">Biểu Đồ Tiến Bộ Điểm Số</h3>
+                        <div class="h-56"><canvas id="studentScoreChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+                        <h3 class="font-bold text-sm text-slate-800 border-b pb-2">Đánh Giá Năng Lực Cấu Trúc Đề Mới</h3>
+                        <div id="studentRadarStats" class="space-y-3 pt-1"></div>
+                    </div>
                 </div>
             </section>
 
-            <!-- TAB 4: TÀI LIỆU -->
+            <!-- TAB 4: KHO TÀI LIỆU THEO CHƯƠNG -->
             <section id="stab-documents" class="stab-content hidden space-y-4">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
-                    <h3 class="font-bold text-sm text-slate-800 border-b pb-2">Tài Liệu Của Lớp</h3>
-                    <div id="studentDocsList" class="space-y-2"></div>
+                    <h3 class="font-bold text-sm text-slate-800 border-b pb-2">Tài Liệu Phân Nhóm Theo Chuyên Đề</h3>
+                    <div id="studentGroupedDocsList" class="space-y-3"></div>
                 </div>
             </section>
         </main>
+    </div>
+
+    <!-- MODAL HƯỚNG DẪN CÀI APP ĐIỆN THOẠI CHO HỌC SINH -->
+    <div id="modalInstallGuide" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4 text-xs">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-indigo-900 flex items-center space-x-1.5">
+                    <i data-lucide="smartphone" class="w-4 h-4 text-indigo-600"></i>
+                    <span>Cài Đặt App Ra Màn Hình Chính</span>
+                </h3>
+                <button onclick="closeInstallGuideModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+
+            <!-- Nếu là Android -->
+            <div id="androidInstallBtnBox" class="hidden">
+                <button onclick="triggerPWAInstall()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-2xl shadow transition text-xs flex items-center justify-center space-x-2">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>Bấm Cài Đặt Ứng Dụng Ngay</span>
+                </button>
+                <div class="text-center text-[11px] text-slate-400 mt-2">Hoặc bấm dấu 3 chấm góc phải trình duyệt ➔ Chọn "Cài đặt ứng dụng".</div>
+            </div>
+
+            <!-- Hướng dẫn iPhone (iOS Safari) -->
+            <div class="p-3 bg-slate-50 border rounded-2xl space-y-2">
+                <div class="font-bold text-slate-800 flex items-center space-x-1">
+                    <span>🍎 Dành cho iPhone (Safari):</span>
+                </div>
+                <ol class="list-decimal list-inside space-y-1 text-slate-600 leading-relaxed text-[11px]">
+                    <li>Mở link bằng trình duyệt <b>Safari</b> trên iPhone.</li>
+                    <li>Bấm vào biểu tượng <b>Chia sẻ</b> (hình vuông có mũi tên chỉ lên ở thanh dưới cùng).</li>
+                    <li>Kéo xuống và chọn <b>"Thêm vào Màn hình chính" (Add to Home Screen)</b>.</li>
+                    <li>Bấm <b>Thêm (Add)</b> ở góc trên bên phải.</li>
+                </ol>
+            </div>
+
+            <button onclick="closeInstallGuideModal()" class="w-full bg-slate-100 hover:bg-slate-200 font-bold py-2.5 rounded-xl text-slate-700">Đã Hiểu</button>
+        </div>
+    </div>
+
+    <!-- MODAL HIỂN THỊ VIETQR THANH TOÁN -->
+    <div id="modalVietQR" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm text-center space-y-4">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-slate-800">Quét Mã VietQR Chuyển Khoản</h3>
+                <button onclick="closeVietQRModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-2 bg-slate-50 border rounded-2xl inline-block mx-auto">
+                <img id="qrImageElement" src="" alt="Mã VietQR" class="w-64 h-64 mx-auto rounded-xl shadow-sm">
+            </div>
+            <div class="text-left text-xs bg-slate-50 p-3 rounded-xl space-y-1.5">
+                <div class="flex justify-between"><span class="text-slate-500">Ngân hàng:</span><b class="text-indigo-900">Agribank</b></div>
+                <div class="flex justify-between"><span class="text-slate-500">Số tài khoản:</span><b class="font-mono text-emerald-700 text-sm">4304205123124</b></div>
+                <div class="flex justify-between"><span class="text-slate-500">Chủ tài khoản:</span><b>TRẦN DƯƠNG QUỐC MẪN</b></div>
+                <div class="flex justify-between border-t pt-1"><span class="text-slate-500">Số tiền:</span><b id="qrAmountText" class="text-emerald-600 font-black text-sm">0 đ</b></div>
+                <div class="flex justify-between"><span class="text-slate-500">Nội dung CK:</span><b id="qrContentText" class="font-mono text-indigo-700">---</b></div>
+            </div>
+            <p class="text-[11px] text-slate-400">Mở app ngân hàng quét mã tự động điền thông tin chuyển khoản.</p>
+        </div>
     </div>
 
     <!-- MODAL ĐỔI MẬT KHẨU -->
@@ -124,8 +245,24 @@
         <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
             <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm">Đổi Mật Khẩu Cá Nhân</h3><button onclick="closeChangePasswordModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
             <form onsubmit="handleSaveNewPassword(event)" class="space-y-3 text-xs">
-                <div><label class="block font-bold mb-1">Mật khẩu mới</label><input type="password" id="newPasswordInput" required minlength="4" class="w-full p-2.5 border rounded-xl outline-none font-bold"></div>
-                <div><label class="block font-bold mb-1">Xác nhận mật khẩu mới</label><input type="password" id="confirmNewPasswordInput" required minlength="4" class="w-full p-2.5 border rounded-xl outline-none font-bold"></div>
+                <div>
+                    <label class="block font-bold mb-1">Mật khẩu mới</label>
+                    <div class="relative">
+                        <input type="password" id="newPasswordInput" required minlength="4" class="w-full p-2.5 pr-10 border rounded-xl outline-none font-bold">
+                        <button type="button" onclick="togglePasswordVisibility('newPasswordInput', 'eyeIconNew')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 p-1">
+                            <i data-lucide="eye" id="eyeIconNew" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">Xác nhận mật khẩu</label>
+                    <div class="relative">
+                        <input type="password" id="confirmNewPasswordInput" required minlength="4" class="w-full p-2.5 pr-10 border rounded-xl outline-none font-bold">
+                        <button type="button" onclick="togglePasswordVisibility('confirmNewPasswordInput', 'eyeIconConfirm')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 p-1">
+                            <i data-lucide="eye" id="eyeIconConfirm" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
                 <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2.5 rounded-xl shadow">Lưu Mật Khẩu</button>
             </form>
         </div>
@@ -134,12 +271,74 @@
     <script>
         const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbznfqhckK2L97z427a50oLuZ0W0nLbtdDcJROOv6S2sGQL3_OGbK0Fs7Hd8wOi_or5cXA/exec";
         const SESSION_KEY = 'ACTIVE_STUDENT_SESSION';
+        const CACHE_DATA_KEY = 'STUDENT_PORTAL_DATA_CACHE';
+
+        const AGRIBANK_BIN = "970405";
+        const AGRIBANK_STK = "4304205123124";
+        const AGRIBANK_NAME = "TRAN DUONG QUOC MAN";
 
         let appData = { classes: [], students: [], attendance: [], payments: [], documents: [], exams: [], examResults: [] };
-        let currentStudent = null;
+        let currentStudent = null, scoreChartInstance = null;
+        let renderedTabs = {};
+        let deferredPrompt = null;
+
+        // ĐĂNG KÝ SERVICE WORKER & BẮT SỰ KIỆN CÀI APP ANDROID
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Fail', err));
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const btnBox = document.getElementById('androidInstallBtnBox');
+            if (btnBox) btnBox.classList.remove('hidden');
+        });
+
+        function triggerPWAInstall() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(() => {
+                    deferredPrompt = null;
+                    closeInstallGuideModal();
+                });
+            } else {
+                alert("Trình duyệt của bạn đang sẵn sàng! Bạn có thể bấm vào dấu 3 chấm của trình duyệt và chọn 'Cài đặt ứng dụng' hoặc 'Thêm vào Màn hình chính'.");
+            }
+        }
+
+        function openInstallGuideModal() {
+            document.getElementById('modalInstallGuide').classList.remove('hidden');
+        }
+        function closeInstallGuideModal() {
+            document.getElementById('modalInstallGuide').classList.add('hidden');
+        }
+
+        function formatDateVN(d) { if(!d) return '---'; const p=d.split('T')[0].split('-'); return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:d; }
+        function formatDateShortVN(d) { if(!d) return '--/--'; const p=d.split('T')[0].split('-'); return p.length===3?`${p[2]}/${p[1]}`:d; }
+
+        function togglePasswordVisibility(inputId, iconId) {
+            const inp = document.getElementById(inputId);
+            const ico = document.getElementById(iconId);
+            if (!inp || !ico) return;
+            if (inp.type === 'password') {
+                inp.type = 'text';
+                ico.setAttribute('data-lucide', 'eye-off');
+            } else {
+                inp.type = 'password';
+                ico.setAttribute('data-lucide', 'eye');
+            }
+            if (window.lucide) lucide.createIcons();
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
             if (window.lucide) lucide.createIcons();
+            const cached = localStorage.getItem(CACHE_DATA_KEY);
+            if (cached) {
+                try {
+                    appData = JSON.parse(cached);
+                    checkSavedSession();
+                } catch(e){}
+            }
             loadStudentCloudData();
         });
 
@@ -151,23 +350,20 @@
                 if(j.Students) appData.students = j.Students.slice(1).map(r=>({id:String(r[0]||''), classId:String(r[1]||''), code:String(r[2]||''), name:String(r[3]||''), phone:String(r[4]||''), joinDate:String(r[5]||''), customFee:r[6]!==''&&r[6]!==null?parseFloat(r[6]):null, username:String(r[7]||''), password:String(r[8]||'')}));
                 if(j.Attendance) appData.attendance = j.Attendance.slice(1).map(r=>({studentId:String(r[0]||''), date:String(r[1]||''), status:String(r[2]||''), note:String(r[3]||'')}));
                 if(j.Payments) appData.payments = j.Payments.slice(1).map(r=>({id:String(r[0]||''), studentId:String(r[1]||''), classId:String(r[2]||''), cycleIndex:parseInt(r[3]), amount:parseFloat(r[4])||0, status:String(r[5]||''), method:String(r[6]||''), date:String(r[8]||'')}));
-                if(j.Documents) appData.documents = j.Documents.slice(1).map(r=>({id:String(r[0]||''), classId:String(r[1]||''), name:String(r[2]||''), url:String(r[4]||'')}));
-                if(j.Exams) appData.exams = j.Exams.slice(1).map(r=>({id:String(r[0]||''), title:String(r[1]||''), classId:String(r[2]||''), duration:parseInt(r[3])||45, matrix:JSON.parse(r[6]||'{}')}));
-                if(j.ExamResults) appData.examResults = j.ExamResults.slice(1).map(r=>({id:String(r[0]||''), examId:String(r[1]||''), studentId:String(r[2]||''), score:parseFloat(r[3]||0), submittedAt:String(r[6]||'')}));
+                if(j.Documents) appData.documents = j.Documents.slice(1).map(r=>({id:String(r[0]||''), classId:String(r[1]||''), name:String(r[2]||''), category:String(r[3]||'Chuyên đề chung'), url:String(r[4]||'')}));
+                if(j.Exams) appData.exams = j.Exams.slice(1).map(r=>({id:String(r[0]||''), title:String(r[1]||''), classId:String(r[2]||''), duration:parseInt(r[3])||45, questions:JSON.parse(r[5]||'[]')}));
+                if(j.ExamResults) appData.examResults = j.ExamResults.slice(1).map(r=>({id:String(r[0]||''), examId:String(r[1]||''), studentId:String(r[2]||''), score:parseFloat(r[3]||0), details:JSON.parse(r[4]||'{}'), submittedAt:String(r[6]||'')}));
 
+                localStorage.setItem(CACHE_DATA_KEY, JSON.stringify(appData));
                 checkSavedSession();
             } catch(e) { console.error("Lỗi:", e); }
         }
 
-        // TỰ ĐỘNG GIỮ ĐĂNG NHẬP NHƯ APP
         function checkSavedSession() {
             const savedId = localStorage.getItem(SESSION_KEY);
-            if(savedId) {
+            if(savedId && (!currentStudent || currentStudent.id !== savedId)) {
                 const s = appData.students.find(x => x.id === savedId);
-                if(s) {
-                    currentStudent = s;
-                    showDashboard();
-                }
+                if(s) { currentStudent = s; showDashboard(); }
             }
         }
 
@@ -185,15 +381,12 @@
             }
 
             currentStudent = s;
-            localStorage.setItem(SESSION_KEY, s.id); // Lưu phiên đăng nhập
+            localStorage.setItem(SESSION_KEY, s.id);
             err.classList.add('hidden');
             showDashboard();
         }
 
-        function studentLogout() {
-            localStorage.removeItem(SESSION_KEY);
-            location.reload();
-        }
+        function studentLogout() { localStorage.removeItem(SESSION_KEY); location.reload(); }
 
         function showDashboard() {
             document.getElementById('studentLoginScreen').classList.add('hidden');
@@ -204,11 +397,8 @@
             document.getElementById('headerStudentClass').innerText = `Lớp: ${c ? c.name : '---'} • Mã HS: ${currentStudent.code}`;
             document.getElementById('userAvatar').innerText = currentStudent.name.split(' ').pop().charAt(0).toUpperCase();
 
-            renderStudentTuition();
-            renderStudentAttendance();
-            renderStudentExams();
-            renderStudentDocs();
-            if (window.lucide) lucide.createIcons();
+            renderedTabs = {};
+            switchStudentTab('tuition');
         }
 
         function switchStudentTab(id) {
@@ -217,17 +407,42 @@
                 b.classList.remove('bg-indigo-50', 'text-indigo-600');
                 b.classList.add('text-slate-500');
             });
+
             document.getElementById(`stab-${id}`).classList.remove('hidden');
             const act = document.getElementById(`stab-btn-${id}`);
             act.classList.add('bg-indigo-50', 'text-indigo-600');
             act.classList.remove('text-slate-500');
+
+            if (!renderedTabs[id]) {
+                if (id === 'tuition') renderStudentTuition();
+                if (id === 'attendance') renderStudentAttendance();
+                if (id === 'analytics') { renderStudentAnalytics(); renderScoreChart(); }
+                if (id === 'documents') renderStudentGroupedDocs();
+                renderedTabs[id] = true;
+            }
+            if (window.lucide) lucide.createIcons();
         }
 
-        // RENDER HỌC PHÍ PHƯƠNG ÁN B MINH BẠCH
+        function showVietQR(cycleNum, amount) {
+            const c = appData.classes.find(x => x.id === currentStudent.classId);
+            const className = (c ? c.name : 'LOP').toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const rawUsername = (currentStudent.username || currentStudent.code).toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const desc = `HP ${className} ${rawUsername} K${cycleNum}`;
+
+            const qrUrl = `https://img.vietqr.io/image/${AGRIBANK_BIN}-${AGRIBANK_STK}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(desc)}&accountName=${encodeURIComponent(AGRIBANK_NAME)}`;
+
+            document.getElementById('qrImageElement').src = qrUrl;
+            document.getElementById('qrAmountText').innerText = amount.toLocaleString() + ' đ';
+            document.getElementById('qrContentText').innerText = desc;
+            document.getElementById('modalVietQR').classList.remove('hidden');
+        }
+        function closeVietQRModal() { document.getElementById('modalVietQR').classList.add('hidden'); }
+
         function renderStudentTuition() {
             const container = document.getElementById('studentTuitionCards');
             const c = appData.classes.find(x => x.id === currentStudent.classId);
             const stdFee = currentStudent.customFee !== null ? currentStudent.customFee : (c ? c.fee : 0);
+            const isExempt = stdFee === 0;
 
             const classSessions = [...new Set(appData.attendance.filter(a => appData.students.some(cs=>cs.classId===currentStudent.classId && cs.id===a.studentId)).map(a=>a.date))].sort();
             const totalClassSess = classSessions.length;
@@ -238,14 +453,17 @@
             let html = '';
             for(let i=0; i<4; i++) {
                 const p = appData.payments.find(x => x.studentId === currentStudent.id && x.cycleIndex === i);
-                let stC = 'bg-slate-50 border-slate-200 text-slate-400', txt = 'Chưa đến', amount = stdFee;
+                let stC = 'bg-slate-50 border-slate-200 text-slate-400', txt = 'Chưa đến', amount = stdFee, showPayBtn = false;
 
-                if(i === joinCycle && skipCount > 0) {
+                if(i === joinCycle && skipCount > 0 && !isExempt) {
                     const actualSess = 8 - (skipCount % 8);
                     amount = Math.round((stdFee / 8) * actualSess);
                 }
 
-                if(p && p.status === 'PAID') {
+                if(isExempt || (p && p.status === 'EXEMPT')) {
+                    stC = 'bg-blue-50 border-blue-200 text-blue-800 font-bold';
+                    txt = `MIỄN PHÍ`;
+                } else if(p && p.status === 'PAID') {
                     stC = 'bg-emerald-50 border-emerald-200 text-emerald-800';
                     txt = `ĐÃ NỘP: ${p.amount.toLocaleString()}đ<br><span class="text-[10px] text-slate-500 font-normal">${p.date}</span>`;
                 } else if(i < joinCycle) {
@@ -253,74 +471,284 @@
                 } else if(i < activeCycleIdx) {
                     stC = 'bg-rose-50 border-rose-200 text-rose-700 font-bold';
                     txt = `NỢ: ${amount.toLocaleString()}đ`;
+                    showPayBtn = true;
                 } else if(i === activeCycleIdx) {
                     stC = 'bg-amber-50 border-amber-200 text-amber-800 font-bold';
                     txt = `CẦN NỘP: ${amount.toLocaleString()}đ`;
+                    showPayBtn = true;
                 }
 
                 html += `
-                    <div class="p-4 rounded-2xl border ${stC} space-y-1">
-                        <div class="text-[11px] font-bold uppercase">Kỳ ${i + 1}</div>
-                        <div class="text-xs leading-relaxed">${txt}</div>
+                    <div class="p-4 rounded-2xl border ${stC} space-y-2 flex flex-col justify-between">
+                        <div>
+                            <div class="text-[11px] font-bold uppercase">Kỳ ${i + 1}</div>
+                            <div class="text-xs leading-relaxed mt-1">${txt}</div>
+                        </div>
+                        ${showPayBtn ? `
+                            <button onclick="showVietQR(${i + 1},${amount})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-[11px] shadow transition flex items-center justify-center space-x-1">
+                                <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
+                                <span>Quét QR Chuyển Khoản</span>
+                            </button>
+                        ` : ''}
                     </div>
                 `;
             }
             container.innerHTML = html;
         }
 
-        // RENDER ĐIỂM DANH
         function renderStudentAttendance() {
-            const list = appData.attendance.filter(a => a.studentId === currentStudent.id).sort((a,b)=>b.date.localeCompare(a.date));
-            const c = document.getElementById('studentAttendanceList');
-            if(list.length === 0) { c.innerHTML = '<div class="text-xs text-slate-400 italic">Chưa có dữ liệu điểm danh.</div>'; return; }
+            const container = document.getElementById('studentAttendanceCyclesContainer');
+            if (!container || !currentStudent) return;
 
-            c.innerHTML = list.map(a => {
-                let badge = '<span class="text-emerald-600 font-bold">🟢 Có mặt</span>';
-                if(a.status === 'ABSENT_PERM') badge = '<span class="text-amber-500 font-bold">🟡 Vắng có phép</span>';
-                else if(a.status === 'ABSENT_NO_PERM') badge = '<span class="text-rose-600 font-bold">🔴 Vắng không phép</span>';
-                else if(a.status === 'LATE') badge = '<span class="text-blue-500 font-bold">🔵 Đi trễ</span>';
+            const classSessions = [...new Set(appData.attendance.filter(a => 
+                appData.students.some(s => s.classId === currentStudent.classId && s.id === a.studentId)
+            ).map(a => a.date))].sort();
 
-                return `
-                    <div class="p-3 bg-slate-50 border rounded-xl flex justify-between items-center text-xs">
-                        <span class="font-mono font-bold">${a.date}</span>
-                        <div>${badge}</div>
+            if (classSessions.length === 0) {
+                container.innerHTML = '<div class="p-6 text-center text-xs text-slate-400 italic">Lớp chưa có buổi học nào được ghi nhận.</div>';
+                return;
+            }
+
+            const myRecords = appData.attendance.filter(a => a.studentId === currentStudent.id);
+            let presentCount = 0, permCount = 0, noPermCount = 0, lateCount = 0;
+
+            myRecords.forEach(r => {
+                if (r.status === 'PRESENT') presentCount++;
+                else if (r.status === 'ABSENT_PERM') permCount++;
+                else if (r.status === 'ABSENT_NO_PERM') noPermCount++;
+                else if (r.status === 'LATE') { lateCount++; presentCount++; }
+            });
+
+            const totalSessionsEnrolled = classSessions.filter(d => !currentStudent.joinDate || d >= currentStudent.joinDate).length;
+            const rate = totalSessionsEnrolled > 0 ? Math.round((presentCount / totalSessionsEnrolled) * 100) : 100;
+
+            document.getElementById('attStatTotal').innerText = `${presentCount}/${totalSessionsEnrolled}`;
+            document.getElementById('attStatRate').innerText = `${rate}%`;
+            document.getElementById('attStatPerm').innerText = permCount;
+            document.getElementById('attStatNoPerm').innerText = `${noPermCount} (${lateCount} trễ)`;
+
+            const chunks = [];
+            for (let i = 0; i < classSessions.length; i += 8) {
+                chunks.push(classSessions.slice(i, i + 8));
+            }
+
+            let html = '';
+            chunks.forEach((chunkDates, cIdx) => {
+                const cycleNum = cIdx + 1;
+                const isCurrentCycle = (cIdx === chunks.length - 1);
+                const startDateStr = formatDateVN(chunkDates[0]);
+                const endDateStr = formatDateVN(chunkDates[chunkDates.length - 1]);
+                const isOpen = isCurrentCycle;
+
+                let cyclePresent = 0;
+                const sessionCells = chunkDates.map((d, dIdx) => {
+                    const r = appData.attendance.find(a => a.studentId === currentStudent.id && a.date === d);
+                    let badgeClass = 'bg-slate-50 border-slate-200 text-slate-400';
+                    let icon = '•';
+
+                    if (currentStudent.joinDate && d < currentStudent.joinDate) {
+                        badgeClass = 'bg-slate-100 border-slate-200 text-slate-400 opacity-60';
+                        icon = '⚪';
+                    } else if (r) {
+                        if (r.status === 'PRESENT') {
+                            badgeClass = 'bg-emerald-50 border-emerald-300 text-emerald-700';
+                            icon = '✓';
+                            cyclePresent++;
+                        } else if (r.status === 'ABSENT_PERM') {
+                            badgeClass = 'bg-amber-50 border-amber-300 text-amber-700';
+                            icon = 'P';
+                        } else if (r.status === 'ABSENT_NO_PERM') {
+                            badgeClass = 'bg-rose-50 border-rose-300 text-rose-700';
+                            icon = 'KP';
+                        } else if (r.status === 'LATE') {
+                            badgeClass = 'bg-blue-50 border-blue-300 text-blue-700';
+                            icon = 'T';
+                            cyclePresent++;
+                        }
+                    }
+
+                    return `
+                        <div class="p-2.5 rounded-2xl border ${badgeClass} flex flex-col items-center justify-between text-center min-h-[76px]">
+                            <div class="text-[10px] font-bold text-slate-500">Buổi ${dIdx + 1}</div>
+                            <div class="text-base font-black my-0.5">${icon}</div>
+                            <div class="text-[9px] font-mono leading-tight">${formatDateShortVN(d)}</div>
+                        </div>
+                    `;
+                }).join('');
+
+                const emptySlots = Array.from({ length: 8 - chunkDates.length }, (_, i) => `
+                    <div class="p-2.5 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 flex flex-col items-center justify-center text-center opacity-40 min-h-[76px]">
+                        <div class="text-[10px] font-bold text-slate-400">Buổi ${chunkDates.length + i + 1}</div>
+                        <div class="text-xs text-slate-300 font-mono mt-1">--/--</div>
+                    </div>
+                `).join('');
+
+                html += `
+                    <div class="border rounded-2xl overflow-hidden shadow-sm transition ${isCurrentCycle ? 'border-indigo-300 ring-2 ring-indigo-50' : 'border-slate-200'}">
+                        <div onclick="toggleStudentCycle(${cIdx})" class="p-4 flex flex-wrap justify-between items-center cursor-pointer select-none ${isCurrentCycle ? 'bg-indigo-50/70 hover:bg-indigo-50' : 'bg-slate-50 hover:bg-slate-100'}">
+                            <div class="flex items-center space-x-3">
+                                <span class="w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs ${isCurrentCycle ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-700'}">
+                                    K${cycleNum}
+                                </span>
+                                <div>
+                                    <div class="font-bold text-xs sm:text-sm text-slate-800 flex items-center space-x-2">
+                                        <span>KỲ ${cycleNum}: ${startDateStr} ➔ ${endDateStr}</span>
+                                        ${isCurrentCycle ? '<span class="text-[10px] font-bold bg-indigo-600 text-white px-2 py-0.5 rounded-full">Đang Diễn Ra</span>' : '<span class="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Đã Khóa Sổ</span>'}
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">Tham gia: <b class="text-indigo-900">${cyclePresent}/${chunkDates.length} buổi</b></p>
+                                </div>
+                            </div>
+                            <i data-lucide="${isOpen ? 'chevron-up' : 'chevron-down'}" id="st-cycle-icon-${cIdx}" class="w-4 h-4 text-slate-400"></i>
+                        </div>
+
+                        <div id="st-cycle-body-${cIdx}" class="${isOpen ? '' : 'hidden'} p-4 bg-white border-t">
+                            <div class="grid grid-cols-4 sm:grid-cols-8 gap-2">
+                                ${sessionCells}
+                                ${emptySlots}
+                            </div>
+                        </div>
                     </div>
                 `;
-            }).join('');
+            });
+
+            container.innerHTML = html;
         }
 
-        // RENDER LỊCH SỬ THI
-        function renderStudentExams() {
-            const list = appData.examResults.filter(r => r.studentId === currentStudent.id).reverse();
-            const c = document.getElementById('studentExamResultsList');
-            if(list.length === 0) { c.innerHTML = '<div class="text-xs text-slate-400 italic">Bạn chưa nộp bài thi nào.</div>'; return; }
+        function toggleStudentCycle(idx) {
+            const body = document.getElementById(`st-cycle-body-${idx}`);
+            const icon = document.getElementById(`st-cycle-icon-${idx}`);
+            if (!body) return;
+            const isHidden = body.classList.contains('hidden');
+            if (isHidden) {
+                body.classList.remove('hidden');
+                if (icon) icon.setAttribute('data-lucide', 'chevron-up');
+            } else {
+                body.classList.add('hidden');
+                if (icon) icon.setAttribute('data-lucide', 'chevron-down');
+            }
+            if (window.lucide) lucide.createIcons();
+        }
 
-            c.innerHTML = list.map(r => {
-                const ex = appData.exams.find(e => e.id === r.examId) || {title: 'Đề thi'};
-                return `
-                    <div class="p-3 bg-slate-50 border rounded-xl flex justify-between items-center text-xs">
-                        <div><b>${ex.title}</b><div class="text-[10px] text-slate-400">${new Date(r.submittedAt).toLocaleString('vi-VN')}</div></div>
-                        <div class="text-base font-black text-indigo-700">${r.score.toFixed(1)}đ</div>
+        function renderStudentAnalytics() {
+            const results = appData.examResults.filter(r => r.studentId === currentStudent.id);
+            const radarContainer = document.getElementById('studentRadarStats');
+
+            if(results.length === 0) {
+                radarContainer.innerHTML = '<div class="text-xs text-slate-400 italic">Chưa có bài thi nào được nộp.</div>';
+                return;
+            }
+
+            let p1Correct = 0, p1Total = 0;
+            let p2Correct = 0, p2Total = 0;
+            let p3Correct = 0, p3Total = 0;
+
+            results.forEach(r => {
+                const ex = appData.exams.find(e => e.id === r.examId);
+                if(ex && ex.questions) {
+                    ex.questions.forEach((q, idx) => {
+                        const uAns = r.details[idx];
+                        if(q.part === 1) {
+                            p1Total++;
+                            if(uAns && uAns === q.correct) p1Correct++;
+                        } else if(q.part === 2) {
+                            (q.statements || []).forEach((st, sIdx) => {
+                                p2Total++;
+                                if(uAns && uAns[sIdx] === st.correct) p2Correct++;
+                            });
+                        } else if(q.part === 3) {
+                            p3Total++;
+                            if(uAns && String(uAns).toLowerCase() === String(q.correct).trim().toLowerCase()) p3Correct++;
+                        }
+                    });
+                }
+            });
+
+            const r1 = p1Total > 0 ? Math.round((p1Correct / p1Total) * 100) : 0;
+            const r2 = p2Total > 0 ? Math.round((p2Correct / p2Total) * 100) : 0;
+            const r3 = p3Total > 0 ? Math.round((p3Correct / p3Total) * 100) : 0;
+
+            radarContainer.innerHTML = `
+                <div class="space-y-2 text-xs">
+                    <div>
+                        <div class="flex justify-between font-bold mb-1"><span>Phần I: Trắc nghiệm 4 lựa chọn</span><span class="text-indigo-600">${r1}%</span></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden"><div class="bg-indigo-600 h-2.5 rounded-full" style="width: ${r1}%"></div></div>
                     </div>
-                `;
-            }).join('');
+                    <div>
+                        <div class="flex justify-between font-bold mb-1"><span>Phần II: Câu hỏi Đúng / Sai</span><span class="text-amber-600">${r2}%</span></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden"><div class="bg-amber-500 h-2.5 rounded-full" style="width: ${r2}%"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between font-bold mb-1"><span>Phần III: Trả lời ngắn</span><span class="text-purple-600">${r3}%</span></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden"><div class="bg-purple-600 h-2.5 rounded-full" style="width: ${r3}%"></div></div>
+                    </div>
+                </div>
+                <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-xl text-xs text-indigo-900 mt-3 leading-relaxed">
+                    💡 <b>Lời khuyên sư phạm:</b> ${r2 < 60 ? 'Em cần chú ý đọc kỹ các giả thiết câu hỏi Đúng/Sai ở Phần II.' : r3 < 60 ? 'Em cần rèn luyện thêm kỹ năng tính toán số tự luận ở Phần III.' : 'Phong độ giải đề của em rất ổn định!'}
+                </div>
+            `;
         }
 
-        // RENDER TÀI LIỆU
-        function renderStudentDocs() {
+        function renderScoreChart() {
+            const results = appData.examResults.filter(r => r.studentId === currentStudent.id);
+            const ctx = document.getElementById('studentScoreChart');
+            if(!ctx || results.length === 0) return;
+
+            const labels = results.map((r, i) => `Bài ${i + 1}`);
+            const dataScores = results.map(r => r.score);
+
+            if(scoreChartInstance) scoreChartInstance.destroy();
+            scoreChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Điểm Số',
+                        data: dataScores,
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { min: 0, max: 10 } }
+                }
+            });
+        }
+
+        function renderStudentGroupedDocs() {
             const list = appData.documents.filter(d => d.classId === currentStudent.classId);
-            const c = document.getElementById('studentDocsList');
+            const c = document.getElementById('studentGroupedDocsList');
             if(list.length === 0) { c.innerHTML = '<div class="text-xs text-slate-400 italic">Chưa có tài liệu nào.</div>'; return; }
 
-            c.innerHTML = list.map((d, i) => `
-                <div class="p-3 bg-slate-50 border rounded-xl flex justify-between items-center text-xs">
-                    <span>${i + 1}. <b>${d.name}</b></span>
-                    <a href="${d.url}" target="_blank" class="bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg font-bold">Xem / Tải</a>
+            const groups = {};
+            list.forEach(d => {
+                const cat = d.category || 'Chuyên đề chung';
+                if(!groups[cat]) groups[cat] = [];
+                groups[cat].push(d);
+            });
+
+            c.innerHTML = Object.keys(groups).map((catName, idx) => `
+                <div class="border rounded-2xl overflow-hidden shadow-sm">
+                    <div onclick="document.getElementById('cat-body-${idx}').classList.toggle('hidden')" class="p-3.5 bg-slate-50 hover:bg-slate-100 flex justify-between items-center cursor-pointer font-bold text-xs text-indigo-950">
+                        <span class="flex items-center space-x-2"><i data-lucide="folder" class="w-4 h-4 text-indigo-600"></i><span>${catName}</span></span>
+                        <span class="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-[10px]">${groups[catName].length} file</span>
+                    </div>
+                    <div id="cat-body-${idx}" class="p-3 space-y-2 bg-white border-t">
+                        ${groups[catName].map(f => `
+                            <div class="p-2.5 rounded-xl border flex justify-between items-center text-xs">
+                                <span>📄 <b>${f.name}</b></span>
+                                <a href="${f.url}" target="_blank" class="bg-indigo-50 text-indigo-700 font-bold px-3 py-1 rounded-lg">Xem / Tải</a>
+                            </div>
+                        `).join('')}
+                    </div>
                 </div>
             `).join('');
         }
 
-        // ĐỔI MẬT KHẨU
         function openChangePasswordModal() { document.getElementById('modalChangePassword').classList.remove('hidden'); }
         function closeChangePasswordModal() { document.getElementById('modalChangePassword').classList.add('hidden'); }
 
@@ -328,7 +756,7 @@
             e.preventDefault();
             const p1 = document.getElementById('newPasswordInput').value;
             const p2 = document.getElementById('confirmNewPasswordInput').value;
-            if(p1 !== p2) { alert("Hai mật khẩu mới không khớp nhau!"); return; }
+            if(p1 !== p2) { alert("Mật khẩu xác nhận không khớp!"); return; }
 
             try {
                 await fetch(CLOUD_API_URL, {
@@ -339,10 +767,8 @@
                 currentStudent.password = p1;
                 alert("Đổi mật khẩu thành công!");
                 closeChangePasswordModal();
-            } catch(err) { alert("Lỗi khi đổi mật khẩu!"); }
+            } catch(err) { alert("Lỗi khi kết nối!"); }
         }
-
-        function goToExamApp() { window.location.href = 'exam.html'; }
     </script>
 </body>
 </html>

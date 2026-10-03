@@ -1,11 +1,11 @@
 {
-  "name": "Quản Lý Dạy Thêm Pro",
-  "short_name": "Dạy Thêm Pro",
-  "start_url": "./index.html",
+  "name": "Sổ Học Tập & Khảo Thí",
+  "short_name": "Sổ Học Tập",
+  "start_url": "./hocsinh.html",
   "display": "standalone",
-  "background_color": "#0f172a",
+  "background_color": "#312e81",
   "theme_color": "#312e81",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/3135/3135755.png",
