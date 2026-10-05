@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hệ Thống Quản Lý Dạy Thêm & Khảo Thí Pro</title>
+    <title>SigmaMath Teacher Pro - Quản Lý Dạy Thêm & Khảo Thí</title>
     
     <!-- PWA & Mobile Meta Tags -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#312e81">
+    <meta name="theme-color" content="#1e1b4b">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135755.png">
+    <meta name="apple-mobile-web-app-title" content="SigmaTeacher">
+    <link rel="icon" type="image/png" href="logo-teacher-192.png">
+    <link rel="apple-touch-icon" href="logo-teacher.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -18,7 +21,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -29,11 +32,11 @@
 </head>
 <body class="text-slate-800 flex flex-col md:flex-row h-screen overflow-hidden">
 
-    <!-- MÀN HÌNH KHÓA BẢO MẬT MÃ PIN QUẢN TRỊ -->
+    <!-- MÀN HÌNH KHÓA MÃ PIN QUẢN TRỊ -->
     <div id="adminPinLockScreen" class="fixed inset-0 bg-slate-950 z-[100] flex items-center justify-center p-4">
         <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl border border-slate-200 w-full max-w-sm text-center space-y-5">
-            <div class="w-16 h-16 bg-indigo-50 text-indigo-700 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
-                <i data-lucide="shield-lock" class="w-8 h-8"></i>
+            <div class="w-20 h-20 mx-auto rounded-3xl overflow-hidden shadow-md border border-slate-100 flex items-center justify-center bg-slate-900">
+                <img src="logo-teacher.png" alt="SigmaMath Teacher" class="w-full h-full object-cover">
             </div>
             <div>
                 <h1 class="text-lg font-black text-slate-800">XÁC THỰC GIÁO VIÊN</h1>
@@ -41,7 +44,7 @@
             </div>
             <form onsubmit="handleVerifyAdminPin(event)" class="space-y-4">
                 <div class="relative">
-                    <input type="password" id="inputAdminPin" maxlength="10" placeholder="Nhập mã PIN..." required autofocus class="w-full text-center tracking-[0.4em] text-xl font-mono font-black p-3.5 border-2 border-indigo-100 rounded-2xl outline-none focus:border-indigo-600 bg-slate-50">
+                    <input type="password" id="inputAdminPin" maxlength="10" placeholder="Nhập PIN..." required autofocus class="w-full text-center tracking-[0.4em] text-xl font-mono font-black p-3.5 border-2 border-indigo-100 rounded-2xl outline-none focus:border-indigo-600 bg-slate-50">
                     <button type="button" onclick="togglePinView()" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 p-1">
                         <i data-lucide="eye" id="eyeIconAdminPin" class="w-4 h-4"></i>
                     </button>
@@ -59,10 +62,10 @@
     <aside id="sidebar" class="w-full md:w-64 bg-slate-900 text-slate-200 flex flex-col shrink-0 transition-all duration-300 z-50 shadow-xl">
         <div class="p-4 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center space-x-3 overflow-hidden">
-                <div class="bg-indigo-600 p-2 rounded-xl shrink-0"><i data-lucide="graduation-cap" class="w-5 h-5 text-amber-400"></i></div>
+                <img src="logo-teacher.png" alt="SigmaMath Teacher" class="w-9 h-9 rounded-xl object-cover border border-amber-400/40 shadow-sm shrink-0">
                 <div class="sidebar-text whitespace-nowrap">
-                    <h1 class="font-bold text-sm tracking-wide text-white leading-tight">QUẢN LÝ DẠY THÊM</h1>
-                    <p class="text-[10px] text-slate-400">Khảo Thí & Học Phí Smart</p>
+                    <h1 class="font-bold text-sm tracking-wide text-white leading-tight">SigmaMath Teacher</h1>
+                    <p class="text-[10px] text-amber-300 font-semibold">Khảo Thí & Học Phí Pro</p>
                 </div>
             </div>
             <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-white p-1"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -71,6 +74,7 @@
         <nav class="flex md:flex-col p-2 space-x-1 md:space-x-0 md:space-y-1 overflow-x-auto md:overflow-y-auto text-xs font-semibold shrink-0">
             <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0 text-indigo-400"></i><span class="sidebar-text">Dashboard</span></button>
             <button onclick="switchTab('classes')" id="tab-btn-classes" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="users" class="w-4 h-4 shrink-0 text-indigo-400"></i><span class="sidebar-text">Lớp & Học Sinh</span></button>
+            <button onclick="switchTab('inactive-students')" id="tab-btn-inactive-students" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="user-x" class="w-4 h-4 shrink-0 text-rose-400"></i><span class="sidebar-text">Hồ Sơ Nghỉ & Nợ</span></button>
             <button onclick="switchTab('schedule')" id="tab-btn-schedule" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="calendar-clock" class="w-4 h-4 shrink-0 text-indigo-400"></i><span class="sidebar-text">Lịch Dạy 2 Tầng</span></button>
             <button onclick="switchTab('attendance-session')" id="tab-btn-attendance-session" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="check-square" class="w-4 h-4 shrink-0 text-indigo-400"></i><span class="sidebar-text">Điểm Danh Buổi</span></button>
             <button onclick="switchTab('attendance-matrix')" id="tab-btn-attendance-matrix" class="tab-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap"><i data-lucide="calendar" class="w-4 h-4 shrink-0 text-indigo-400"></i><span class="sidebar-text">Sổ Lưu Trữ 8 Buổi</span></button>
@@ -187,7 +191,7 @@
                             <div class="flex items-center space-x-2">
                                 <button onclick="autoGenerateAccountsForOldStudents()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-2 rounded-xl shadow transition flex items-center space-x-1" title="Quét và tạo tài khoản tự động cho học sinh cũ">
                                     <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
-                                    <span>Tạo TK Tự Động Cho HS Cũ</span>
+                                    <span>Tạo TK Cho HS Cũ</span>
                                 </button>
                                 <button onclick="openAddStudentModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow transition flex items-center space-x-1">
                                     <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
@@ -215,7 +219,42 @@
                 </div>
             </section>
 
-            <!-- TAB 3: LỊCH DẠY 2 TẦNG -->
+            <!-- TAB 3: SỔ HỌC SINH ĐÃ NGHỈ & LƯU TRỮ CÔNG NỢ CŨ -->
+            <section id="tab-inactive-students" class="tab-content hidden space-y-6">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
+                        <div>
+                            <h2 class="font-bold text-sm text-rose-900 flex items-center space-x-2">
+                                <i data-lucide="archive" class="w-4 h-4 text-rose-600"></i>
+                                <span>Hồ Sơ Học Sinh Đã Nghỉ Học & Công Nợ Chốt</span>
+                            </h2>
+                            <p class="text-xs text-slate-500">Lưu trữ đối soát số buổi thực học, số tiền đã đóng và số tiền nợ lại khi nghỉ học.</p>
+                        </div>
+                        <span id="inactiveStudentsCountBadge" class="text-xs bg-rose-50 text-rose-700 font-bold px-3 py-1 rounded-xl border border-rose-200">0 Hồ Sơ</span>
+                    </div>
+                    <div class="overflow-x-auto rounded-xl border">
+                        <table class="w-full text-left text-xs whitespace-nowrap">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 font-bold border-b">
+                                    <th class="p-3">Lớp Cũ</th>
+                                    <th class="p-3">Mã HS</th>
+                                    <th class="p-3">Họ Tên</th>
+                                    <th class="p-3">SĐT</th>
+                                    <th class="p-3">Ngày Nghỉ</th>
+                                    <th class="p-3 text-center">Số Buổi Học</th>
+                                    <th class="p-3">Đã Nộp</th>
+                                    <th class="p-3 text-rose-600">Nợ Chốt Lại</th>
+                                    <th class="p-3">Lý Do Nghỉ</th>
+                                    <th class="p-3 text-center">Khôi Phục</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inactiveStudentsTableBody" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: LỊCH DẠY 2 TẦNG -->
             <section id="tab-schedule" class="tab-content hidden space-y-6">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
                     <div class="flex items-center space-x-2">
@@ -253,7 +292,7 @@
                 </div>
             </section>
 
-            <!-- TAB 4: ĐIỂM DANH BUỔI -->
+            <!-- TAB 5: ĐIỂM DANH BUỔI -->
             <section id="tab-attendance-session" class="tab-content hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex justify-between items-center border-b pb-3">
@@ -272,13 +311,13 @@
                 </div>
             </section>
 
-            <!-- TAB 5: SỔ LƯU TRỮ ĐIỂM DANH 8 BUỔI -->
+            <!-- TAB 6: SỔ LƯU TRỮ ĐIỂM DANH 8 BUỔI (THEO CLASS_ID) -->
             <section id="tab-attendance-matrix" class="tab-content hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
                         <div>
                             <h2 class="font-bold text-sm text-slate-800">Sổ Lưu Trữ Lịch Sử Điểm Danh (8 Buổi / Chu Kỳ)</h2>
-                            <p class="text-xs text-slate-500">Mỗi chu kỳ 8 buổi dạy của lớp được tự động đóng gói thành hồ sơ lưu trữ riêng biệt.</p>
+                            <p class="text-xs text-slate-500">Khóa lịch sử theo lớp: Nhóm 1 và Nhóm 2 hoàn toàn độc lập, không bị lẫn ngày khi học sinh chuyển lớp.</p>
                         </div>
                         <div class="flex items-center space-x-2">
                             <button onclick="expandAllCycles(true)" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-3 py-1.5 rounded-xl transition">Mở Tất Cả</button>
@@ -289,13 +328,13 @@
                 </div>
             </section>
 
-            <!-- TAB 6: HỌC PHÍ THEO KỲ -->
+            <!-- TAB 7: HỌC PHÍ THEO KỲ -->
             <section id="tab-tuition" class="tab-content hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex justify-between items-center border-b pb-2">
                         <div>
                             <h2 class="font-bold text-sm text-slate-800">Theo Dõi Học Phí Theo Chu Kỳ Của Lớp</h2>
-                            <p class="text-[11px] text-slate-500">Cả lớp chạy chung nhịp kỳ. Học sinh vào sau tính phí lẻ, miễn phí hiển thị đúng "Miễn giảm".</p>
+                            <p class="text-[11px] text-slate-500">Cả lớp chạy chung nhịp kỳ. Học sinh vào sau hoặc chuyển lớp tính phí lẻ từ ngày gia nhập mới.</p>
                         </div>
                     </div>
                     <div class="overflow-x-auto border rounded-xl">
@@ -316,7 +355,7 @@
                 </div>
             </section>
 
-            <!-- TAB 7: NHẬT KÝ THU TIỀN -->
+            <!-- TAB 8: NHẬT KÝ THU TIỀN -->
             <section id="tab-history" class="tab-content hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex justify-between items-center border-b pb-2">
@@ -332,7 +371,7 @@
                 </div>
             </section>
 
-            <!-- TAB 8: NGÂN HÀNG ĐỀ THI -->
+            <!-- TAB 9: NGÂN HÀNG ĐỀ THI -->
             <section id="tab-qbank" class="tab-content hidden space-y-6">
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
@@ -346,7 +385,7 @@
                             <input type="url" id="directExamSolutionUrl" placeholder="Link PDF lời giải (Drive)" class="p-2 border rounded-xl text-xs outline-none font-mono">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Dán nội dung từ Word ([P1], [P2], [P3] và Win + Shift + S chụp ảnh rồi Ctrl + V):</label>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-1">Dán nội dung từ Word ([P1], [P2], [P3] và dán ảnh bằng Ctrl + V):</label>
                             <div id="directEditorArea" contenteditable="true" placeholder="Dán đề vào đây..." class="direct-editor w-full p-3 border-2 border-dashed border-slate-300 rounded-xl min-h-[240px] max-h-[360px] overflow-y-auto text-xs font-mono bg-slate-50 outline-none leading-relaxed"></div>
                         </div>
                         <div class="flex gap-2">
@@ -366,7 +405,7 @@
                 </div>
             </section>
 
-            <!-- TAB 9: PHỔ ĐIỂM & GIAN LẬN -->
+            <!-- TAB 10: PHỔ ĐIỂM & GIAN LẬN -->
             <section id="tab-analytics" class="tab-content hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex justify-between items-center border-b pb-2">
@@ -377,7 +416,7 @@
                 </div>
             </section>
 
-            <!-- TAB 10: TÀI LIỆU PHÂN NHÓM THEO CHUYÊN ĐỀ -->
+            <!-- TAB 11: TÀI LIỆU PHÂN NHÓM THEO CHUYÊN ĐỀ -->
             <section id="tab-documents" class="tab-content hidden space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-3 h-fit">
@@ -397,9 +436,9 @@
                 </div>
             </section>
 
-            <!-- TAB 11: CẤU HÌNH & BẢO MẬT PIN -->
+            <!-- TAB 12: CẤU HÌNH, THƯƠNG HIỆU & BẢO MẬT PIN -->
             <section id="tab-settings" class="tab-content hidden space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
                     <!-- Khối Cấu hình API & Sao lưu -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
                         <h2 class="font-bold text-sm border-b pb-2 flex items-center space-x-2">
@@ -413,7 +452,7 @@
                         </div>
                         <div class="border-t pt-3 space-y-2">
                             <label class="block text-xs font-bold text-slate-700">Sao Lưu Dự Phòng Google Drive:</label>
-                            <p class="text-[11px] text-slate-500">Tạo bản sao dự phòng tức thì của cơ sở dữ liệu vào thư mục `SaoLuu_HeThongDayThem`.</p>
+                            <p class="text-[11px] text-slate-500">Tạo bản sao lưu tức thì của cơ sở dữ liệu vào thư mục `SaoLuu_HeThongDayThem`.</p>
                             <button onclick="backupDatabaseNow()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs py-2.5 rounded-xl shadow flex items-center justify-center space-x-1.5">
                                 <i data-lucide="database-backup" class="w-4 h-4 text-emerald-400"></i>
                                 <span>Sao Lưu Dữ Liệu Ngay Lập Tức</span>
@@ -421,8 +460,39 @@
                         </div>
                     </div>
 
-                    <!-- Khối Đổi Mã PIN Admin -->
+                    <!-- Khối Cấu hình Tên & Logo App Học Sinh -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
+                        <h2 class="font-bold text-sm border-b pb-2 flex items-center space-x-2">
+                            <i data-lucide="palette" class="w-4 h-4 text-purple-600"></i>
+                            <span>Tùy Biến Tên App & Logo Cổng Học Sinh</span>
+                        </h2>
+                        <form onsubmit="handleSaveAppBranding(event)" class="space-y-3 text-xs">
+                            <div>
+                                <label class="block font-bold mb-1">Tên Ứng Dụng (App Name):</label>
+                                <input type="text" id="cfgAppName" value="SigmaMath - Thầy Mẫn" required class="w-full p-2.5 border rounded-xl font-bold outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold mb-1">Tên Rút Gọn Icon Màn Hình (Short Name):</label>
+                                <input type="text" id="cfgAppShortName" value="M-SigmaMath" required class="w-full p-2.5 border rounded-xl font-bold outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold mb-1">Câu Slogan / Giới thiệu:</label>
+                                <input type="text" id="cfgAppSlogan" value="Hệ thống học tập, chuyên cần & khảo thí Toán Thầy Mẫn" class="w-full p-2.5 border rounded-xl outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold mb-1">Đường dẫn Logo (Mặc định logo-student.png):</label>
+                                <input type="text" id="cfgAppLogo" value="logo-student.png" required oninput="previewAppLogo(this.value)" class="w-full p-2.5 border rounded-xl font-mono outline-none">
+                            </div>
+                            <div class="flex items-center space-x-3 p-3 bg-slate-50 border rounded-xl">
+                                <img id="cfgLogoPreview" src="logo-student.png" class="w-12 h-12 rounded-xl object-cover border bg-slate-900 shadow-sm" alt="Preview Logo">
+                                <div class="text-[11px] text-slate-500">Xem trước logo hiển thị trên máy học sinh.</div>
+                            </div>
+                            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl shadow transition">Lưu & Đổi Tự Động Toàn Hệ Thống</button>
+                        </form>
+                    </div>
+
+                    <!-- Khối Đổi Mã PIN Admin -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4 md:col-span-2 max-w-md mx-auto w-full">
                         <h2 class="font-bold text-sm border-b pb-2 flex items-center space-x-2">
                             <i data-lucide="key-round" class="w-4 h-4 text-amber-500"></i>
                             <span>Bảo Mật Mã PIN Quản Trị</span>
@@ -451,14 +521,12 @@
     <!-- WIDGET CHATBOX TRỢ LÝ GIÁO VIÊN NỔI -->
     <div id="teacherAssistantWidget" class="fixed bottom-5 right-5 z-50 flex flex-col items-end">
         <div id="assistantChatWindow" class="hidden w-[360px] sm:w-[400px] h-[520px] bg-white rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden mb-3 transition-all duration-200">
-            <div class="bg-indigo-900 text-white p-4 flex justify-between items-center shrink-0">
+            <div class="bg-indigo-950 text-white p-4 flex justify-between items-center shrink-0">
                 <div class="flex items-center space-x-2.5">
-                    <div class="w-8 h-8 rounded-xl bg-indigo-700 flex items-center justify-center text-amber-400 font-bold">
-                        <i data-lucide="bot" class="w-5 h-5"></i>
-                    </div>
+                    <img src="logo-teacher.png" class="w-8 h-8 rounded-xl object-cover border border-amber-400/40">
                     <div>
-                        <h3 class="font-bold text-xs leading-tight">Trợ Lý Giáo Viên</h3>
-                        <p class="text-[10px] text-indigo-200 flex items-center space-x-1">
+                        <h3 class="font-bold text-xs leading-tight">Trợ Lý SigmaTeacher</h3>
+                        <p class="text-[10px] text-indigo-300 flex items-center space-x-1">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                             <span>Google Workspace Assistant</span>
                         </p>
@@ -471,15 +539,9 @@
                 <div class="flex items-start space-x-2">
                     <div class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0 text-[10px] font-bold">AI</div>
                     <div class="p-3 bg-white border border-slate-200 rounded-2xl rounded-tl-none shadow-sm leading-relaxed text-slate-700">
-                        Chào thầy! Em là Trợ lý Dạy học. Em có thể giúp thầy kiểm tra ca dạy hôm nay, rà soát học phí, tạo sự kiện Google Calendar hoặc gợi ý câu hỏi Toán.
+                        Chào thầy! Em là Trợ lý Dạy học. Em có thể giúp thầy kiểm tra ca dạy hôm nay, rà soát học phí hoặc nhắc lịch Google Calendar.
                     </div>
                 </div>
-            </div>
-
-            <div class="p-2 border-t bg-white flex space-x-1.5 overflow-x-auto shrink-0 text-[11px]">
-                <button onclick="sendQuickPrompt('Hôm nay tôi có những ca dạy nào?')" class="bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 font-bold px-2.5 py-1 rounded-lg whitespace-nowrap transition">📅 Ca dạy hôm nay</button>
-                <button onclick="sendQuickPrompt('Ai chưa nộp học phí?')" class="bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 font-bold px-2.5 py-1 rounded-lg whitespace-nowrap transition">💰 Ai nợ học phí?</button>
-                <button onclick="sendQuickPrompt('Soạn câu hỏi trắc nghiệm Toán')" class="bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 font-bold px-2.5 py-1 rounded-lg whitespace-nowrap transition">📝 Soạn đề Toán</button>
             </div>
 
             <form onsubmit="handleSendAssistantMessage(event)" class="p-2.5 bg-white border-t flex items-center space-x-2 shrink-0">
@@ -517,22 +579,60 @@
         </div>
     </div>
 
-    <!-- MODAL: SỬA HỌC SINH & CHUYỂN LỚP -->
+    <!-- MODAL: SỬA HỌC SINH & CHUYỂN LỚP (CÓ ĐỔI NGÀY GIA NHẬP LỚP MỚI) -->
     <div id="modalEditStudent" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-md space-y-4">
             <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm text-indigo-900">Sửa Thông Tin & Chuyển Lớp</h3><button onclick="closeEditStudentModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
             <form id="formEditStudent" onsubmit="handleSaveEditStudent(event)" class="space-y-3 text-xs">
                 <input type="hidden" id="editStudentId">
-                <div><label class="block font-bold text-indigo-700 mb-1">Lớp (Chọn để chuyển lớp):</label><select id="editStudentClassId" onchange="onEditClassChange()" class="w-full p-2.5 border rounded-xl font-bold bg-indigo-50/50"></select></div>
+                <input type="hidden" id="editOriginalClassId">
+                <div>
+                    <label class="block font-bold text-indigo-700 mb-1">Lớp (Chọn để chuyển lớp):</label>
+                    <select id="editStudentClassId" onchange="onEditClassChange()" class="w-full p-2.5 border rounded-xl font-bold bg-indigo-50/50"></select>
+                </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div><label class="block font-bold mb-1">Mã HS</label><input type="text" id="editStudentCode" required class="w-full p-2.5 border rounded-xl font-mono font-bold"></div>
-                    <div><label class="block font-bold mb-1">Ngày Vào Học</label><input type="date" id="editStudentJoinDate" required class="w-full p-2.5 border rounded-xl font-bold"></div>
+                    <div><label class="block font-bold mb-1">Ngày Vào Học Tại Lớp</label><input type="date" id="editStudentJoinDate" required class="w-full p-2.5 border rounded-xl font-bold"></div>
                 </div>
                 <div><label class="block font-bold mb-1">Họ Và Tên</label><input type="text" id="editStudentName" required class="w-full p-2.5 border rounded-xl font-bold"></div>
                 <div><label class="block font-bold mb-1">Tài Khoản (Username)</label><input type="text" id="editStudentUsername" readonly class="w-full p-2.5 border rounded-xl font-mono font-bold bg-slate-100 text-slate-500"></div>
                 <div><label class="block font-bold mb-1">Số Điện Thoại</label><input type="text" id="editStudentPhone" class="w-full p-2.5 border rounded-xl"></div>
                 <div><label class="block font-bold mb-1">Học Phí Riêng (Điền 0 nếu miễn học phí):</label><input type="number" id="editStudentCustomFee" placeholder="VD: 0 hoặc 400000" class="w-full p-2.5 border rounded-xl"></div>
                 <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl shadow">Cập Nhật Thông Tin</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: BÁO NGHỈ HỌC & CHỐT CÔNG NỢ ĐƯA VÀO SỔ LƯU TRỮ -->
+    <div id="modalLeaveStudent" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
+            <div class="flex justify-between border-b pb-2">
+                <h3 class="font-bold text-sm text-rose-800">Xác Nhận Cho Nghỉ Học & Chốt Nợ</h3>
+                <button onclick="closeLeaveModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <form onsubmit="handleConfirmStudentLeave(event)" class="space-y-3 text-xs">
+                <input type="hidden" id="leaveStudentId">
+                <div>
+                    <label class="block font-bold mb-1 text-slate-700">Học sinh nghỉ học:</label>
+                    <input type="text" id="leaveStudentInfo" readonly class="w-full p-2.5 bg-slate-50 border rounded-xl font-bold">
+                </div>
+                <div>
+                    <label class="block font-bold mb-1 text-slate-700">Ngày chính thức nghỉ:</label>
+                    <input type="date" id="leaveDateInput" required class="w-full p-2.5 border rounded-xl font-bold">
+                </div>
+                <div class="p-3 bg-rose-50 border border-rose-200 rounded-2xl space-y-1.5">
+                    <div class="flex justify-between"><span class="text-slate-600">Tổng số buổi đã học:</span><b id="leaveTotalSessionsText" class="text-indigo-900">0 buổi</b></div>
+                    <div class="flex justify-between"><span class="text-slate-600">Tổng học phí đã nộp:</span><b id="leaveTotalPaidText" class="text-emerald-700">0 đ</b></div>
+                    <div class="flex justify-between border-t border-rose-200 pt-1">
+                        <span class="font-bold text-rose-800">Số tiền nợ chốt lại:</span>
+                        <input type="number" id="leaveDebtInput" class="w-28 p-1 border rounded-lg text-right font-black text-rose-700 bg-white" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold mb-1 text-slate-700">Lý do nghỉ học:</label>
+                    <input type="text" id="leaveReasonInput" placeholder="VD: Chuyển trường, bận lịch học thêm..." required class="w-full p-2.5 border rounded-xl">
+                </div>
+                <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl shadow transition">Lưu Vào Sổ Nghỉ Học & Xóa Khỏi Lớp</button>
             </form>
         </div>
     </div>
@@ -560,7 +660,7 @@
         </div>
     </div>
 
-    <!-- MODAL: HIỂN THỊ VIETQR AGRIBANK CHO GIÁO VIÊN -->
+    <!-- MODAL: HIỂN THỊ VIETQR AGRIBANK -->
     <div id="modalAdminQR" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm text-center space-y-4">
             <div class="flex justify-between items-center border-b pb-2"><h3 class="font-bold text-sm text-slate-800">VietQR Agribank (Chuyển Khoản)</h3><button onclick="closeAdminQRModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
@@ -577,13 +677,9 @@
     <!-- MODAL: ĐIỀU CHỈNH CA HỌC TUẦN NÀY -->
     <div id="modalOverrideLesson" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
-            <div class="flex justify-between border-b pb-2">
-                <h3 class="font-bold text-sm text-slate-800">Điều Chỉnh Ca Học Tuần Này</h3>
-                <button onclick="closeOverrideModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
+            <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm text-slate-800">Điều Chỉnh Ca Học Tuần Này</h3><button onclick="closeOverrideModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
             <form id="formOverrideLesson" onsubmit="handleSaveOverride(event)" class="space-y-3 text-xs">
-                <input type="hidden" id="overrideClassId">
-                <input type="hidden" id="overrideOriginalDate">
+                <input type="hidden" id="overrideClassId"><input type="hidden" id="overrideOriginalDate">
                 <div><label class="block font-bold mb-1">Ca Học</label><input type="text" id="overrideClassInfo" readonly class="w-full p-2.5 bg-slate-50 border rounded-xl font-bold"></div>
                 <div>
                     <label class="block font-bold mb-1">Hành Động</label>
@@ -605,7 +701,7 @@
         </div>
     </div>
 
-    <!-- MODAL: THÊM CA TĂNG CƯỜNG TRONG TUẦN -->
+    <!-- MODAL: THÊM CA TĂNG CƯỜNG -->
     <div id="modalExtraLesson" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
             <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm text-purple-900">+ Thêm Ca Dạy Tăng Cường</h3><button onclick="closeExtraModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
@@ -634,20 +730,16 @@
         const AGRIBANK_STK = "4304205123124";
         const AGRIBANK_NAME = "TRAN DUONG QUOC MAN";
 
-        let appData = { classes: [], students: [], attendance: [], payments: [], documents: [], exams: [], examResults: [], weeklyOverrides: [] };
+        let appData = { classes: [], students: [], attendance: [], payments: [], documents: [], exams: [], examResults: [], weeklyOverrides: [], inactiveStudents: [], appConfig: [] };
         let currentClassId = 'ALL', currentTab = 'dashboard', tempParsedQuestions = [];
         let currentWeekOffset = 0;
 
-        // ĐĂNG KÝ SERVICE WORKER (PWA)
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Registration Fail', err));
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Fail', err));
         }
 
-        // ==================== BẢO MẬT MÃ PIN ADMIN ====================
-        function getStoredAdminPin() {
-            return localStorage.getItem(ADMIN_PIN_KEY) || '123456'; // PIN mặc định ban đầu là 123456
-        }
-
+        // BẢO MẬT MÃ PIN ADMIN
+        function getStoredAdminPin() { return localStorage.getItem(ADMIN_PIN_KEY) || '123456'; }
         function checkAdminSession() {
             const isUnlocked = sessionStorage.getItem(ADMIN_SESSION_KEY);
             const lockScreen = document.getElementById('adminPinLockScreen');
@@ -658,7 +750,6 @@
                 document.getElementById('inputAdminPin').focus();
             }
         }
-
         function handleVerifyAdminPin(e) {
             e.preventDefault();
             const inputPin = document.getElementById('inputAdminPin').value.trim();
@@ -675,51 +766,30 @@
                 document.getElementById('inputAdminPin').focus();
             }
         }
-
-        function lockAdminNow() {
-            sessionStorage.removeItem(ADMIN_SESSION_KEY);
-            checkAdminSession();
-        }
-
+        function lockAdminNow() { sessionStorage.removeItem(ADMIN_SESSION_KEY); checkAdminSession(); }
         function togglePinView() {
             const inp = document.getElementById('inputAdminPin');
             const ico = document.getElementById('eyeIconAdminPin');
-            if (inp.type === 'password') {
-                inp.type = 'text';
-                ico.setAttribute('data-lucide', 'eye-off');
-            } else {
-                inp.type = 'password';
-                ico.setAttribute('data-lucide', 'eye');
-            }
+            if (inp.type === 'password') { inp.type = 'text'; ico.setAttribute('data-lucide', 'eye-off'); }
+            else { inp.type = 'password'; ico.setAttribute('data-lucide', 'eye'); }
             if (window.lucide) lucide.createIcons();
         }
-
         function handleChangeAdminPin(e) {
             e.preventDefault();
             const oldPin = document.getElementById('inputOldAdminPin').value.trim();
             const newPin = document.getElementById('inputNewAdminPin').value.trim();
             const confirmPin = document.getElementById('inputConfirmAdminPin').value.trim();
-
-            if (oldPin !== getStoredAdminPin()) {
-                alert('Mã PIN hiện tại không chính xác!');
-                return;
-            }
-            if (newPin !== confirmPin) {
-                alert('Mật khẩu PIN mới và xác nhận không khớp nhau!');
-                return;
-            }
+            if (oldPin !== getStoredAdminPin()) { alert('Mã PIN hiện tại không chính xác!'); return; }
+            if (newPin !== confirmPin) { alert('Xác nhận mã PIN mới không khớp!'); return; }
             localStorage.setItem(ADMIN_PIN_KEY, newPin);
-            alert('Đổi mã PIN quản trị thành công! Hãy ghi nhớ mã PIN này.');
-            document.getElementById('inputOldAdminPin').value = '';
-            document.getElementById('inputNewAdminPin').value = '';
-            document.getElementById('inputConfirmAdminPin').value = '';
+            alert('Đổi mã PIN quản trị thành công!');
+            e.target.reset();
         }
 
-        // ==================== SAO LƯU DỰ PHÒNG 1-CLICK ====================
+        // BACKUP 1-CLICK
         async function backupDatabaseNow() {
             if (!cloudApiUrl) { alert('Chưa cấu hình API URL!'); return; }
-            if (!confirm('Tạo một bản sao lưu dự phòng toàn bộ Google Sheets sang Google Drive ngay bây giờ?')) return;
-
+            if (!confirm('Tạo một bản sao lưu toàn bộ Google Sheets sang Google Drive ngay bây giờ?')) return;
             updateSyncStatus('syncing', 'Đang sao lưu...');
             try {
                 const res = await fetch(cloudApiUrl, {
@@ -728,16 +798,11 @@
                     body: JSON.stringify({ action: 'backupNow' })
                 });
                 const result = await res.json();
-                if (result.status === 'success') {
-                    alert(result.message);
-                    updateSyncStatus('success', 'Đã sao lưu');
-                } else {
-                    alert('Lỗi sao lưu: ' + result.message);
-                    updateSyncStatus('error', 'Lỗi sao lưu');
-                }
-            } catch (err) {
+                alert(result.message);
+                updateSyncStatus('success', 'Đã sao lưu');
+            } catch(err) {
                 alert('Đã gửi yêu cầu sao lưu sang Google Drive!');
-                updateSyncStatus('success', 'Đã kích hoạt sao lưu');
+                updateSyncStatus('success', 'Đã kích hoạt');
             }
         }
 
@@ -764,7 +829,15 @@
         function formatDateShortVN(d) { if(!d) return '--/--'; const p=d.split('T')[0].split('-'); return p.length===3?`${p[2]}/${p[1]}`:d; }
 
         function saveToStorage() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
-        function loadFromStorage() { const st=localStorage.getItem(STORAGE_KEY); if(st) try{ appData=JSON.parse(st); if(!appData.weeklyOverrides) appData.weeklyOverrides=[]; }catch(e){} }
+        function loadFromStorage() { 
+            const st = localStorage.getItem(STORAGE_KEY); 
+            if(st) try{ 
+                appData = JSON.parse(st); 
+                if(!appData.weeklyOverrides) appData.weeklyOverrides = []; 
+                if(!appData.inactiveStudents) appData.inactiveStudents = [];
+                if(!appData.appConfig) appData.appConfig = [];
+            }catch(e){} 
+        }
         function updateSyncStatus(t, msg) { const x=document.getElementById('syncText'); if(x) x.innerText=msg; const d=document.getElementById('syncDot'); if(d) d.className='w-2 h-2 rounded-full shrink-0 '+(t==='syncing'?'bg-amber-400 animate-ping':t==='success'?'bg-emerald-400':'bg-rose-400'); }
         function saveApiUrlSetting() { cloudApiUrl=document.getElementById('inputApiUrl').value.trim(); localStorage.setItem('API_URL', cloudApiUrl); alert('Đã lưu API!'); loadDataFromCloud(); }
         async function manualSync() { if(cloudApiUrl) loadDataFromCloud(); }
@@ -778,7 +851,6 @@
             const cName = (className || '').toLowerCase().replace(/[^a-z0-9]/g, '');
             return `${str}.${cName}`;
         }
-
         function previewGeneratedUsername() {
             const name = document.getElementById('inputStudentName').value;
             const cId = document.getElementById('inputStudentClassId').value;
@@ -786,7 +858,6 @@
             const u = generateUsername(name, c ? c.name : '');
             document.getElementById('previewUsername').innerText = u || '---';
         }
-
         function getEffectiveStudentFee(student, classObj) {
             if (student.customFee !== null && student.customFee !== undefined && student.customFee !== '') {
                 return parseFloat(student.customFee);
@@ -794,18 +865,40 @@
             return classObj ? classObj.fee : 0;
         }
 
+        // TẢI & LƯU CLOUD
         async function loadDataFromCloud() {
             if(!cloudApiUrl) return; updateSyncStatus('syncing', 'Đang tải...');
             try {
                 const res = await fetch(cloudApiUrl); const j = await res.json();
                 if(j.Classes) appData.classes = j.Classes.slice(1).map(r=>({id:String(r[0]||''), name:String(r[1]||''), fee:parseFloat(r[2])||0, schedules:JSON.parse(r[3]||'[]')}));
                 if(j.Students) appData.students = j.Students.slice(1).map(r=>({id:String(r[0]||''), classId:String(r[1]||''), code:String(r[2]||''), name:String(r[3]||''), phone:String(r[4]||''), joinDate:normalizeCloudDate(r[5]||'2026-08-01'), customFee:r[6]!==''&&r[6]!==null?parseFloat(r[6]):null, username:String(r[7]||''), password:String(r[8]||''), mustChangePassword:r[9]===true||r[9]==='true'}));
-                if(j.Attendance) appData.attendance = j.Attendance.slice(1).map(r=>({studentId:String(r[0]||''), date:normalizeCloudDate(r[1]||''), status:String(r[2]||''), note:String(r[3]||'')}));
+                
+                if(j.Attendance) appData.attendance = j.Attendance.slice(1).map(r => {
+                    const sId = String(r[0]||'');
+                    const cId = (r.length >= 5) ? String(r[1]||'') : (appData.students.find(s=>s.id===sId)?.classId || '');
+                    const d = (r.length >= 5) ? normalizeCloudDate(r[2]||'') : normalizeCloudDate(r[1]||'');
+                    const st = (r.length >= 5) ? String(r[3]||'') : String(r[2]||'');
+                    const n = (r.length >= 5) ? String(r[4]||'') : String(r[3]||'');
+                    return { studentId: sId, classId: cId, date: d, status: st, note: n };
+                });
+
                 if(j.Payments) appData.payments = j.Payments.slice(1).map(r=>({id:String(r[0]||''), studentId:String(r[1]||''), classId:String(r[2]||''), cycleIndex:parseInt(r[3]), amount:parseFloat(r[4])||0, status:String(r[5]||''), method:String(r[6]||''), note:String(r[7]||''), date:normalizeCloudDate(r[8]||'')}));
                 if(j.Documents) appData.documents = j.Documents.slice(1).map(r=>({id:String(r[0]||''), classId:String(r[1]||''), name:String(r[2]||''), category:String(r[3]||'Chuyên đề chung'), url:String(r[4]||'')}));
                 if(j.Exams) appData.exams = j.Exams.slice(1).map(r=>({id:String(r[0]||''), title:String(r[1]||''), classId:String(r[2]||''), duration:parseInt(r[3])||45, questions:JSON.parse(r[5]||'[]'), matrix:JSON.parse(r[6]||'{}'), status:String(r[7]||'OPEN')}));
                 if(j.ExamResults) appData.examResults = j.ExamResults.slice(1).map(r=>({id:String(r[0]||''), examId:String(r[1]||''), studentId:String(r[2]||''), score:parseFloat(r[3]||0), details:JSON.parse(r[4]||'{}'), tabSwitchCount:parseInt(r[5]||0), submittedAt:String(r[6]||'')}));
                 if(j.WeeklyOverrides) appData.weeklyOverrides = j.WeeklyOverrides.slice(1).map(r=>({id:String(r[0]||''), classId:String(r[1]||''), date:normalizeCloudDate(r[2]||''), type:String(r[3]||''), startTime:String(r[4]||''), endTime:String(r[5]||''), note:String(r[6]||'')}));
+                
+                if(j.InactiveStudents) appData.inactiveStudents = j.InactiveStudents.slice(1).map(r=>({
+                    id: String(r[0]||''), studentId: String(r[1]||''), studentCode: String(r[2]||''), studentName: String(r[3]||''),
+                    classId: String(r[4]||''), className: String(r[5]||''), phone: String(r[6]||''), joinDate: normalizeCloudDate(r[7]||''),
+                    leaveDate: normalizeCloudDate(r[8]||''), totalSessions: parseInt(r[9]||0), totalPaid: parseFloat(r[10]||0),
+                    debtAmount: parseFloat(r[11]||0), reason: String(r[12]||'')
+                }));
+
+                if(j.AppConfig) {
+                    appData.appConfig = j.AppConfig.slice(1).map(r=>({ key: String(r[0]||''), value: String(r[1]||'') }));
+                    loadBrandingToSettings();
+                }
 
                 saveToStorage(); renderGlobalClassSelect(); refreshCurrentTab(); updateSyncStatus('success', 'Đã đồng bộ');
             } catch(e) { updateSyncStatus('error', 'Lỗi kết nối'); }
@@ -817,16 +910,25 @@
                 const payload = {
                     Classes: [['id','name','fee','schedulesJson'], ...appData.classes.map(c=>[c.id,c.name,c.fee,JSON.stringify(c.schedules||[])])],
                     Students: [['id','classId','code','name','phone','joinDate','customFee','username','password','mustChangePassword'], ...appData.students.map(s=>[s.id,s.classId,s.code,s.name,s.phone||'',s.joinDate||'',s.customFee!==null?s.customFee:'',s.username||'',s.password||'',s.mustChangePassword||false])],
-                    Attendance: [['studentId','date','status','note'], ...appData.attendance.map(a=>[a.studentId,a.date,a.status,a.note||''])],
+                    Attendance: [['studentId','classId','date','status','note'], ...appData.attendance.map(a=>[a.studentId, a.classId||'', a.date, a.status, a.note||''])],
                     Payments: [['id','studentId','classId','cycleIndex','amount','status','method','note','date'], ...appData.payments.map(p=>[p.id,p.studentId,p.classId,p.cycleIndex,p.amount,p.status,p.method,p.note||'',p.date])],
                     Documents: [['id','classId','name','category','url'], ...appData.documents.map(d=>[d.id,d.classId,d.name,d.category||'Chuyên đề chung',d.url])],
                     Exams: [['id','title','classId','duration','deadline','questionsJson','matrixJson','status','viewSolution'], ...appData.exams.map(e=>[e.id,e.title,e.classId,e.duration||45,'',JSON.stringify(e.questions||[]),JSON.stringify(e.matrix||{}),e.status,'0'])],
                     ExamResults: [['id','examId','studentId','score','detailsJson','tabSwitchCount','submittedAt'], ...appData.examResults.map(r=>[r.id,r.examId,r.studentId,r.score,JSON.stringify(r.details||{}),r.tabSwitchCount,r.submittedAt])],
-                    WeeklyOverrides: [['id','classId','date','type','startTime','endTime','note'], ...(appData.weeklyOverrides||[]).map(o=>[o.id,o.classId,o.date,o.type,o.startTime||'',o.endTime||'',o.note||''])]
+                    WeeklyOverrides: [['id','classId','date','type','startTime','endTime','note'], ...(appData.weeklyOverrides||[]).map(o=>[o.id,o.classId,o.date,o.type,o.startTime||'',o.endTime||'',o.note||''])],
+                    InactiveStudents: [['id','studentId','studentCode','studentName','classId','className','phone','joinDate','leaveDate','totalSessions','totalPaid','debtAmount','reason'], ...(appData.inactiveStudents||[]).map(x=>[x.id, x.studentId, x.studentCode, x.studentName, x.classId, x.className, x.phone||'', x.joinDate, x.leaveDate, x.totalSessions, x.totalPaid, x.debtAmount, x.reason||''])],
+                    AppConfig: [['key','value'], ...(appData.appConfig||[]).map(c=>[c.key, c.value])]
                 };
                 await fetch(cloudApiUrl, { method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({action: 'saveAll', payload})});
                 updateSyncStatus('success', 'Đã lưu');
             } catch(e) { updateSyncStatus('error', 'Lỗi lưu'); }
+        }
+
+        function getClassSessionDates(classId) {
+            if(!classId || classId === 'ALL') {
+                return [...new Set(appData.attendance.map(a => a.date))].sort();
+            }
+            return [...new Set(appData.attendance.filter(a => a.classId === classId).map(a => a.date))].sort();
         }
 
         function getFilteredStudents() { return currentClassId==='ALL' ? appData.students : appData.students.filter(s=>s.classId===currentClassId); }
@@ -857,6 +959,7 @@
         function refreshCurrentTab() {
             if(currentTab==='dashboard') renderDashboard();
             if(currentTab==='classes') renderClassesAndStudents();
+            if(currentTab==='inactive-students') renderInactiveStudents();
             if(currentTab==='schedule') renderScheduleTab();
             if(currentTab==='attendance-session') loadSessionAttendance();
             if(currentTab==='attendance-matrix') renderAttendanceMatrix();
@@ -885,7 +988,7 @@
 
                 if (!isCancelled) {
                     (c.schedules || []).filter(sc => sc.day === dayOfWeek).forEach(sc => {
-                        const classSessions = [...new Set(appData.attendance.filter(a => appData.students.some(s=>s.classId===c.id && s.id===a.studentId)).map(a=>a.date))].sort();
+                        const classSessions = getClassSessionDates(c.id);
                         const totalSess = classSessions.length;
                         const curCycle = Math.floor(totalSess / 8) + 1;
                         const sessInCycle = (totalSess % 8) + 1;
@@ -929,13 +1032,14 @@
                 }).join('');
             }
 
+            // TÍNH HỌC PHÍ PHƯƠNG ÁN B DỰA TRÊN NGÀY CỦA TỪNG LỚP
             let totalDueCount = 0, dueListHtml = '', paidCount = 0;
             stds.forEach(s => {
                 const c = appData.classes.find(x => x.id === s.classId);
                 const effFee = getEffectiveStudentFee(s, c);
                 const isExempt = effFee === 0;
 
-                const classSessions = [...new Set(appData.attendance.filter(a => appData.students.some(cs=>cs.classId===s.classId && cs.id===a.studentId)).map(a=>a.date))].sort();
+                const classSessions = getClassSessionDates(s.classId);
                 const totalClassSess = classSessions.length;
                 const activeCycleIdx = Math.max(0, Math.floor((totalClassSess - 1) / 8));
 
@@ -974,13 +1078,14 @@
             const rate = stds.length > 0 ? Math.round((paidCount / stds.length) * 100) : 0;
             document.getElementById('dashTuitionRate').innerText = `${rate}%`;
 
+            // RADAR KHẢO THÍ
             const radarContainer = document.getElementById('dashExamRadarContainer');
             const recentResults = appData.examResults.slice(-10).reverse();
             const cheatCases = recentResults.filter(r => r.tabSwitchCount > 0);
 
             let radarHtml = '';
             if(cheatCases.length > 0) {
-                radarHtml += `<div class="space-y-1.5"><h4 class="text-[11px] font-bold text-rose-700 uppercase">Cảnh Báo Chuyển Tab Gần Đây:</h4>`;
+                radarHtml += `<div class="space-y-1.5"><h4 class="text-[11px] font-bold text-rose-700 uppercase">Cảnh Báo Chuyển Tab:</h4>`;
                 cheatCases.slice(0, 3).forEach(c => {
                     const st = appData.students.find(x => x.id === c.studentId) || {name: 'HS đã xóa'};
                     radarHtml += `
@@ -995,9 +1100,9 @@
 
             if(appData.exams.length > 0 && recentResults.length > 0) {
                 const latestExam = appData.exams[appData.exams.length - 1];
-                radarHtml += `<div class="pt-2"><h4 class="text-[11px] font-bold text-indigo-900 uppercase mb-1">Đề Mới Nhất: ${latestExam.title}</h4><div class="p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl text-xs space-y-1"><p>• Tổng bài nộp: <b>${recentResults.filter(r=>r.examId===latestExam.id).length} bài</b></p><p>• Trọng tâm chữa bài: <b>Các câu phân loại Phần II và Phần III</b></p></div></div>`;
+                radarHtml += `<div class="pt-2"><h4 class="text-[11px] font-bold text-indigo-900 uppercase mb-1">Đề Mới Nhất: ${latestExam.title}</h4><div class="p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl text-xs space-y-1"><p>• Tổng bài nộp: <b>${recentResults.filter(r=>r.examId===latestExam.id).length} bài</b></p></div></div>`;
             } else {
-                radarHtml += `<div class="p-4 text-center text-slate-400 text-xs italic">Chưa có dữ liệu bài thi nào được nộp.</div>`;
+                radarHtml += `<div class="p-4 text-center text-slate-400 text-xs italic">Chưa có bài thi nào được nộp.</div>`;
             }
             radarContainer.innerHTML = radarHtml;
 
@@ -1062,22 +1167,17 @@
             closeAddStudentModal();
             refreshCurrentTab();
             document.getElementById('formAddStudent').reset();
-            alert(`Đã thêm học sinh!\nTài khoản: ${username}\nMật khẩu mặc định: ${defaultPassword}`);
+            alert(`Đã thêm học sinh!\nTài khoản: ${username}\nMật khẩu: ${defaultPassword}`);
         }
 
         async function autoGenerateAccountsForOldStudents() {
-            if (!appData.students || appData.students.length === 0) {
-                alert("Danh sách học sinh đang trống!");
-                return;
-            }
-
+            if (!appData.students || appData.students.length === 0) { alert("Danh sách học sinh đang trống!"); return; }
             let updatedCount = 0;
             appData.students.forEach(s => {
                 if (!s.username || s.username.trim() === '' || s.username === '---') {
                     const c = appData.classes.find(x => x.id === s.classId);
                     const newUsername = generateUsername(s.name, c ? c.name : '');
                     const defaultPassword = (s.phone && s.phone.trim() !== '') ? s.phone.trim() : '123456';
-
                     s.username = newUsername;
                     if (!s.password || s.password.trim() === '') {
                         s.password = defaultPassword;
@@ -1086,16 +1186,11 @@
                     updatedCount++;
                 }
             });
-
-            if (updatedCount === 0) {
-                alert("Tất cả học sinh trong hệ thống đều đã có tài khoản đầy đủ!");
-                return;
-            }
-
-            if (confirm(`Tìm thấy ${updatedCount} học sinh cũ chưa có tài khoản.\nThầy có muốn hệ thống tự động sinh tài khoản và đồng bộ ngay lên Google Sheet không?`)) {
+            if (updatedCount === 0) { alert("Tất cả học sinh đều đã có tài khoản!"); return; }
+            if (confirm(`Tìm thấy ${updatedCount} học sinh chưa có tài khoản. Tạo tự động và lưu lên Google Sheets?`)) {
                 await saveDataToCloud();
                 refreshCurrentTab();
-                alert(`✅ Đã tạo tài khoản thành công cho ${updatedCount} học sinh cũ và đồng bộ lên Google Sheets!`);
+                alert(`✅ Đã tạo tài khoản cho ${updatedCount} học sinh thành công!`);
             }
         }
 
@@ -1105,6 +1200,7 @@
             populateClassSelectModal();
 
             document.getElementById('editStudentId').value = s.id;
+            document.getElementById('editOriginalClassId').value = s.classId;
             document.getElementById('editStudentClassId').value = s.classId;
             document.getElementById('editStudentCode').value = s.code;
             document.getElementById('editStudentName').value = s.name;
@@ -1118,8 +1214,13 @@
         function closeEditStudentModal() { document.getElementById('modalEditStudent').classList.add('hidden'); }
 
         function onEditClassChange() {
+            const origClassId = document.getElementById('editOriginalClassId').value;
             const newClassId = document.getElementById('editStudentClassId').value;
-            document.getElementById('editStudentCode').value = generateNextStudentCode(newClassId);
+            
+            if (newClassId !== origClassId) {
+                document.getElementById('editStudentJoinDate').value = getTodayVNString();
+                document.getElementById('editStudentCode').value = generateNextStudentCode(newClassId);
+            }
             const name = document.getElementById('editStudentName').value;
             const c = appData.classes.find(x => x.id === newClassId);
             document.getElementById('editStudentUsername').value = generateUsername(name, c ? c.name : '');
@@ -1131,11 +1232,15 @@
             const s = appData.students.find(x => x.id === id);
             if(!s) return;
 
-            s.classId = document.getElementById('editStudentClassId').value;
+            const oldClassId = s.classId;
+            const newClassId = document.getElementById('editStudentClassId').value;
+
+            s.classId = newClassId;
             s.code = document.getElementById('editStudentCode').value.trim();
             s.name = document.getElementById('editStudentName').value.trim();
             s.phone = document.getElementById('editStudentPhone').value.trim();
             s.joinDate = document.getElementById('editStudentJoinDate').value;
+            
             const c = appData.classes.find(x => x.id === s.classId);
             s.username = generateUsername(s.name, c ? c.name : '');
 
@@ -1145,27 +1250,130 @@
             saveDataToCloud();
             closeEditStudentModal();
             refreshCurrentTab();
-            alert('Cập nhật thông tin học sinh thành công!');
+            
+            if (oldClassId !== newClassId) {
+                alert(`Đã chuyển ${s.name} sang ${c ? c.name : 'lớp mới'} an toàn!\nNgày tính học phí lớp mới bắt đầu từ: ${formatDateVN(s.joinDate)}.`);
+            } else {
+                alert('Cập nhật thông tin học sinh thành công!');
+            }
         }
 
-        function resetStudentPassword(id) {
+        // ==================== BÁO NGHỈ HỌC & LƯU VÀO SỔ NỢ ====================
+        function openLeaveStudentModal(id) {
             const s = appData.students.find(x => x.id === id);
             if(!s) return;
-            const defaultPw = s.phone || '123456';
-            if(confirm(`Khôi phục mật khẩu cho ${s.name} về mặc định (${defaultPw})?`)) {
-                s.password = defaultPw;
-                s.mustChangePassword = true;
-                saveDataToCloud();
-                alert(`Đã reset mật khẩu thành công: ${defaultPw}`);
-            }
+            const c = appData.classes.find(x => x.id === s.classId);
+
+            const attendedCount = appData.attendance.filter(a => a.studentId === s.id && (a.status === 'PRESENT' || a.status === 'LATE')).length;
+            const paidTotal = appData.payments.filter(p => p.studentId === s.id && p.status === 'PAID').reduce((sum, p) => sum + p.amount, 0);
+
+            const effFee = getEffectiveStudentFee(s, c);
+            const feePerSession = effFee > 0 ? (effFee / 8) : 0;
+            const requiredTuition = Math.round(feePerSession * attendedCount);
+            const debt = Math.max(0, requiredTuition - paidTotal);
+
+            document.getElementById('leaveStudentId').value = s.id;
+            document.getElementById('leaveStudentInfo').value = `${s.name} (${s.code}) - Lớp ${c ? c.name : ''}`;
+            document.getElementById('leaveDateInput').value = getTodayVNString();
+            document.getElementById('leaveTotalSessionsText').innerText = `${attendedCount} buổi`;
+            document.getElementById('leaveTotalPaidText').innerText = `${paidTotal.toLocaleString()} đ`;
+            document.getElementById('leaveDebtInput').value = debt;
+            document.getElementById('leaveReasonInput').value = '';
+
+            document.getElementById('modalLeaveStudent').classList.remove('hidden');
+        }
+        function closeLeaveModal() { document.getElementById('modalLeaveStudent').classList.add('hidden'); }
+
+        function handleConfirmStudentLeave(e) {
+            e.preventDefault();
+            const id = document.getElementById('leaveStudentId').value;
+            const s = appData.students.find(x => x.id === id);
+            if(!s) return;
+            const c = appData.classes.find(x => x.id === s.classId);
+
+            const leaveDate = document.getElementById('leaveDateInput').value;
+            const debt = parseFloat(document.getElementById('leaveDebtInput').value) || 0;
+            const reason = document.getElementById('leaveReasonInput').value.trim();
+
+            const attendedCount = appData.attendance.filter(a => a.studentId === s.id && (a.status === 'PRESENT' || a.status === 'LATE')).length;
+            const paidTotal = appData.payments.filter(p => p.studentId === s.id && p.status === 'PAID').reduce((sum, p) => sum + p.amount, 0);
+
+            if(!appData.inactiveStudents) appData.inactiveStudents = [];
+            appData.inactiveStudents.push({
+                id: 'inact_' + Date.now(),
+                studentId: s.id,
+                studentCode: s.code,
+                studentName: s.name,
+                classId: s.classId,
+                className: c ? c.name : '---',
+                phone: s.phone || '',
+                joinDate: s.joinDate || '',
+                leaveDate: leaveDate,
+                totalSessions: attendedCount,
+                totalPaid: paidTotal,
+                debtAmount: debt,
+                reason: reason
+            });
+
+            appData.students = appData.students.filter(x => x.id !== id);
+
+            saveDataToCloud();
+            closeLeaveModal();
+            refreshCurrentTab();
+            alert(`Đã chuyển hồ sơ của ${s.name} vào "Sổ Học Sinh Đã Nghỉ & Lưu Trữ Nợ"!`);
         }
 
-        function deleteStudent(id) {
-            if(confirm('Xác nhận xóa học sinh này?')) {
-                appData.students = appData.students.filter(s => s.id !== id);
-                saveDataToCloud();
-                refreshCurrentTab();
+        function restoreInactiveStudent(inactiveId) {
+            const inact = appData.inactiveStudents.find(x => x.id === inactiveId);
+            if(!inact) return;
+            if(!confirm(`Khôi phục học sinh ${inact.studentName} trở lại danh sách học sinh đang học?`)) return;
+
+            appData.students.push({
+                id: inact.studentId,
+                classId: inact.classId,
+                code: inact.studentCode,
+                name: inact.studentName,
+                phone: inact.phone,
+                joinDate: getTodayVNString(),
+                customFee: null,
+                username: generateUsername(inact.studentName, inact.className),
+                password: inact.phone || '123456',
+                mustChangePassword: false
+            });
+
+            appData.inactiveStudents = appData.inactiveStudents.filter(x => x.id !== inactiveId);
+
+            saveDataToCloud();
+            refreshCurrentTab();
+            alert(`Đã khôi phục ${inact.studentName} thành công! Ngày vào học mới là hôm nay.`);
+        }
+
+        function renderInactiveStudents() {
+            const tbody = document.getElementById('inactiveStudentsTableBody');
+            const list = appData.inactiveStudents || [];
+            document.getElementById('inactiveStudentsCountBadge').innerText = `${list.length} Hồ Sơ`;
+
+            if(list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-400 italic">Chưa có học sinh nào nghỉ học.</td></tr>`;
+                return;
             }
+
+            tbody.innerHTML = list.map(x => `
+                <tr>
+                    <td class="p-3"><span class="bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded text-[10px]">${x.className}</span></td>
+                    <td class="p-3 font-mono font-bold">${x.studentCode}</td>
+                    <td class="p-3 font-bold">${x.studentName}</td>
+                    <td class="p-3 font-mono text-slate-500">${x.phone || '---'}</td>
+                    <td class="p-3 font-mono text-rose-600 font-bold">${formatDateVN(x.leaveDate)}</td>
+                    <td class="p-3 text-center font-bold">${x.totalSessions} buổi</td>
+                    <td class="p-3 font-bold text-emerald-600">${x.totalPaid.toLocaleString()}đ</td>
+                    <td class="p-3 font-black ${x.debtAmount>0?'text-rose-600 bg-rose-50':'text-slate-400'}">${x.debtAmount>0?x.debtAmount.toLocaleString()+'đ':'Hết nợ'}</td>
+                    <td class="p-3 text-slate-600 italic max-w-xs truncate">${x.reason}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="restoreInactiveStudent('${x.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-lg font-bold transition text-[11px]">Khôi Phục</button>
+                    </td>
+                </tr>
+            `).join('');
         }
 
         function renderClassesAndStudents() {
@@ -1191,7 +1399,7 @@
                         <td class="p-3 text-center space-x-1">
                             <button onclick="openEditStudentModal('${s.id}')" class="text-indigo-600 hover:bg-indigo-50 p-1.5 rounded-lg" title="Sửa thông tin / Chuyển lớp"><i data-lucide="pencil" class="w-3.5 h-3.5 inline"></i></button>
                             <button onclick="resetStudentPassword('${s.id}')" class="text-amber-600 hover:bg-amber-50 p-1.5 rounded-lg" title="Reset Mật khẩu"><i data-lucide="key-round" class="w-3.5 h-3.5 inline"></i></button>
-                            <button onclick="deleteStudent('${s.id}')" class="text-rose-500 hover:bg-rose-50 p-1.5 rounded-lg" title="Xóa học sinh"><i data-lucide="trash-2" class="w-3.5 h-3.5 inline"></i></button>
+                            <button onclick="openLeaveStudentModal('${s.id}')" class="text-rose-600 hover:bg-rose-50 p-1.5 rounded-lg" title="Báo nghỉ học & Chốt nợ"><i data-lucide="user-minus" class="w-3.5 h-3.5 inline"></i></button>
                         </td>
                     </tr>
                 `;
@@ -1234,10 +1442,8 @@
             const monday = getStartOfWeek(new Date(), currentWeekOffset);
             const sunday = new Date(monday);
             sunday.setDate(sunday.getDate() + 6);
-
             const formatD = (d) => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
             document.getElementById('currentWeekRangeLabel').innerText = `Tuần: ${formatD(monday)} ➔ ${formatD(sunday)}`;
-
             renderFixedSchedule();
             renderWeeklyOperational(monday);
         }
@@ -1344,7 +1550,7 @@
                                                 <b>${l.className} (Tăng cường)</b>
                                                 <div class="text-[10px] font-mono text-purple-700">${l.startTime} - ${l.endTime}</div>
                                             </div>
-                                            <button onclick="removeExtraLesson('${l.overrideData.id}')" class="text-purple-600 p-1"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                                            <button onclick="removeExtraLesson('${l.overrideData.id}')" class="text-purple-600 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                                         </div>
                                     `;
                                 }
@@ -1354,7 +1560,7 @@
                                             <b class="text-indigo-900">${l.className}</b>
                                             <div class="text-[10px] text-emerald-600 font-mono">${l.startTime} - ${l.endTime}</div>
                                         </div>
-                                        <button onclick="openOverrideModal('${l.classId}','${l.className}','${curDateStr}','${l.startTime}','${l.endTime}')" class="opacity-0 group-hover:opacity-100 bg-white p-1 rounded-lg border text-indigo-600 hover:bg-indigo-50 shadow-sm" title="Điều chỉnh ca này"><i data-lucide="settings-2" class="w-3 h-3"></i></button>
+                                        <button onclick="openOverrideModal('${l.classId}','${l.className}','${curDateStr}','${l.startTime}','${l.endTime}')" class="opacity-0 group-hover:opacity-100 bg-white p-1 rounded-lg border text-indigo-600 hover:bg-indigo-50 shadow-sm" title="Điều chỉnh ca này"><i data-lucide="settings-2" class="w-3.5 h-3.5"></i></button>
                                     </div>
                                 `;
                             }).join('')}
@@ -1377,7 +1583,6 @@
             document.getElementById('modalOverrideLesson').classList.remove('hidden');
         }
         function closeOverrideModal() { document.getElementById('modalOverrideLesson').classList.add('hidden'); }
-
         function toggleOverrideInputs() {
             const type = document.getElementById('overrideType').value;
             const resFields = document.getElementById('rescheduleFields');
@@ -1483,26 +1688,30 @@
             }
         }
 
-        // ==================== ĐIỂM DANH BUỔI ====================
+        // ==================== ĐIỂM DANH BUỔI (GẮN CHẶT CLASS_ID) ====================
         function loadSessionAttendance() {
             const d = document.getElementById('sessionDatePicker').value, stds = getFilteredStudents(), tbody = document.getElementById('sessionAttendanceBody');
             tbody.innerHTML = stds.length===0 ? `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Trống</td></tr>` : stds.map(s => {
-                if(s.joinDate && d < s.joinDate) return `<tr class="opacity-50"><td class="p-3">${getClassName(s.classId)}</td><td class="p-3 font-mono">${s.code}</td><td class="p-3">${s.name}</td><td colspan="2" class="p-3 italic">Chưa vào học</td></tr>`;
+                if(s.joinDate && d < s.joinDate) return `<tr class="opacity-50"><td class="p-3">${getClassName(s.classId)}</td><td class="p-3 font-mono">${s.code}</td><td class="p-3">${s.name}</td><td colspan="2" class="p-3 italic">Chưa vào học tại lớp này</td></tr>`;
                 const r = appData.attendance.find(a=>a.studentId===s.id && a.date===d) || {status:'PRESENT', note:''};
-                return `<tr><td class="p-3"><span class="bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded font-bold text-[10px]">${getClassName(s.classId)}</span></td><td class="p-3 font-mono font-bold">${s.code}</td><td class="p-3 font-bold">${s.name}</td><td class="p-3"><select data-student-id="${s.id}" class="att-status p-1.5 border rounded-lg text-xs font-bold w-full outline-none"><option value="PRESENT" ${r.status==='PRESENT'?'selected':''}>🟢 Có mặt</option><option value="ABSENT_PERM" ${r.status==='ABSENT_PERM'?'selected':''}>🟡 Phép</option><option value="ABSENT_NO_PERM" ${r.status==='ABSENT_NO_PERM'?'selected':''}>🔴 KP</option><option value="LATE" ${r.status==='LATE'?'selected':''}>🔵 Trễ</option></select></td><td class="p-3"><input type="text" data-student-id="${s.id}" value="${r.note||''}" class="att-note w-full p-1.5 border rounded-lg text-xs outline-none" placeholder="Ghi chú..."></td></tr>`;
+                return `<tr><td class="p-3"><span class="bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded font-bold text-[10px]">${getClassName(s.classId)}</span></td><td class="p-3 font-mono font-bold">${s.code}</td><td class="p-3 font-bold">${s.name}</td><td class="p-3"><select data-student-id="${s.id}" data-class-id="${s.classId}" class="att-status p-1.5 border rounded-lg text-xs font-bold w-full outline-none"><option value="PRESENT" ${r.status==='PRESENT'?'selected':''}>🟢 Có mặt</option><option value="ABSENT_PERM" ${r.status==='ABSENT_PERM'?'selected':''}>🟡 Phép</option><option value="ABSENT_NO_PERM" ${r.status==='ABSENT_NO_PERM'?'selected':''}>🔴 KP</option><option value="LATE" ${r.status==='LATE'?'selected':''}>🔵 Trễ</option></select></td><td class="p-3"><input type="text" data-student-id="${s.id}" value="${r.note||''}" class="att-note w-full p-1.5 border rounded-lg text-xs outline-none" placeholder="Ghi chú..."></td></tr>`;
             }).join('');
         }
         function saveSessionAttendance() {
             const d = document.getElementById('sessionDatePicker').value;
             document.querySelectorAll('.att-status').forEach(el => {
-                const id = el.getAttribute('data-student-id'), status = el.value, note = document.querySelector(`.att-note[data-student-id="${id}"]`).value;
-                appData.attendance = appData.attendance.filter(a => !(a.studentId===id && a.date===d));
-                appData.attendance.push({studentId:id, date:d, status, note});
+                const sId = el.getAttribute('data-student-id');
+                const cId = el.getAttribute('data-class-id');
+                const status = el.value;
+                const note = document.querySelector(`.att-note[data-student-id="${sId}"]`).value;
+                
+                appData.attendance = appData.attendance.filter(a => !(a.studentId===sId && a.date===d));
+                appData.attendance.push({ studentId: sId, classId: cId, date: d, status: status, note: note });
             });
             saveDataToCloud(); alert('Đã lưu điểm danh thành công!'); refreshCurrentTab();
         }
 
-        // ==================== SỔ ĐIỂM DANH LỊCH SỬ DẠNG THẺ ====================
+        // ==================== SỔ ĐIỂM DANH 8 BUỔI (THEO CLASS_ID) ====================
         function renderAttendanceMatrix() {
             const stds = getFilteredStudents();
             const container = document.getElementById('attendanceCycleAccordionContainer');
@@ -1513,9 +1722,9 @@
                 return;
             }
 
-            const allDates = [...new Set(appData.attendance.filter(a => stds.some(s => s.id === a.studentId)).map(a => a.date))].sort();
+            const allDates = getClassSessionDates(currentClassId);
             if (allDates.length === 0) {
-                container.innerHTML = `<div class="p-6 text-center text-slate-400 italic text-xs">Chưa có buổi học nào được điểm danh.</div>`;
+                container.innerHTML = `<div class="p-6 text-center text-slate-400 italic text-xs">Chưa có buổi học nào được điểm danh cho lớp này.</div>`;
                 return;
             }
 
@@ -1547,9 +1756,7 @@
                                     <p class="text-[11px] text-slate-500 mt-0.5">Tiến độ kỳ: <b>${chunkDates.length}/8 buổi</b> • Bấm để xem chi tiết</p>
                                 </div>
                             </div>
-                            <div class="flex items-center space-x-2 mt-2 sm:mt-0">
-                                <i data-lucide="${isOpen ? 'chevron-up' : 'chevron-down'}" id="cycle-icon-${cIdx}" class="w-5 h-5 text-slate-400"></i>
-                            </div>
+                            <i data-lucide="${isOpen ? 'chevron-up' : 'chevron-down'}" id="cycle-icon-${cIdx}" class="w-5 h-5 text-slate-400"></i>
                         </div>
 
                         <div id="cycle-body-${cIdx}" class="${isOpen ? '' : 'hidden'} border-t overflow-x-auto bg-white">
@@ -1650,7 +1857,7 @@
             if (window.lucide) lucide.createIcons();
         }
 
-        // ==================== BẢNG THEO DÕI HỌC PHÍ THEO KỲ ====================
+        // ==================== BẢNG HỌC PHÍ THEO KỲ ====================
         function renderTuitionTable() {
             const stds = getFilteredStudents(), tb = document.getElementById('tuitionTableBody');
             if(!tb) return;
@@ -1661,7 +1868,7 @@
                 const effFee = getEffectiveStudentFee(s, c);
                 const isExempt = effFee === 0;
 
-                const classSessions = [...new Set(appData.attendance.filter(a => appData.students.some(cs=>cs.classId===s.classId && cs.id===a.studentId)).map(a=>a.date))].sort();
+                const classSessions = getClassSessionDates(s.classId);
                 const totalClassSess = classSessions.length;
                 const activeCycleIdx = Math.max(0, Math.floor((totalClassSess - 1) / 8));
                 
@@ -1708,7 +1915,7 @@
             const c = appData.classes.find(x=>x.id===s.classId);
             const effFee = getEffectiveStudentFee(s, c);
             
-            const classSessions = [...new Set(appData.attendance.filter(a => appData.students.some(cs=>cs.classId===s.classId && cs.id===a.studentId)).map(a=>a.date))].sort();
+            const classSessions = getClassSessionDates(s.classId);
             const skipCount = classSessions.filter(d => d < s.joinDate).length;
             const joinCycle = Math.floor(skipCount / 8);
             let defaultAmount = effFee;
@@ -1786,7 +1993,7 @@
             }).join('');
         }
 
-        // ==================== BÓC TÁCH ĐỀ THI 3 PHẦN & DÁN ẢNH ====================
+        // ==================== BÓC TÁCH ĐỀ THI & DÁN ẢNH ====================
         function setupDirectImagePaste() {
             const ed = document.getElementById('directEditorArea');
             if(!ed) return;
@@ -2002,7 +2209,7 @@
             container.innerHTML = html;
         }
 
-        // ==================== TÀI LIỆU PHÂN NHÓM THEO CHUYÊN ĐỀ ====================
+        // ==================== TÀI LIỆU ====================
         function renderDocumentsTab() {
             populateClassSelectModal();
             const docs = currentClassId==='ALL' ? appData.documents : appData.documents.filter(d=>d.classId===currentClassId);
@@ -2056,7 +2263,42 @@
             alert('Đã lưu tài liệu vào chuyên đề thành công!');
         }
 
-        // ==================== ĐỒNG BỘ TOÀN BỘ SANG GOOGLE CALENDAR ====================
+        // ==================== BRANDING & LOGO ====================
+        function previewAppLogo(url) {
+            if(url) document.getElementById('cfgLogoPreview').src = url;
+        }
+
+        function loadBrandingToSettings() {
+            const cfgs = appData.appConfig || [];
+            const getVal = (k, df) => { const f = cfgs.find(x => x.key === k); return f ? f.value : df; };
+            
+            document.getElementById('cfgAppName').value = getVal('student_app_name', 'SigmaMath - Thầy Mẫn');
+            document.getElementById('cfgAppShortName').value = getVal('student_app_short_name', 'M-SigmaMath');
+            document.getElementById('cfgAppSlogan').value = getVal('student_app_slogan', 'Hệ thống học tập, chuyên cần & khảo thí Toán Thầy Mẫn');
+            const logo = getVal('student_app_logo', 'logo-student.png');
+            document.getElementById('cfgAppLogo').value = logo;
+            previewAppLogo(logo);
+        }
+
+        async function handleSaveAppBranding(e) {
+            e.preventDefault();
+            const name = document.getElementById('cfgAppName').value.trim();
+            const shortName = document.getElementById('cfgAppShortName').value.trim();
+            const slogan = document.getElementById('cfgAppSlogan').value.trim();
+            const logo = document.getElementById('cfgAppLogo').value.trim();
+
+            appData.appConfig = [
+                { key: 'student_app_name', value: name },
+                { key: 'student_app_short_name', value: shortName },
+                { key: 'student_app_slogan', value: slogan },
+                { key: 'student_app_logo', value: logo }
+            ];
+
+            await saveDataToCloud();
+            alert('Đã cập nhật Tên và Logo App! Cổng Học Sinh sẽ tự động áp dụng ngay lập tức.');
+        }
+
+        // ==================== ĐỒNG BỘ GOOGLE CALENDAR ====================
         async function syncScheduleToGoogleCalendar() {
             if (!cloudApiUrl) { alert("Vui lòng cấu hình API Web App trước!"); return; }
 
@@ -2085,16 +2327,11 @@
             } catch (e) { alert("Đã kích hoạt đồng bộ lịch dạy sang Google Calendar!"); }
         }
 
-        // ==================== WIDGET TRỢ LÝ GIÁO VIÊN ====================
+        // ==================== TRỢ LÝ GIÁO VIÊN ====================
         function toggleTeacherAssistant() {
             const win = document.getElementById('assistantChatWindow');
             win.classList.toggle('hidden');
             if (!win.classList.contains('hidden')) { document.getElementById('assistantInput').focus(); }
-        }
-
-        function sendQuickPrompt(text) {
-            document.getElementById('assistantInput').value = text;
-            handleSendAssistantMessage(new Event('submit'));
         }
 
         async function handleSendAssistantMessage(e) {
@@ -2104,26 +2341,12 @@
             if (!query) return;
 
             const list = document.getElementById('assistantMessagesList');
-            list.innerHTML += `
-                <div class="flex items-start justify-end space-x-2">
-                    <div class="p-3 bg-indigo-600 text-white rounded-2xl rounded-tr-none shadow-sm leading-relaxed text-xs">
-                        ${query}
-                    </div>
-                </div>
-            `;
+            list.innerHTML += `<div class="flex items-start justify-end space-x-2"><div class="p-3 bg-indigo-600 text-white rounded-2xl rounded-tr-none shadow-sm text-xs">${query}</div></div>`;
             input.value = '';
             list.scrollTop = list.scrollHeight;
 
             const tempId = 'msg-loading-' + Date.now();
-            list.innerHTML += `
-                <div id="${tempId}" class="flex items-start space-x-2 text-slate-400 italic">
-                    <div class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0 text-[10px] font-bold">AI</div>
-                    <div class="p-2.5 bg-white border rounded-2xl rounded-tl-none shadow-sm text-xs flex items-center space-x-1.5">
-                        <span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
-                        <span>Đang tra cứu dữ liệu...</span>
-                    </div>
-                </div>
-            `;
+            list.innerHTML += `<div id="${tempId}" class="flex items-start space-x-2 text-slate-400 italic"><div class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0 text-[10px] font-bold">AI</div><div class="p-2.5 bg-white border rounded-2xl text-xs">Đang xử lý...</div></div>`;
             list.scrollTop = list.scrollHeight;
 
             try {
@@ -2133,37 +2356,15 @@
                     body: JSON.stringify({ action: 'askTeacherAssistant', query: query })
                 });
                 const data = await res.json();
-                
                 const loadingEl = document.getElementById(tempId);
                 if (loadingEl) loadingEl.remove();
 
-                const formattedReply = data.reply.replace(/\n/g, '<br>');
-                list.innerHTML += `
-                    <div class="flex items-start space-x-2">
-                        <div class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0 text-[10px] font-bold">AI</div>
-                        <div class="p-3 bg-white border border-slate-200 rounded-2xl rounded-tl-none shadow-sm leading-relaxed text-slate-800 text-xs">
-                            ${formattedReply}
-                        </div>
-                    </div>
-                `;
-
-                if (window.renderMathInElement) {
-                    renderMathInElement(list, { delimiters: [{left: '$', right: '$', display: false}], throwOnError: false });
-                }
-            } catch (err) {
+                list.innerHTML += `<div class="flex items-start space-x-2"><div class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0 text-[10px] font-bold">AI</div><div class="p-3 bg-white border rounded-2xl text-xs">${data.reply.replace(/\n/g, '<br>')}</div></div>`;
+            } catch(err) {
                 const loadingEl = document.getElementById(tempId);
                 if (loadingEl) loadingEl.remove();
-
-                list.innerHTML += `
-                    <div class="flex items-start space-x-2">
-                        <div class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0 text-[10px] font-bold">AI</div>
-                        <div class="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl rounded-tl-none text-xs">
-                            Đã xảy ra lỗi khi kết nối với Trợ lý.
-                        </div>
-                    </div>
-                `;
+                list.innerHTML += `<div class="text-rose-600 text-xs p-2">Lỗi kết nối tới Trợ lý AI.</div>`;
             }
-
             list.scrollTop = list.scrollHeight;
             if (window.lucide) lucide.createIcons();
         }

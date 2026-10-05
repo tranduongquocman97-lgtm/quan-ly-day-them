@@ -1,21 +1,13 @@
 {
-  "name": "Sổ Học Tập & Khảo Thí",
-  "short_name": "Sổ Học Tập",
+  "name": "SigmaMath - Thầy Mẫn",
+  "short_name": "M-SigmaMath",
   "start_url": "./hocsinh.html",
   "display": "standalone",
-  "background_color": "#312e81",
+  "background_color": "#0b1329",
   "theme_color": "#312e81",
   "orientation": "portrait",
   "icons": [
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135755.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135755.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    { "src": "logo-student-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "logo-student-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
