@@ -1,12 +1,12 @@
 {
-  "name": "SigmaMath Teacher Pro",
-  "short_name": "SigmaTeacher",
+  "name": "M_SigmaTeacher - Quản Lý Dạy Thêm & Khảo Thí",
+  "short_name": "M_SigmaTeacher",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#0b1329",
   "theme_color": "#1e1b4b",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "icons": [
     {
       "src": "logo-teacher-192.png",

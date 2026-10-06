@@ -1,5 +1,5 @@
 // ==================== SERVICE WORKER SIGMAMATH ====================
-const CACHE_NAME = 'sigmamath-pwa-v2026.1';
+const CACHE_NAME = 'sigmamath-pwa-v2026.2';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -15,7 +15,7 @@ const STATIC_ASSETS = [
   './logo-student-512.png'
 ];
 
-// Cài đặt và kích hoạt ngay bản mới
+// Cài đặt và ép kích hoạt ngay phiên bản mới
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
@@ -23,7 +23,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Xóa cache cũ khi có phiên bản mới
+// Xóa sạch cache cũ để nạp code mới ngay lập tức
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -38,11 +38,11 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Chiến lược Network-First: Ưu tiên nạp bản mới nhất từ mạng
+// Chiến lược Network-First: Ưu tiên tải dữ liệu mới nhất từ mạng
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   
-  // Bỏ qua các yêu cầu gọi sang Google Apps Script API (không cache dữ liệu động)
+  // Bỏ qua các API Google Apps Script và VietQR để lấy dữ liệu thời gian thực
   if (event.request.url.includes('script.google.com') || event.request.url.includes('vietqr.io')) {
     return;
   }

@@ -2,10 +2,10 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>SigmaMath - Thầy Mẫn | Cổng Học Sinh</title>
 
-    <!-- CẤU HÌNH PWA CHUẨN ANDROID & IPHONE -->
+    <!-- CẤU HÌNH PWA TĨNH CHUẨN ANDROID & IPHONE -->
     <link rel="manifest" href="manifest-hocsinh.json">
     <meta name="theme-color" content="#312e81">
     <meta name="mobile-web-app-capable" content="yes">
@@ -23,38 +23,49 @@
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+        /* TỐI ƯU KHI XOAY MÀN HÌNH NGANG (LANDSCAPE) */
+        @media (orientation: landscape) and (max-height: 550px) {
+            header { padding-top: 0.4rem !important; padding-bottom: 0.4rem !important; }
+            main { padding-top: 0.5rem !important; }
+        }
+
+        /* TỐI ƯU MÀN HÌNH NGOÀI GALAXY Z FOLD (< 380px) */
+        @media (max-width: 380px) {
+            .stab-btn { padding-left: 0.5rem !important; padding-right: 0.5rem !important; font-size: 11px !important; }
+            header h2 { font-size: 12px !important; }
+        }
     </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col">
 
     <!-- MÀN HÌNH ĐĂNG NHẬP -->
-    <div id="studentLoginScreen" class="flex-1 flex items-center justify-center p-4">
-        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-slate-200 w-full max-w-sm text-center space-y-4">
-            <!-- LOGO M-SIGMAMATH -->
-            <div id="appLogoContainer" class="w-20 h-20 mx-auto rounded-3xl overflow-hidden shadow-md border border-slate-100 flex items-center justify-center bg-slate-900">
+    <div id="studentLoginScreen" class="flex-1 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white p-5 sm:p-8 rounded-3xl shadow-xl border border-slate-200 w-full max-w-sm text-center space-y-4">
+            <div id="appLogoContainer" class="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-3xl overflow-hidden shadow-md border border-slate-100 flex items-center justify-center bg-slate-900">
                 <img id="loginLogoImg" src="logo-student.png" alt="Logo SigmaMath" class="w-full h-full object-cover">
             </div>
 
             <div>
-                <h1 id="appTitleText" class="text-lg sm:text-xl font-black text-slate-900 tracking-tight">SigmaMath - Thầy Mẫn</h1>
-                <p id="appSloganText" class="text-[11px] text-slate-500 mt-1 leading-snug">Hệ thống học tập, chuyên cần & khảo thí Toán Thầy Mẫn</p>
+                <h1 id="appTitleText" class="text-base sm:text-xl font-black text-slate-900 tracking-tight">SigmaMath - Thầy Mẫn</h1>
+                <p id="appSloganText" class="text-[10px] sm:text-[11px] text-slate-500 mt-1 leading-snug">Hệ thống học tập, chuyên cần & khảo thí Toán Thầy Mẫn</p>
             </div>
 
-            <!-- Nút cài App -->
-            <button type="button" onclick="triggerPWAInstall()" class="w-full bg-slate-50 hover:bg-indigo-50 border border-slate-200 text-indigo-700 font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-1.5 shadow-sm">
-                <i data-lucide="smartphone" class="w-4 h-4 text-indigo-600"></i>
-                <span id="installBtnText">Cài App Ra Màn Hình Điện Thoại</span>
+            <!-- NÚT CÀI ĐẶT TRỰC TIẾP -->
+            <button type="button" id="btnInstallAppDirect" onclick="triggerPWAInstall()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-2 shadow-md hover:shadow-lg">
+                <i data-lucide="download-cloud" class="w-4 h-4 text-amber-300"></i>
+                <span id="installBtnText">Cài Đặt Ứng Dụng M-SigmaMath</span>
             </button>
 
             <form onsubmit="handleStudentLogin(event)" class="space-y-3 text-left pt-1">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Tên đăng nhập / Mã HS</label>
-                    <input type="text" id="loginUsername" placeholder="VD: nguyenthiutman.10n1" required class="w-full p-3 border rounded-xl text-xs font-bold font-mono outline-none focus:border-indigo-600">
+                    <input type="text" id="loginUsername" placeholder="VD: nguyenthiutman.10n1" required class="w-full p-2.5 sm:p-3 border rounded-xl text-xs font-bold font-mono outline-none focus:border-indigo-600">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Mật khẩu</label>
                     <div class="relative">
-                        <input type="password" id="loginPassword" placeholder="Nhập mật khẩu..." required class="w-full p-3 pr-10 border rounded-xl text-xs font-bold outline-none focus:border-indigo-600">
+                        <input type="password" id="loginPassword" placeholder="Nhập mật khẩu..." required class="w-full p-2.5 sm:p-3 pr-10 border rounded-xl text-xs font-bold outline-none focus:border-indigo-600">
                         <button type="button" onclick="togglePasswordVisibility('loginPassword', 'eyeIconLogin')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 p-1">
                             <i data-lucide="eye" id="eyeIconLogin" class="w-4 h-4"></i>
                         </button>
@@ -71,15 +82,15 @@
     <!-- MÀN HÌNH CHÍNH CỦA HỌC SINH -->
     <div id="studentDashboardScreen" class="hidden flex-1 flex flex-col">
         <header class="bg-indigo-950 text-white shadow-md sticky top-0 z-30">
-            <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <img id="headerLogoImg" src="logo-student.png" alt="Logo" class="w-9 h-9 rounded-xl object-cover border border-indigo-700 shadow-inner">
+            <div class="max-w-5xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between">
+                <div class="flex items-center space-x-2.5 sm:space-x-3">
+                    <img id="headerLogoImg" src="logo-student.png" alt="Logo" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl object-cover border border-indigo-700 shadow-inner">
                     <div>
                         <h2 class="font-bold text-xs sm:text-sm leading-tight" id="headerStudentName">---</h2>
                         <p class="text-[10px] text-indigo-300" id="headerStudentClass">---</p>
                     </div>
                 </div>
-                <div class="flex items-center space-x-2">
+                <div class="flex items-center space-x-1.5 sm:space-x-2">
                     <button onclick="triggerPWAInstall()" class="bg-indigo-900 hover:bg-indigo-800 text-amber-300 text-xs px-2.5 py-1.5 rounded-xl font-bold transition flex items-center space-x-1" title="Cài App">
                         <i data-lucide="download" class="w-3.5 h-3.5"></i>
                         <span class="hidden sm:inline">Cài App</span>
@@ -95,32 +106,32 @@
             </div>
         </header>
 
-        <main class="flex-1 max-w-5xl w-full mx-auto p-4 space-y-4">
+        <main class="flex-1 max-w-5xl w-full mx-auto p-3 sm:p-4 space-y-4">
             <!-- BANNER VÀO PHÒNG THI ONLINE -->
-            <div class="bg-gradient-to-r from-indigo-700 via-indigo-800 to-purple-800 rounded-3xl p-5 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="bg-gradient-to-r from-indigo-700 via-indigo-800 to-purple-800 rounded-3xl p-4 sm:p-5 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div class="space-y-1 text-center sm:text-left">
                     <span class="bg-amber-400 text-indigo-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Khảo thí trực tuyến</span>
-                    <h3 class="text-base sm:text-lg font-black">Phòng Thi Trắc Nghiệm Online</h3>
-                    <p class="text-xs text-indigo-100">Làm các bài thi GDPT mới 3 phần (Trắc nghiệm, Đúng/Sai, Trả lời ngắn).</p>
+                    <h3 class="text-sm sm:text-base md:text-lg font-black">Phòng Thi Trắc Nghiệm Online</h3>
+                    <p class="text-xs text-indigo-100">Làm bài thi theo cấu trúc GDPT mới 3 phần (Trắc nghiệm, Đúng/Sai, Trả lời ngắn).</p>
                 </div>
-                <button onclick="location.href='exam.html'" class="w-full sm:w-auto bg-amber-400 hover:bg-amber-300 text-indigo-950 font-black text-xs px-5 py-3 rounded-2xl shadow transition flex items-center justify-center space-x-1.5 shrink-0">
+                <button onclick="location.href='exam.html'" class="w-full sm:w-auto bg-amber-400 hover:bg-amber-300 text-indigo-950 font-black text-xs px-5 py-2.5 sm:py-3 rounded-2xl shadow transition flex items-center justify-center space-x-1.5 shrink-0">
                     <span>Vào Phòng Thi</span>
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </div>
 
             <!-- THANH ĐIỀU HƯỚNG TABS -->
-            <nav class="flex items-center space-x-2 border-b pb-2 overflow-x-auto">
-                <button onclick="switchStudentTab('tuition')" id="stab-btn-tuition" class="stab-btn px-4 py-2 rounded-xl font-bold text-xs text-indigo-600 bg-indigo-50 shrink-0 transition">Học Phí & QR</button>
-                <button onclick="switchStudentTab('attendance')" id="stab-btn-attendance" class="stab-btn px-4 py-2 rounded-xl font-bold text-xs text-slate-500 hover:bg-slate-100 shrink-0 transition">Sổ Điểm Danh 8B</button>
-                <button onclick="switchStudentTab('analytics')" id="stab-btn-analytics" class="stab-btn px-4 py-2 rounded-xl font-bold text-xs text-slate-500 hover:bg-slate-100 shrink-0 transition">Tiến Độ & Năng Lực</button>
-                <button onclick="switchStudentTab('documents')" id="stab-btn-documents" class="stab-btn px-4 py-2 rounded-xl font-bold text-xs text-slate-500 hover:bg-slate-100 shrink-0 transition">Kho Chuyên Đề</button>
+            <nav class="flex items-center space-x-1.5 sm:space-x-2 border-b pb-2 overflow-x-auto">
+                <button onclick="switchStudentTab('tuition')" id="stab-btn-tuition" class="stab-btn px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-bold text-xs text-indigo-600 bg-indigo-50 shrink-0 transition">Học Phí & QR</button>
+                <button onclick="switchStudentTab('attendance')" id="stab-btn-attendance" class="stab-btn px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-bold text-xs text-slate-500 hover:bg-slate-100 shrink-0 transition">Sổ Điểm Danh 8B</button>
+                <button onclick="switchStudentTab('analytics')" id="stab-btn-analytics" class="stab-btn px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-bold text-xs text-slate-500 hover:bg-slate-100 shrink-0 transition">Tiến Độ & Năng Lực</button>
+                <button onclick="switchStudentTab('documents')" id="stab-btn-documents" class="stab-btn px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-bold text-xs text-slate-500 hover:bg-slate-100 shrink-0 transition">Kho Chuyên Đề</button>
             </nav>
 
             <!-- TAB 1: HỌC PHÍ & VIETQR TỰ ĐỘNG -->
             <section id="stab-tuition" class="stab-content space-y-4">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
-                    <h3 class="font-bold text-sm text-slate-800 border-b pb-2 flex items-center space-x-2">
+                <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+                    <h3 class="font-bold text-xs sm:text-sm text-slate-800 border-b pb-2 flex items-center space-x-2">
                         <i data-lucide="qr-code" class="w-4 h-4 text-emerald-600"></i>
                         <span>Tình Trạng Học Phí & Mã Thanh Toán VietQR</span>
                     </h3>
@@ -130,28 +141,28 @@
 
             <!-- TAB 2: ĐIỂM DANH KHOA HỌC THEO CHU KỲ (8 BUỔI) -->
             <section id="stab-attendance" class="stab-content hidden space-y-4">
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div class="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-sm text-center">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+                    <div class="p-3 sm:p-3.5 bg-white rounded-2xl border border-slate-200 shadow-sm text-center">
                         <span class="text-[10px] font-bold text-slate-500 uppercase block">Tổng Buổi Lớp Này</span>
-                        <span class="text-xl font-black text-slate-800" id="attStatTotal">0</span>
+                        <span class="text-lg sm:text-xl font-black text-slate-800" id="attStatTotal">0</span>
                     </div>
-                    <div class="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <div class="p-3 sm:p-3.5 bg-white rounded-2xl border border-slate-200 shadow-sm text-center">
                         <span class="text-[10px] font-bold text-slate-500 uppercase block">Chuyên Cần</span>
-                        <span class="text-xl font-black text-emerald-600" id="attStatRate">0%</span>
+                        <span class="text-lg sm:text-xl font-black text-emerald-600" id="attStatRate">0%</span>
                     </div>
-                    <div class="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <div class="p-3 sm:p-3.5 bg-white rounded-2xl border border-slate-200 shadow-sm text-center">
                         <span class="text-[10px] font-bold text-slate-500 uppercase block">Vắng Có Phép</span>
-                        <span class="text-xl font-black text-amber-500" id="attStatPerm">0</span>
+                        <span class="text-lg sm:text-xl font-black text-amber-500" id="attStatPerm">0</span>
                     </div>
-                    <div class="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-sm text-center">
-                        <span class="text-[10px] font-bold text-slate-500 uppercase block">Vắng K.Phép / Trễ</span>
-                        <span class="text-xl font-black text-rose-600" id="attStatNoPerm">0</span>
+                    <div class="p-3 sm:p-3.5 bg-white rounded-2xl border border-slate-200 shadow-sm text-center">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase block">Vắng KP / Trễ</span>
+                        <span class="text-lg sm:text-xl font-black text-rose-600" id="attStatNoPerm">0</span>
                     </div>
                 </div>
 
-                <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 space-y-3">
+                <div class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-slate-200 space-y-3">
                     <div class="flex justify-between items-center border-b pb-2">
-                        <h3 class="font-bold text-sm text-slate-800 flex items-center space-x-2">
+                        <h3 class="font-bold text-xs sm:text-sm text-slate-800 flex items-center space-x-2">
                             <i data-lucide="calendar-check" class="w-4 h-4 text-indigo-600"></i>
                             <span>Hồ Sơ Chuyên Cần Lớp Hiện Tại (8 Buổi / Chu Kỳ)</span>
                         </h3>
@@ -161,9 +172,9 @@
                 </div>
 
                 <!-- LỊCH SỬ LỚP CŨ NẾU CÓ CHUYỂN NHÓM -->
-                <div id="studentPreviousClassHistorySection" class="hidden bg-white p-5 rounded-3xl shadow-sm border border-slate-200 space-y-3">
+                <div id="studentPreviousClassHistorySection" class="hidden bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-slate-200 space-y-3">
                     <div class="flex justify-between items-center border-b pb-2">
-                        <h3 class="font-bold text-sm text-slate-700 flex items-center space-x-2">
+                        <h3 class="font-bold text-xs sm:text-sm text-slate-700 flex items-center space-x-2">
                             <i data-lucide="history" class="w-4 h-4 text-slate-500"></i>
                             <span>Lịch Sử Học Tại Lớp Cũ (Trước Khi Chuyển Lớp)</span>
                         </h3>
@@ -176,12 +187,12 @@
             <!-- TAB 3: TIẾN ĐỘ & PHÂN TÍCH -->
             <section id="stab-analytics" class="stab-content hidden space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
-                        <h3 class="font-bold text-sm text-slate-800 border-b pb-2">Biểu Đồ Tiến Bộ Điểm Số</h3>
-                        <div class="h-56"><canvas id="studentScoreChart"></canvas></div>
+                    <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+                        <h3 class="font-bold text-xs sm:text-sm text-slate-800 border-b pb-2">Biểu Đồ Tiến Bộ Điểm Số</h3>
+                        <div class="h-52 sm:h-56"><canvas id="studentScoreChart"></canvas></div>
                     </div>
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
-                        <h3 class="font-bold text-sm text-slate-800 border-b pb-2">Đánh Giá Năng Lực 3 Phần</h3>
+                    <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+                        <h3 class="font-bold text-xs sm:text-sm text-slate-800 border-b pb-2">Đánh Giá Năng Lực 3 Phần</h3>
                         <div id="studentRadarStats" class="space-y-3 pt-1"></div>
                     </div>
                 </div>
@@ -189,17 +200,32 @@
 
             <!-- TAB 4: KHO TÀI LIỆU -->
             <section id="stab-documents" class="stab-content hidden space-y-4">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
-                    <h3 class="font-bold text-sm text-slate-800 border-b pb-2">Tài Liệu Phân Nhóm Theo Chuyên Đề</h3>
+                <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+                    <h3 class="font-bold text-xs sm:text-sm text-slate-800 border-b pb-2">Tài Liệu Phân Nhóm Theo Chuyên Đề</h3>
                     <div id="studentGroupedDocsList" class="space-y-3"></div>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- MODAL HƯỚNG DẪN CÀI APP ĐIỆN THOẠI -->
+    <!-- BANNER GỢI Ý CÀI ĐẶT NHANH (CHỈ HIỆN KHI CHƯA CÀI) -->
+    <div id="pwaBottomBanner" class="fixed bottom-3 inset-x-3 sm:max-w-md sm:mx-auto bg-slate-900/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-2xl border border-indigo-500/30 flex items-center justify-between z-50 hidden transition-all">
+        <div class="flex items-center space-x-2.5">
+            <img src="logo-student-192.png" class="w-9 h-9 rounded-xl object-cover border border-indigo-400">
+            <div>
+                <div class="text-xs font-bold leading-tight">Cài đặt M-SigmaMath</div>
+                <div class="text-[10px] text-slate-300">Mở toàn màn hình, tra cứu mượt mà</div>
+            </div>
+        </div>
+        <div class="flex items-center space-x-1.5">
+            <button onclick="triggerPWAInstall()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow">Cài Đặt</button>
+            <button onclick="document.getElementById('pwaBottomBanner').classList.add('hidden')" class="text-slate-400 hover:text-white p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+    </div>
+
+    <!-- MODAL HƯỚNG DẪN DÀNH RIÊNG CHO IPHONE (IOS SAFARI) -->
     <div id="modalInstallGuide" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4 text-xs">
+        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4 text-xs">
             <div class="flex justify-between items-center border-b pb-2">
                 <h3 class="font-bold text-sm text-indigo-900 flex items-center space-x-1.5">
                     <i data-lucide="smartphone" class="w-4 h-4 text-indigo-600"></i>
@@ -208,31 +234,14 @@
                 <button onclick="closeInstallGuideModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
 
-            <div id="androidDirectInstallBox" class="hidden">
-                <button onclick="execPromptInstall()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-2xl shadow transition text-xs flex items-center justify-center space-x-2">
-                    <i data-lucide="download" class="w-4 h-4"></i>
-                    <span>Cài Đặt Ngay Ra Màn Hình Chính</span>
-                </button>
-            </div>
-
             <div class="p-3 bg-slate-50 border rounded-2xl space-y-2">
                 <div class="font-bold text-slate-800 flex items-center space-x-1">
                     <span>🍎 Dành cho iPhone (Safari):</span>
                 </div>
                 <ol class="list-decimal list-inside space-y-1 text-slate-600 leading-relaxed text-[11px]">
-                    <li>Mở web bằng trình duyệt <b>Safari</b>.</li>
-                    <li>Bấm vào biểu tượng <b>Chia sẻ</b> (hình vuông có mũi tên chỉ lên).</li>
-                    <li>Kéo xuống chọn <b>"Thêm vào Màn hình chính" (Add to Home Screen)</b>.</li>
-                </ol>
-            </div>
-
-            <div class="p-3 bg-slate-50 border rounded-2xl space-y-2">
-                <div class="font-bold text-slate-800 flex items-center space-x-1">
-                    <span>🤖 Dành cho Android (Chrome):</span>
-                </div>
-                <ol class="list-decimal list-inside space-y-1 text-slate-600 leading-relaxed text-[11px]">
-                    <li>Bấm vào dấu <b>3 chấm</b> ở góc trên bên phải trình duyệt Chrome.</li>
-                    <li>Chọn <b>"Cài đặt ứng dụng"</b> hoặc <b>"Thêm vào Màn hình chính"</b>.</li>
+                    <li>Mở web bằng trình duyệt <b>Safari</b>[cite: 8].</li>
+                    <li>Bấm vào biểu tượng <b>Chia sẻ</b> (hình vuông có mũi tên chỉ lên ở thanh dưới)[cite: 8].</li>
+                    <li>Kéo xuống chọn <b>"Thêm vào Màn hình chính" (Add to Home Screen)</b>[cite: 8].</li>
                 </ol>
             </div>
 
@@ -240,15 +249,15 @@
         </div>
     </div>
 
-    <!-- MODAL VIETQR -->
+    <!-- MODAL HIỂN THỊ VIETQR -->
     <div id="modalVietQR" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm text-center space-y-4">
+        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-sm text-center space-y-4">
             <div class="flex justify-between items-center border-b pb-2">
                 <h3 class="font-bold text-sm text-slate-800">Quét Mã VietQR Chuyển Khoản</h3>
                 <button onclick="closeVietQRModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
             <div class="p-2 bg-slate-50 border rounded-2xl inline-block mx-auto">
-                <img id="qrImageElement" src="" alt="Mã VietQR" class="w-64 h-64 mx-auto rounded-xl shadow-sm">
+                <img id="qrImageElement" src="" alt="Mã VietQR" class="w-56 h-56 sm:w-64 sm:h-64 mx-auto rounded-xl shadow-sm">
             </div>
             <div class="text-left text-xs bg-slate-50 p-3 rounded-xl space-y-1.5">
                 <div class="flex justify-between"><span class="text-slate-500">Ngân hàng:</span><b class="text-indigo-900">Agribank</b></div>
@@ -257,32 +266,21 @@
                 <div class="flex justify-between border-t pt-1"><span class="text-slate-500">Số tiền:</span><b id="qrAmountText" class="text-emerald-600 font-black text-sm">0 đ</b></div>
                 <div class="flex justify-between"><span class="text-slate-500">Nội dung CK:</span><b id="qrContentText" class="font-mono text-indigo-700">---</b></div>
             </div>
-            <p class="text-[11px] text-slate-400">Mở ứng dụng ngân hàng quét mã để thanh toán học phí.</p>
         </div>
     </div>
 
     <!-- MODAL ĐỔI MẬT KHẨU -->
     <div id="modalChangePassword" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
+        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
             <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm">Đổi Mật Khẩu Cá Nhân</h3><button onclick="closeChangePasswordModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
             <form onsubmit="handleSaveNewPassword(event)" class="space-y-3 text-xs">
                 <div>
                     <label class="block font-bold mb-1">Mật khẩu mới</label>
-                    <div class="relative">
-                        <input type="password" id="newPasswordInput" required minlength="4" class="w-full p-2.5 pr-10 border rounded-xl outline-none font-bold">
-                        <button type="button" onclick="togglePasswordVisibility('newPasswordInput', 'eyeIconNew')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 p-1">
-                            <i data-lucide="eye" id="eyeIconNew" class="w-4 h-4"></i>
-                        </button>
-                    </div>
+                    <input type="password" id="newPasswordInput" required minlength="4" class="w-full p-2.5 border rounded-xl outline-none font-bold">
                 </div>
                 <div>
                     <label class="block font-bold mb-1">Xác nhận mật khẩu</label>
-                    <div class="relative">
-                        <input type="password" id="confirmNewPasswordInput" required minlength="4" class="w-full p-2.5 pr-10 border rounded-xl outline-none font-bold">
-                        <button type="button" onclick="togglePasswordVisibility('confirmNewPasswordInput', 'eyeIconConfirm')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 p-1">
-                            <i data-lucide="eye" id="eyeIconConfirm" class="w-4 h-4"></i>
-                        </button>
-                    </div>
+                    <input type="password" id="confirmNewPasswordInput" required minlength="4" class="w-full p-2.5 border rounded-xl outline-none font-bold">
                 </div>
                 <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2.5 rounded-xl shadow">Lưu Mật Khẩu</button>
             </form>
@@ -311,7 +309,7 @@
         let currentTabId = 'tuition';
         let deferredPrompt = null;
 
-        // ĐĂNG KÝ VÀ TỰ ĐỘNG CẬP NHẬT SERVICE WORKER
+        // 1. ĐĂNG KÝ VÀ TỰ ĐỘNG CẬP NHẬT SERVICE WORKER KHI CÓ CODE MỚI
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').then((reg) => {
                 reg.onupdatefound = () => {
@@ -327,36 +325,55 @@
             }).catch(err => console.log('SW Fail', err));
         }
 
-        // BẮT SỰ KIỆN CÀI ĐẶT TRÊN ANDROID
+        // 2. LẮNG NGHE SỰ KIỆN CÀI ĐẶT PWA TRỰC TIẾP TRÊN CHROME ANDROID
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            const btn = document.getElementById('installBtnText');
-            if (btn) btn.innerText = "Cài Đặt App M-SigmaMath";
-            const directBox = document.getElementById('androidDirectInstallBox');
-            if (directBox) directBox.classList.remove('hidden');
+
+            // Hiển thị Banner gợi ý cài đặt ở dưới cùng
+            const banner = document.getElementById('pwaBottomBanner');
+            if (banner) banner.classList.remove('hidden');
+
+            const btnText = document.getElementById('installBtnText');
+            if (btnText) btnText.innerText = "Cài Đặt Ngay Vào Điện Thoại";
         });
 
-        function triggerPWAInstall() {
+        // 3. HÀM KÍCH HOẠT POPUP CÀI ĐẶT TRỰC TIẾP CỦA HỆ ĐIỀU HÀNH
+        async function triggerPWAInstall() {
+            // NẾU LÀ ANDROID / CHROME CÓ SẴN PROMPT -> BẬT POPUP HỆ THỐNG NGAY LẬP TỨC
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(() => {
-                    deferredPrompt = null;
-                });
-            } else {
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    const banner = document.getElementById('pwaBottomBanner');
+                    if (banner) banner.classList.add('hidden');
+                }
+                deferredPrompt = null;
+                return;
+            }
+
+            // NẾU LÀ IPHONE HOẶC TRÌNH DUYỆT KHÁC
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+            if (isStandalone) {
+                alert("Ứng dụng M-SigmaMath đã được cài đặt trên thiết bị của bạn!");
+                return;
+            }
+
+            if (isIOS) {
                 openInstallGuideModal();
+            } else {
+                alert("Thầy/Cô và các bạn có thể bấm vào dấu 3 chấm góc phải trên Chrome ➔ Chọn 'Cài đặt ứng dụng' (Install App).");
             }
         }
 
-        function execPromptInstall() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(() => {
-                    deferredPrompt = null;
-                    closeInstallGuideModal();
-                });
-            }
-        }
+        window.addEventListener('appinstalled', () => {
+            deferredPrompt = null;
+            const banner = document.getElementById('pwaBottomBanner');
+            if (banner) banner.classList.add('hidden');
+            alert("Chúc mừng! Ứng dụng M-SigmaMath đã được cài ra màn hình chính.");
+        });
 
         function openInstallGuideModal() {
             document.getElementById('modalInstallGuide').classList.remove('hidden');
@@ -365,7 +382,7 @@
             document.getElementById('modalInstallGuide').classList.add('hidden');
         }
 
-        // CHUẨN HÓA NGÀY THÁNG AN TOÀN TRÁNH LỆCH MÚI GIỜ CLOUD
+        // CHUẨN HÓA NGÀY THÁNG AN TOÀN TRÁNH LỆCH MÚI GIỜ
         function normalizeCloudDate(d) {
             if (!d) return '';
             d = String(d);
@@ -472,7 +489,6 @@
                 localStorage.setItem(CACHE_DATA_KEY, JSON.stringify(appData));
                 applyBranding();
 
-                // LÀM MỚI TỨC THÌ DỮ LIỆU CỦA HỌC SINH ĐANG ĐĂNG NHẬP
                 const savedId = localStorage.getItem(SESSION_KEY);
                 if (savedId) {
                     const freshStudent = appData.students.find(x => x.id === savedId);
@@ -481,7 +497,7 @@
                         showDashboard(false);
                     }
                 }
-            } catch(e) { console.error("Lỗi nạp dữ liệu cloud:", e); }
+            } catch(e) { console.error("Lỗi nạp cloud:", e); }
         }
 
         function checkSavedSession() {
@@ -573,7 +589,7 @@
             document.getElementById('modalVietQR').classList.add('hidden');
         }
 
-        // ==================== BẢNG HỌC PHÍ (ĐÃ SỬA CHUẨN XÁC) ====================
+        // BẢNG HỌC PHÍ (TỰ ĐỘNG CHUẨN XÁC)
         function renderStudentTuition() {
             const container = document.getElementById('studentTuitionCards');
             const c = appData.classes.find(x => x.id === currentStudent.classId);
@@ -591,25 +607,18 @@
                 const p = appData.payments.find(x => x.studentId === currentStudent.id && x.classId === currentStudent.classId && x.cycleIndex === i);
                 let stC = 'bg-slate-50 border-slate-200 text-slate-400', txt = 'Chưa đến', amount = (p && p.amount > 0) ? p.amount : stdFee, showPayBtn = false;
 
-                // 1. Nếu được miễn phí
                 if (isExempt || (p && p.status === 'EXEMPT')) {
                     stC = 'bg-blue-50 border-blue-200 text-blue-800 font-bold';
                     txt = (p && p.note) ? p.note : `MIỄN PHÍ`;
-                }
-                // 2. Nếu ĐÃ NỘP (ưu tiên kiểm tra trước để không bị báo nợ oan)
-                else if (p && p.status === 'PAID') {
+                } else if (p && p.status === 'PAID') {
                     stC = 'bg-emerald-50 border-emerald-200 text-emerald-800';
                     txt = `ĐÃ NỘP: ${p.amount.toLocaleString()}đ<br><span class="text-[10px] text-slate-500 font-normal">${formatDateVN(p.date)}</span>`;
                     if (p.note) txt += `<br><span class="text-[10px] text-emerald-700 font-semibold">${p.note}</span>`;
-                }
-                // 3. Nếu là khoản chuyển lớp CỘNG DỒN LIÊN TỤC đang chờ thu
-                else if (p && p.note && p.note.includes('Cộng dồn liên tục')) {
+                } else if (p && p.note && p.note.includes('Cộng dồn liên tục')) {
                     txt = `<span class="text-amber-800 font-bold">${p.note}</span><br><b class="text-rose-600">Cần nộp: ${p.amount.toLocaleString()}đ</b>`;
                     stC = 'bg-amber-50 border-amber-300 text-amber-900';
                     showPayBtn = true;
-                }
-                // 4. Các trường hợp chu kỳ thông thường
-                else if (i < joinCycle && (!p || p.amount === 0)) {
+                } else if (i < joinCycle && (!p || p.amount === 0)) {
                     txt = 'Chưa vào học';
                 } else if (i < activeCycleIdx) {
                     stC = 'bg-rose-50 border-rose-200 text-rose-700 font-bold';
@@ -626,7 +635,7 @@
                 }
 
                 html += `
-                    <div class="p-4 rounded-2xl border ${stC} space-y-2 flex flex-col justify-between">
+                    <div class="p-3.5 sm:p-4 rounded-2xl border ${stC} space-y-2 flex flex-col justify-between">
                         <div>
                             <div class="text-[11px] font-bold uppercase">Kỳ ${i + 1}</div>
                             <div class="text-xs leading-relaxed mt-1">${txt}</div>
@@ -643,7 +652,7 @@
             container.innerHTML = html;
         }
 
-        // ==================== BẢNG CHUYÊN CẦN 8 BUỔI ====================
+        // BẢNG CHUYÊN CẦN 8 BUỔI
         function renderStudentAttendance() {
             const container = document.getElementById('studentAttendanceCyclesContainer');
             if (!container || !currentStudent) return;
@@ -698,9 +707,9 @@
                         }
 
                         return `
-                            <div class="p-2.5 rounded-2xl border ${badgeClass} flex flex-col items-center justify-between text-center min-h-[76px]">
+                            <div class="p-2 sm:p-2.5 rounded-2xl border ${badgeClass} flex flex-col items-center justify-between text-center min-h-[70px] sm:min-h-[76px]">
                                 <div class="text-[10px] font-bold text-slate-500">Buổi ${dIdx + 1}</div>
-                                <div class="text-base font-black my-0.5">${icon}</div>
+                                <div class="text-sm sm:text-base font-black my-0.5">${icon}</div>
                                 <div class="text-[9px] font-mono leading-tight">${formatDateShortVN(d)}</div>
                             </div>
                         `;
@@ -708,12 +717,12 @@
 
                     html += `
                         <div class="border rounded-2xl overflow-hidden shadow-sm ${isCurrentCycle ? 'border-indigo-300 ring-2 ring-indigo-50' : 'border-slate-200'}">
-                            <div class="p-4 bg-slate-50 flex justify-between items-center font-bold text-xs sm:text-sm">
+                            <div class="p-3 sm:p-4 bg-slate-50 flex justify-between items-center font-bold text-xs sm:text-sm">
                                 <span>KỲ ${cycleNum}: ${formatDateVN(chunkDates[0])} ➔ ${formatDateVN(chunkDates[chunkDates.length - 1])}</span>
                                 <span class="text-indigo-900">${cyclePresent}/${chunkDates.length} buổi</span>
                             </div>
-                            <div class="p-4 bg-white border-t">
-                                <div class="grid grid-cols-4 sm:grid-cols-8 gap-2">${sessionCells}</div>
+                            <div class="p-3 sm:p-4 bg-white border-t">
+                                <div class="grid grid-cols-4 sm:grid-cols-8 gap-1.5 sm:gap-2">${sessionCells}</div>
                             </div>
                         </div>
                     `;
@@ -721,7 +730,6 @@
                 container.innerHTML = html;
             }
 
-            // HIỂN THỊ LỊCH SỬ LỚP CŨ (NẾU CÓ)
             const prevClassRecords = appData.attendance.filter(a => a.studentId === currentStudent.id && a.classId && a.classId !== currentStudent.classId);
             const prevSection = document.getElementById('studentPreviousClassHistorySection');
             const prevList = document.getElementById('studentPreviousClassList');
@@ -761,7 +769,6 @@
             }
         }
 
-        // PHÂN TÍCH TIẾN ĐỘ & BÀI THI
         function renderStudentAnalytics() {
             const results = appData.examResults.filter(r => r.studentId === currentStudent.id);
             const radarContainer = document.getElementById('studentRadarStats');
@@ -798,15 +805,12 @@
             const ctx = document.getElementById('studentScoreChart');
             if (!ctx || results.length === 0) return;
 
-            const labels = results.map((r, i) => `Bài ${i + 1}`);
-            const dataScores = results.map(r => r.score);
-
             if (scoreChartInstance) scoreChartInstance.destroy();
             scoreChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels,
-                    datasets: [{ label: 'Điểm Số', data: dataScores, borderColor: '#4f46e5', tension: 0.3, fill: true, backgroundColor: 'rgba(79, 70, 229, 0.08)' }]
+                    labels: results.map((r, i) => `Bài ${i + 1}`),
+                    datasets: [{ label: 'Điểm Số', data: results.map(r => r.score), borderColor: '#4f46e5', tension: 0.3, fill: true, backgroundColor: 'rgba(79, 70, 229, 0.08)' }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 10 } } }
             });
@@ -815,7 +819,7 @@
         function renderStudentGroupedDocs() {
             const list = appData.documents.filter(d => d.classId === currentStudent.classId);
             const c = document.getElementById('studentGroupedDocsList');
-            if (list.length === 0) { c.innerHTML = '<div class="text-xs text-slate-400 italic">Chưa có tài liệu nào cho lớp này.</div>'; return; }
+            if (list.length === 0) { c.innerHTML = '<div class="text-xs text-slate-400 italic">Chưa có tài liệu nào.</div>'; return; }
             c.innerHTML = list.map(f => `
                 <div class="p-2.5 rounded-xl border flex justify-between items-center text-xs bg-slate-50">
                     <span>📄 <b>${f.name}</b></span>
