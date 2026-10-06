@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SigmaMath Teacher Pro - Quản Lý Dạy Thêm & Khảo Thí</title>
     
-    <!-- PWA & Mobile Meta Tags -->
+    <!-- PWA CỐ ĐỊNH CHO GIÁO VIÊN -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e1b4b">
     <meta name="mobile-web-app-capable" content="yes">
@@ -106,6 +106,10 @@
                 <select id="globalClassSelect" onchange="onGlobalClassChange()" class="bg-slate-50 border border-slate-300 font-bold text-indigo-700 text-xs sm:text-sm rounded-xl p-2 outline-none focus:ring-2 focus:ring-indigo-100"></select>
             </div>
             <div class="flex items-center space-x-2 text-xs font-semibold">
+                <button onclick="triggerTeacherPWAInstall()" class="bg-purple-50 hover:bg-purple-100 text-purple-700 px-3 py-2 rounded-xl border border-purple-200 flex items-center space-x-1 transition" title="Cài App Giáo Viên">
+                    <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
+                    <span class="hidden sm:inline">Cài App Thầy</span>
+                </button>
                 <button onclick="copyStudentLink()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-2 rounded-xl border border-indigo-200 flex items-center space-x-1 transition"><i data-lucide="link" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Cổng Học Sinh</span></button>
                 <button onclick="copyExamLink()" class="bg-amber-50 hover:bg-amber-100 text-amber-700 px-3 py-2 rounded-xl border border-amber-200 flex items-center space-x-1 transition"><i data-lucide="pen-tool" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Cổng Thi Online</span></button>
                 <span class="bg-slate-100 text-slate-700 px-3 py-2 rounded-xl border font-bold" id="badgeStudentCount">0 HS</span>
@@ -206,7 +210,7 @@
                                         <th class="p-3">Lớp</th>
                                         <th class="p-3">Mã HS</th>
                                         <th class="p-3">Họ Tên</th>
-                                        <th class="p-3">Tài Khoản (Username)</th>
+                                        <th class="p-3">Tài Khoản</th>
                                         <th class="p-3">Ngày Vào</th>
                                         <th class="p-3">Học Phí</th>
                                         <th class="p-3 text-center">Thao Tác</th>
@@ -219,7 +223,7 @@
                 </div>
             </section>
 
-            <!-- TAB 3: SỔ HỌC SINH ĐÃ NGHỈ & LƯU TRỮ CÔNG NỢ CŨ -->
+            <!-- TAB 3: SỔ HỌC SINH ĐÃ NGHỈ & CÔNG NỢ CŨ -->
             <section id="tab-inactive-students" class="tab-content hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                     <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
@@ -334,7 +338,7 @@
                     <div class="flex justify-between items-center border-b pb-2">
                         <div>
                             <h2 class="font-bold text-sm text-slate-800">Theo Dõi Học Phí Theo Chu Kỳ Của Lớp</h2>
-                            <p class="text-[11px] text-slate-500">Cả lớp chạy chung nhịp kỳ. Học sinh vào sau hoặc chuyển lớp tính phí lẻ từ ngày gia nhập mới.</p>
+                            <p class="text-[11px] text-slate-500">Cả lớp chạy chung nhịp kỳ. Khi chuyển nhóm, hệ thống tự động cộng dồn số buổi liên tục.</p>
                         </div>
                     </div>
                     <div class="overflow-x-auto border rounded-xl">
@@ -579,7 +583,7 @@
         </div>
     </div>
 
-    <!-- MODAL: SỬA HỌC SINH & CHUYỂN LỚP (CÓ ĐỔI NGÀY GIA NHẬP LỚP MỚI) -->
+    <!-- MODAL: SỬA HỌC SINH & CHUYỂN LỚP (CÓ TÍNH CỘNG DỒN HỌC PHÍ) -->
     <div id="modalEditStudent" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-md space-y-4">
             <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm text-indigo-900">Sửa Thông Tin & Chuyển Lớp</h3><button onclick="closeEditStudentModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
@@ -592,7 +596,7 @@
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div><label class="block font-bold mb-1">Mã HS</label><input type="text" id="editStudentCode" required class="w-full p-2.5 border rounded-xl font-mono font-bold"></div>
-                    <div><label class="block font-bold mb-1">Ngày Vào Học Tại Lớp</label><input type="date" id="editStudentJoinDate" required class="w-full p-2.5 border rounded-xl font-bold"></div>
+                    <div><label class="block font-bold mb-1">Ngày Vào Học Lớp Mới</label><input type="date" id="editStudentJoinDate" required class="w-full p-2.5 border rounded-xl font-bold"></div>
                 </div>
                 <div><label class="block font-bold mb-1">Họ Và Tên</label><input type="text" id="editStudentName" required class="w-full p-2.5 border rounded-xl font-bold"></div>
                 <div><label class="block font-bold mb-1">Tài Khoản (Username)</label><input type="text" id="editStudentUsername" readonly class="w-full p-2.5 border rounded-xl font-mono font-bold bg-slate-100 text-slate-500"></div>
@@ -603,36 +607,21 @@
         </div>
     </div>
 
-    <!-- MODAL: BÁO NGHỈ HỌC & CHỐT CÔNG NỢ ĐƯA VÀO SỔ LƯU TRỮ -->
+    <!-- MODAL: BÁO NGHỈ HỌC & CHỐT NỢ -->
     <div id="modalLeaveStudent" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
-            <div class="flex justify-between border-b pb-2">
-                <h3 class="font-bold text-sm text-rose-800">Xác Nhận Cho Nghỉ Học & Chốt Nợ</h3>
-                <button onclick="closeLeaveModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
+            <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm text-rose-800">Xác Nhận Cho Nghỉ Học & Chốt Nợ</h3><button onclick="closeLeaveModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
             <form onsubmit="handleConfirmStudentLeave(event)" class="space-y-3 text-xs">
                 <input type="hidden" id="leaveStudentId">
-                <div>
-                    <label class="block font-bold mb-1 text-slate-700">Học sinh nghỉ học:</label>
-                    <input type="text" id="leaveStudentInfo" readonly class="w-full p-2.5 bg-slate-50 border rounded-xl font-bold">
-                </div>
-                <div>
-                    <label class="block font-bold mb-1 text-slate-700">Ngày chính thức nghỉ:</label>
-                    <input type="date" id="leaveDateInput" required class="w-full p-2.5 border rounded-xl font-bold">
-                </div>
+                <div><label class="block font-bold mb-1">Học sinh nghỉ học:</label><input type="text" id="leaveStudentInfo" readonly class="w-full p-2.5 bg-slate-50 border rounded-xl font-bold"></div>
+                <div><label class="block font-bold mb-1">Ngày chính thức nghỉ:</label><input type="date" id="leaveDateInput" required class="w-full p-2.5 border rounded-xl font-bold"></div>
                 <div class="p-3 bg-rose-50 border border-rose-200 rounded-2xl space-y-1.5">
-                    <div class="flex justify-between"><span class="text-slate-600">Tổng số buổi đã học:</span><b id="leaveTotalSessionsText" class="text-indigo-900">0 buổi</b></div>
-                    <div class="flex justify-between"><span class="text-slate-600">Tổng học phí đã nộp:</span><b id="leaveTotalPaidText" class="text-emerald-700">0 đ</b></div>
-                    <div class="flex justify-between border-t border-rose-200 pt-1">
-                        <span class="font-bold text-rose-800">Số tiền nợ chốt lại:</span>
-                        <input type="number" id="leaveDebtInput" class="w-28 p-1 border rounded-lg text-right font-black text-rose-700 bg-white" required>
-                    </div>
+                    <div class="flex justify-between"><span>Số buổi đã học:</span><b id="leaveTotalSessionsText" class="text-indigo-900">0 buổi</b></div>
+                    <div class="flex justify-between"><span>Tổng học phí đã nộp:</span><b id="leaveTotalPaidText" class="text-emerald-700">0 đ</b></div>
+                    <div class="flex justify-between border-t border-rose-200 pt-1"><span class="font-bold text-rose-800">Số tiền nợ chốt lại:</span><input type="number" id="leaveDebtInput" class="w-28 p-1 border rounded-lg text-right font-black text-rose-700 bg-white" required></div>
                 </div>
-                <div>
-                    <label class="block font-bold mb-1 text-slate-700">Lý do nghỉ học:</label>
-                    <input type="text" id="leaveReasonInput" placeholder="VD: Chuyển trường, bận lịch học thêm..." required class="w-full p-2.5 border rounded-xl">
-                </div>
-                <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl shadow transition">Lưu Vào Sổ Nghỉ Học & Xóa Khỏi Lớp</button>
+                <div><label class="block font-bold mb-1">Lý do nghỉ học:</label><input type="text" id="leaveReasonInput" placeholder="VD: Chuyển trường, bận lịch..." required class="w-full p-2.5 border rounded-xl"></div>
+                <button type="submit" class="w-full bg-rose-600 text-white font-bold py-3 rounded-xl shadow">Lưu Vào Sổ Nghỉ Học & Xóa Khỏi Lớp</button>
             </form>
         </div>
     </div>
@@ -718,7 +707,6 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT HỆ THỐNG TOÀN DIỆN -->
     <script>
         const STORAGE_KEY = 'TUTORING_MASTER_SYSTEM_V2026';
         const ADMIN_PIN_KEY = 'MASTER_SYSTEM_ADMIN_PIN';
@@ -733,9 +721,37 @@
         let appData = { classes: [], students: [], attendance: [], payments: [], documents: [], exams: [], examResults: [], weeklyOverrides: [], inactiveStudents: [], appConfig: [] };
         let currentClassId = 'ALL', currentTab = 'dashboard', tempParsedQuestions = [];
         let currentWeekOffset = 0;
+        let teacherDeferredPrompt = null;
 
+        // ĐĂNG KÝ VÀ TỰ ĐỘNG CẬP NHẬT SERVICE WORKER
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Fail', err));
+            navigator.serviceWorker.register('sw.js').then((reg) => {
+                reg.onupdatefound = () => {
+                    const installingWorker = reg.installing;
+                    if (installingWorker) {
+                        installingWorker.onstatechange = () => {
+                            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                window.location.reload();
+                            }
+                        };
+                    }
+                };
+            }).catch(err => console.log('SW Fail', err));
+        }
+
+        // BẮT SỰ KIỆN CÀI ĐẶT APP CHO GIÁO VIÊN
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            teacherDeferredPrompt = e;
+        });
+
+        function triggerTeacherPWAInstall() {
+            if (teacherDeferredPrompt) {
+                teacherDeferredPrompt.prompt();
+                teacherDeferredPrompt.userChoice.then(() => { teacherDeferredPrompt = null; });
+            } else {
+                alert("Nếu dùng iPhone: Bấm nút Chia sẻ ➔ Chọn 'Thêm vào Màn hình chính'.\nNếu dùng Android: Bấm menu 3 chấm của Chrome ➔ Chọn 'Cài đặt ứng dụng'.");
+            }
         }
 
         // BẢO MẬT MÃ PIN ADMIN
@@ -824,9 +840,27 @@
         function toggleMobileSidebar() { toggleSidebar(); }
 
         function getTodayVNString() { const v = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" })); return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}-${String(v.getDate()).padStart(2,'0')}`; }
-        function normalizeCloudDate(d) { if(!d) return ''; d=String(d); if(d.includes('T')) { const v=new Date(new Date(d).toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" })); return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}-${String(v.getDate()).padStart(2,'0')}`; } return d.trim(); }
-        function formatDateVN(d) { if(!d) return '---'; const p=d.split('T')[0].split('-'); return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:d; }
-        function formatDateShortVN(d) { if(!d) return '--/--'; const p=d.split('T')[0].split('-'); return p.length===3?`${p[2]}/${p[1]}`:d; }
+        function normalizeCloudDate(d) {
+            if(!d) return '';
+            d = String(d);
+            if(d.includes('T')) {
+                const v = new Date(new Date(d).toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
+                return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}-${String(v.getDate()).padStart(2,'0')}`;
+            }
+            return d.trim();
+        }
+        function formatDateVN(d) {
+            if(!d) return '---';
+            const cleanD = normalizeCloudDate(d);
+            const p = cleanD.split('-');
+            return p.length===3 ? `${p[2]}/${p[1]}/${p[0]}` : d;
+        }
+        function formatDateShortVN(d) {
+            if(!d) return '--/--';
+            const cleanD = normalizeCloudDate(d);
+            const p = cleanD.split('-');
+            return p.length===3 ? `${p[2]}/${p[1]}` : d;
+        }
 
         function saveToStorage() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
         function loadFromStorage() { 
@@ -865,7 +899,7 @@
             return classObj ? classObj.fee : 0;
         }
 
-        // TẢI & LƯU CLOUD
+        // TẢI VÀ LƯU CLOUD
         async function loadDataFromCloud() {
             if(!cloudApiUrl) return; updateSyncStatus('syncing', 'Đang tải...');
             try {
@@ -971,7 +1005,132 @@
             if(window.lucide) lucide.createIcons();
         }
 
-        // ==================== DASHBOARD ====================
+        // ==================== CỘNG DỒN HỌC PHÍ KHI CHUYỂN LỚP ====================
+        function calculateTransferTuition(studentId, oldClassId, newClassId) {
+            if (!oldClassId || !newClassId || oldClassId === newClassId) return null;
+
+            const oldClass = appData.classes.find(c => c.id === oldClassId);
+            const newClass = appData.classes.find(c => c.id === newClassId);
+            if (!oldClass || !newClass) return null;
+
+            const oldClassSessions = getClassSessionDates(oldClassId);
+            const oldTotalSess = oldClassSessions.length;
+            const oldActiveCycle = Math.max(0, Math.floor((oldTotalSess - 1) / 8));
+            const oldCycleDates = oldClassSessions.slice(oldActiveCycle * 8, (oldActiveCycle + 1) * 8);
+
+            const attendedInOldCycle = appData.attendance.filter(a => 
+                a.studentId === studentId && 
+                a.classId === oldClassId && 
+                oldCycleDates.includes(a.date) &&
+                (a.status === 'PRESENT' || a.status === 'LATE')
+            ).length;
+
+            const newClassSessions = getClassSessionDates(newClassId);
+            const newTotalSess = newClassSessions.length;
+            const newActiveCycle = Math.max(0, Math.floor((newTotalSess - 1) / 8));
+            const sessTaughtInNewCycle = newTotalSess % 8;
+            const remainingInNewCycle = 8 - sessTaughtInNewCycle;
+
+            const totalCombinedSessions = attendedInOldCycle + remainingInNewCycle;
+            const feePerSession = newClass.fee / 8;
+            const totalTransferFee = Math.round(feePerSession * totalCombinedSessions);
+
+            return {
+                attendedInOldCycle,
+                oldCycleIndex: oldActiveCycle,
+                remainingInNewCycle,
+                newCycleIndex: newActiveCycle,
+                totalCombinedSessions,
+                totalTransferFee,
+                oldClassName: oldClass.name,
+                newClassName: newClass.name
+            };
+        }
+
+        function onEditClassChange() {
+            const studentId = document.getElementById('editStudentId').value;
+            const origClassId = document.getElementById('editOriginalClassId').value;
+            const newClassId = document.getElementById('editStudentClassId').value;
+            
+            if (newClassId !== origClassId) {
+                document.getElementById('editStudentJoinDate').value = getTodayVNString();
+                document.getElementById('editStudentCode').value = generateNextStudentCode(newClassId);
+
+                const transferInfo = calculateTransferTuition(studentId, origClassId, newClassId);
+                if (transferInfo && transferInfo.attendedInOldCycle > 0) {
+                    const msg = `Phát hiện học sinh đã học ${transferInfo.attendedInOldCycle} buổi tại ${transferInfo.oldClassName}.\n` +
+                                `Lớp mới ${transferInfo.newClassName} còn ${transferInfo.remainingInNewCycle} buổi nữa là hết kỳ.\n\n` +
+                                `Thầy có muốn CỘNG DỒN LIÊN TỤC (${transferInfo.attendedInOldCycle}b cũ + ${transferInfo.remainingInNewCycle}b mới = ${transferInfo.totalCombinedSessions} buổi)?\n` +
+                                `Tổng học phí đề xuất kỳ này: ${transferInfo.totalTransferFee.toLocaleString()} đ`;
+                    if (confirm(msg)) {
+                        document.getElementById('formEditStudent').dataset.transferCalc = JSON.stringify(transferInfo);
+                    }
+                }
+            }
+        }
+
+        function handleSaveEditStudent(e) {
+            e.preventDefault();
+            const id = document.getElementById('editStudentId').value;
+            const s = appData.students.find(x => x.id === id);
+            if (!s) return;
+
+            const oldClassId = s.classId;
+            const newClassId = document.getElementById('editStudentClassId').value;
+
+            s.classId = newClassId;
+            s.code = document.getElementById('editStudentCode').value.trim();
+            s.name = document.getElementById('editStudentName').value.trim();
+            s.phone = document.getElementById('editStudentPhone').value.trim();
+            s.joinDate = document.getElementById('editStudentJoinDate').value;
+            
+            const c = appData.classes.find(x => x.id === s.classId);
+            s.username = generateUsername(s.name, c ? c.name : '');
+
+            const custFee = document.getElementById('editStudentCustomFee').value;
+            s.customFee = custFee !== '' ? parseFloat(custFee) : null;
+
+            // Xử lý cộng dồn học phí sang lớp mới
+            const transferCalcStr = document.getElementById('formEditStudent').dataset.transferCalc;
+            if (transferCalcStr && oldClassId !== newClassId) {
+                try {
+                    const tf = JSON.parse(transferCalcStr);
+                    appData.payments = appData.payments.filter(p => !(p.studentId === s.id && p.classId === oldClassId && p.cycleIndex === tf.oldCycleIndex));
+                    appData.payments.push({
+                        id: 'p_' + Date.now() + '_old',
+                        studentId: s.id,
+                        classId: oldClassId,
+                        cycleIndex: tf.oldCycleIndex,
+                        amount: 0,
+                        status: 'EXEMPT',
+                        method: 'Gộp sang lớp mới',
+                        note: `Đã gộp ${tf.attendedInOldCycle} buổi sang lớp ${tf.newClassName}`,
+                        date: getTodayVNString()
+                    });
+
+                    appData.payments = appData.payments.filter(p => !(p.studentId === s.id && p.classId === newClassId && p.cycleIndex === tf.newCycleIndex));
+                    appData.payments.push({
+                        id: 'p_' + Date.now() + '_new',
+                        studentId: s.id,
+                        classId: newClassId,
+                        cycleIndex: tf.newCycleIndex,
+                        amount: tf.totalTransferFee,
+                        status: 'PENDING',
+                        method: 'Chờ thu',
+                        note: `Cộng dồn liên tục: ${tf.attendedInOldCycle}b lớp cũ (${tf.oldClassName}) + ${tf.remainingInNewCycle}b lớp mới = ${tf.totalCombinedSessions} buổi`,
+                        date: getTodayVNString()
+                    });
+                    delete document.getElementById('formEditStudent').dataset.transferCalc;
+                } catch(err){}
+            }
+
+            saveDataToCloud();
+            closeEditStudentModal();
+            refreshCurrentTab();
+            alert(`Đã cập nhật và chuyển lớp thành công!`);
+        }
+
+        // ==================== DASHBOARD & CHI TIẾT ====================
         function renderDashboard() {
             const stds = getFilteredStudents();
             document.getElementById('dashTotalStudents').innerText = stds.length;
@@ -995,16 +1154,6 @@
                         todayLessons.push({ class: c, schedule: sc, totalSess, curCycle, sessInCycle, isOverride: false });
                     });
                 }
-
-                const extraToday = (appData.weeklyOverrides || []).filter(o => o.classId === c.id && (o.date === todayStr || o.newDate === todayStr) && (o.type === 'EXTRA' || o.type === 'RESCHEDULE'));
-                extraToday.forEach(ex => {
-                    todayLessons.push({
-                        class: c,
-                        schedule: { startTime: ex.startTime, endTime: ex.endTime },
-                        totalSess: 0, curCycle: 1, sessInCycle: 1,
-                        isOverride: true, overrideType: ex.type
-                    });
-                });
             });
 
             document.getElementById('dashTodayLessonsCount').innerText = `${todayLessons.length} Ca`;
@@ -1013,26 +1162,19 @@
             if(todayLessons.length === 0) {
                 lessonContainer.innerHTML = `<div class="col-span-3 p-4 bg-slate-50 border rounded-xl text-center text-xs text-slate-400 italic">Hôm nay không có ca dạy nào theo lịch.</div>`;
             } else {
-                lessonContainer.innerHTML = todayLessons.map(l => {
-                    const isCycleEnding = l.sessInCycle === 8;
-                    return `
-                        <div class="p-4 rounded-2xl border ${isCycleEnding ? 'border-amber-300 bg-amber-50/50 ring-2 ring-amber-200' : 'border-slate-200 bg-slate-50'} space-y-2">
-                            <div class="flex justify-between items-center">
-                                <span class="font-black text-sm text-indigo-900">${l.class.name}</span>
-                                <span class="text-xs font-mono font-bold text-emerald-600 bg-white px-2 py-0.5 rounded-md border">${l.schedule.startTime} - ${l.schedule.endTime}</span>
-                            </div>
-                            <div class="text-xs font-semibold text-slate-600">
-                                Tiến độ: <b class="text-indigo-700">Buổi ${l.sessInCycle}/8 (Kỳ ${l.curCycle})</b>
-                            </div>
-                            ${isCycleEnding ? '<div class="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">⚡ Buổi chốt kỳ - Chuẩn bị thu học phí kỳ mới</div>' : ''}
-                            ${l.isOverride ? '<div class="text-[10px] font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded">⚡ Ca học điều chỉnh tuần này</div>' : ''}
-                            <button onclick="currentClassId='${l.class.id}';renderGlobalClassSelect();switchTab('attendance-session')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2 rounded-xl transition shadow">Điểm Danh Ngay</button>
+                lessonContainer.innerHTML = todayLessons.map(l => `
+                    <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-black text-sm text-indigo-900">${l.class.name}</span>
+                            <span class="text-xs font-mono font-bold text-emerald-600 bg-white px-2 py-0.5 rounded-md border">${l.schedule.startTime} - ${l.schedule.endTime}</span>
                         </div>
-                    `;
-                }).join('');
+                        <div class="text-xs font-semibold text-slate-600">Tiến độ: <b class="text-indigo-700">Buổi ${l.sessInCycle}/8 (Kỳ ${l.curCycle})</b></div>
+                        <button onclick="currentClassId='${l.class.id}';renderGlobalClassSelect();switchTab('attendance-session')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2 rounded-xl transition shadow">Điểm Danh Ngay</button>
+                    </div>
+                `).join('');
             }
 
-            // TÍNH HỌC PHÍ PHƯƠNG ÁN B DỰA TRÊN NGÀY CỦA TỪNG LỚP
+            // Tính tỷ lệ học phí
             let totalDueCount = 0, dueListHtml = '', paidCount = 0;
             stds.forEach(s => {
                 const c = appData.classes.find(x => x.id === s.classId);
@@ -1043,7 +1185,7 @@
                 const totalClassSess = classSessions.length;
                 const activeCycleIdx = Math.max(0, Math.floor((totalClassSess - 1) / 8));
 
-                const p = appData.payments.find(x => x.studentId === s.id && x.cycleIndex === activeCycleIdx);
+                const p = appData.payments.find(x => x.studentId === s.id && x.classId === s.classId && x.cycleIndex === activeCycleIdx);
                 const isPaid = (p && p.status === 'PAID') || isExempt || (p && p.status === 'EXEMPT');
 
                 if(isPaid) {
@@ -1055,7 +1197,10 @@
                     let requiredAmount = effFee;
                     let note = `Đủ 8 buổi (Kỳ ${activeCycleIdx + 1})`;
 
-                    if(activeCycleIdx === joinCycle && skipCount > 0) {
+                    if (p && p.amount > 0) {
+                        requiredAmount = p.amount;
+                        note = p.note || `Kỳ ${activeCycleIdx + 1}`;
+                    } else if(activeCycleIdx === joinCycle && skipCount > 0) {
                         const actualSess = 8 - (skipCount % 8);
                         requiredAmount = Math.round((effFee / 8) * actualSess);
                         note = `Học lẻ ${actualSess} buổi (Kỳ ${activeCycleIdx + 1})`;
@@ -1074,45 +1219,12 @@
             });
 
             document.getElementById('dashDueCountBadge').innerText = `${totalDueCount} HS`;
-            document.getElementById('dashDueListContainer').innerHTML = dueListHtml || `<div class="p-4 text-center text-emerald-600 font-bold text-xs bg-emerald-50 rounded-xl">Tất cả học sinh đã hoàn thành học phí kỳ hiện tại!</div>`;
+            document.getElementById('dashDueListContainer').innerHTML = dueListHtml || `<div class="p-4 text-center text-emerald-600 font-bold text-xs bg-emerald-50 rounded-xl">Tất cả học sinh đã hoàn thành học phí!</div>`;
             const rate = stds.length > 0 ? Math.round((paidCount / stds.length) * 100) : 0;
             document.getElementById('dashTuitionRate').innerText = `${rate}%`;
-
-            // RADAR KHẢO THÍ
-            const radarContainer = document.getElementById('dashExamRadarContainer');
-            const recentResults = appData.examResults.slice(-10).reverse();
-            const cheatCases = recentResults.filter(r => r.tabSwitchCount > 0);
-
-            let radarHtml = '';
-            if(cheatCases.length > 0) {
-                radarHtml += `<div class="space-y-1.5"><h4 class="text-[11px] font-bold text-rose-700 uppercase">Cảnh Báo Chuyển Tab:</h4>`;
-                cheatCases.slice(0, 3).forEach(c => {
-                    const st = appData.students.find(x => x.id === c.studentId) || {name: 'HS đã xóa'};
-                    radarHtml += `
-                        <div class="p-2.5 bg-rose-50 border border-rose-200 rounded-xl flex justify-between items-center text-xs">
-                            <div><b>${st.name}</b>: Rời màn hình <b class="text-rose-600">${c.tabSwitchCount} lần</b></div>
-                            <span class="font-black text-rose-700">${c.score.toFixed(1)}đ</span>
-                        </div>
-                    `;
-                });
-                radarHtml += `</div>`;
-            }
-
-            if(appData.exams.length > 0 && recentResults.length > 0) {
-                const latestExam = appData.exams[appData.exams.length - 1];
-                radarHtml += `<div class="pt-2"><h4 class="text-[11px] font-bold text-indigo-900 uppercase mb-1">Đề Mới Nhất: ${latestExam.title}</h4><div class="p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl text-xs space-y-1"><p>• Tổng bài nộp: <b>${recentResults.filter(r=>r.examId===latestExam.id).length} bài</b></p></div></div>`;
-            } else {
-                radarHtml += `<div class="p-4 text-center text-slate-400 text-xs italic">Chưa có bài thi nào được nộp.</div>`;
-            }
-            radarContainer.innerHTML = radarHtml;
-
-            if(appData.examResults.length > 0) {
-                const avg = appData.examResults.reduce((a,b)=>a+b.score, 0) / appData.examResults.length;
-                document.getElementById('dashAvgScore').innerText = avg.toFixed(1);
-            }
         }
 
-        // ==================== QUẢN LÝ LỚP & HỌC SINH ====================
+        // ==================== CÁC HÀM TIỆN ÍCH KHÁC ====================
         function generateNextStudentCode(classId) {
             const target = appData.classes.find(c => c.id === classId), name = target ? target.name : 'HS';
             const m = name.match(/^\d+/), prefix = m ? m[0] : name.substring(0, 2).toUpperCase();
@@ -1166,7 +1278,6 @@
             saveDataToCloud();
             closeAddStudentModal();
             refreshCurrentTab();
-            document.getElementById('formAddStudent').reset();
             alert(`Đã thêm học sinh!\nTài khoản: ${username}\nMật khẩu: ${defaultPassword}`);
         }
 
@@ -1213,52 +1324,6 @@
         }
         function closeEditStudentModal() { document.getElementById('modalEditStudent').classList.add('hidden'); }
 
-        function onEditClassChange() {
-            const origClassId = document.getElementById('editOriginalClassId').value;
-            const newClassId = document.getElementById('editStudentClassId').value;
-            
-            if (newClassId !== origClassId) {
-                document.getElementById('editStudentJoinDate').value = getTodayVNString();
-                document.getElementById('editStudentCode').value = generateNextStudentCode(newClassId);
-            }
-            const name = document.getElementById('editStudentName').value;
-            const c = appData.classes.find(x => x.id === newClassId);
-            document.getElementById('editStudentUsername').value = generateUsername(name, c ? c.name : '');
-        }
-
-        function handleSaveEditStudent(e) {
-            e.preventDefault();
-            const id = document.getElementById('editStudentId').value;
-            const s = appData.students.find(x => x.id === id);
-            if(!s) return;
-
-            const oldClassId = s.classId;
-            const newClassId = document.getElementById('editStudentClassId').value;
-
-            s.classId = newClassId;
-            s.code = document.getElementById('editStudentCode').value.trim();
-            s.name = document.getElementById('editStudentName').value.trim();
-            s.phone = document.getElementById('editStudentPhone').value.trim();
-            s.joinDate = document.getElementById('editStudentJoinDate').value;
-            
-            const c = appData.classes.find(x => x.id === s.classId);
-            s.username = generateUsername(s.name, c ? c.name : '');
-
-            const custFee = document.getElementById('editStudentCustomFee').value;
-            s.customFee = custFee !== '' ? parseFloat(custFee) : null;
-
-            saveDataToCloud();
-            closeEditStudentModal();
-            refreshCurrentTab();
-            
-            if (oldClassId !== newClassId) {
-                alert(`Đã chuyển ${s.name} sang ${c ? c.name : 'lớp mới'} an toàn!\nNgày tính học phí lớp mới bắt đầu từ: ${formatDateVN(s.joinDate)}.`);
-            } else {
-                alert('Cập nhật thông tin học sinh thành công!');
-            }
-        }
-
-        // ==================== BÁO NGHỈ HỌC & LƯU VÀO SỔ NỢ ====================
         function openLeaveStudentModal(id) {
             const s = appData.students.find(x => x.id === id);
             if(!s) return;
@@ -1320,13 +1385,13 @@
             saveDataToCloud();
             closeLeaveModal();
             refreshCurrentTab();
-            alert(`Đã chuyển hồ sơ của ${s.name} vào "Sổ Học Sinh Đã Nghỉ & Lưu Trữ Nợ"!`);
+            alert(`Đã chuyển hồ sơ của ${s.name} vào Sổ Nghỉ Học!`);
         }
 
         function restoreInactiveStudent(inactiveId) {
             const inact = appData.inactiveStudents.find(x => x.id === inactiveId);
             if(!inact) return;
-            if(!confirm(`Khôi phục học sinh ${inact.studentName} trở lại danh sách học sinh đang học?`)) return;
+            if(!confirm(`Khôi phục học sinh ${inact.studentName} trở lại lớp?`)) return;
 
             appData.students.push({
                 id: inact.studentId,
@@ -1342,10 +1407,9 @@
             });
 
             appData.inactiveStudents = appData.inactiveStudents.filter(x => x.id !== inactiveId);
-
             saveDataToCloud();
             refreshCurrentTab();
-            alert(`Đã khôi phục ${inact.studentName} thành công! Ngày vào học mới là hôm nay.`);
+            alert(`Đã khôi phục ${inact.studentName} thành công!`);
         }
 
         function renderInactiveStudents() {
@@ -1360,17 +1424,17 @@
 
             tbody.innerHTML = list.map(x => `
                 <tr>
-                    <td class="p-3"><span class="bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded text-[10px]">${x.className}</span></td>
-                    <td class="p-3 font-mono font-bold">${x.studentCode}</td>
+                    <td class="p-3 font-bold">${x.className}</td>
+                    <td class="p-3 font-mono">${x.studentCode}</td>
                     <td class="p-3 font-bold">${x.studentName}</td>
-                    <td class="p-3 font-mono text-slate-500">${x.phone || '---'}</td>
-                    <td class="p-3 font-mono text-rose-600 font-bold">${formatDateVN(x.leaveDate)}</td>
-                    <td class="p-3 text-center font-bold">${x.totalSessions} buổi</td>
+                    <td class="p-3">${x.phone || '---'}</td>
+                    <td class="p-3 font-mono text-rose-600">${formatDateVN(x.leaveDate)}</td>
+                    <td class="p-3 text-center">${x.totalSessions} buổi</td>
                     <td class="p-3 font-bold text-emerald-600">${x.totalPaid.toLocaleString()}đ</td>
                     <td class="p-3 font-black ${x.debtAmount>0?'text-rose-600 bg-rose-50':'text-slate-400'}">${x.debtAmount>0?x.debtAmount.toLocaleString()+'đ':'Hết nợ'}</td>
-                    <td class="p-3 text-slate-600 italic max-w-xs truncate">${x.reason}</td>
+                    <td class="p-3 text-slate-600 italic">${x.reason}</td>
                     <td class="p-3 text-center">
-                        <button onclick="restoreInactiveStudent('${x.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-lg font-bold transition text-[11px]">Khôi Phục</button>
+                        <button onclick="restoreInactiveStudent('${x.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-lg font-bold">Khôi Phục</button>
                     </td>
                 </tr>
             `).join('');
@@ -1406,7 +1470,7 @@
             }).join('');
         }
 
-        // ==================== LỊCH 2 TẦNG ====================
+        // LỊCH 2 TẦNG
         function initScheduleRows() {
             const c = document.getElementById('scheduleRowsContainer');
             if(c) { c.innerHTML=''; addScheduleRow('Thứ 3','17:30','19:00'); addScheduleRow('Thứ 6','17:30','19:00'); }
@@ -1688,13 +1752,13 @@
             }
         }
 
-        // ==================== ĐIỂM DANH BUỔI (GẮN CHẶT CLASS_ID) ====================
+        // ĐIỂM DANH BUỔI
         function loadSessionAttendance() {
             const d = document.getElementById('sessionDatePicker').value, stds = getFilteredStudents(), tbody = document.getElementById('sessionAttendanceBody');
             tbody.innerHTML = stds.length===0 ? `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Trống</td></tr>` : stds.map(s => {
-                if(s.joinDate && d < s.joinDate) return `<tr class="opacity-50"><td class="p-3">${getClassName(s.classId)}</td><td class="p-3 font-mono">${s.code}</td><td class="p-3">${s.name}</td><td colspan="2" class="p-3 italic">Chưa vào học tại lớp này</td></tr>`;
+                if(s.joinDate && d < s.joinDate) return `<tr class="opacity-50"><td class="p-3">${getClassName(s.classId)}</td><td class="p-3 font-mono">${s.code}</td><td class="p-3">${s.name}</td><td colspan="2" class="p-3 italic">Chưa vào học lớp này</td></tr>`;
                 const r = appData.attendance.find(a=>a.studentId===s.id && a.date===d) || {status:'PRESENT', note:''};
-                return `<tr><td class="p-3"><span class="bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded font-bold text-[10px]">${getClassName(s.classId)}</span></td><td class="p-3 font-mono font-bold">${s.code}</td><td class="p-3 font-bold">${s.name}</td><td class="p-3"><select data-student-id="${s.id}" data-class-id="${s.classId}" class="att-status p-1.5 border rounded-lg text-xs font-bold w-full outline-none"><option value="PRESENT" ${r.status==='PRESENT'?'selected':''}>🟢 Có mặt</option><option value="ABSENT_PERM" ${r.status==='ABSENT_PERM'?'selected':''}>🟡 Phép</option><option value="ABSENT_NO_PERM" ${r.status==='ABSENT_NO_PERM'?'selected':''}>🔴 KP</option><option value="LATE" ${r.status==='LATE'?'selected':''}>🔵 Trễ</option></select></td><td class="p-3"><input type="text" data-student-id="${s.id}" value="${r.note||''}" class="att-note w-full p-1.5 border rounded-lg text-xs outline-none" placeholder="Ghi chú..."></td></tr>`;
+                return `<tr><td class="p-3 font-bold">${getClassName(s.classId)}</td><td class="p-3 font-mono">${s.code}</td><td class="p-3 font-bold">${s.name}</td><td class="p-3"><select data-student-id="${s.id}" data-class-id="${s.classId}" class="att-status p-1.5 border rounded-lg text-xs font-bold w-full"><option value="PRESENT" ${r.status==='PRESENT'?'selected':''}>🟢 Có mặt</option><option value="ABSENT_PERM" ${r.status==='ABSENT_PERM'?'selected':''}>🟡 Phép</option><option value="ABSENT_NO_PERM" ${r.status==='ABSENT_NO_PERM'?'selected':''}>🔴 KP</option><option value="LATE" ${r.status==='LATE'?'selected':''}>🔵 Trễ</option></select></td><td class="p-3"><input type="text" data-student-id="${s.id}" value="${r.note||''}" class="att-note w-full p-1.5 border rounded-lg text-xs" placeholder="Ghi chú..."></td></tr>`;
             }).join('');
         }
         function saveSessionAttendance() {
@@ -1708,122 +1772,53 @@
                 appData.attendance = appData.attendance.filter(a => !(a.studentId===sId && a.date===d));
                 appData.attendance.push({ studentId: sId, classId: cId, date: d, status: status, note: note });
             });
-            saveDataToCloud(); alert('Đã lưu điểm danh thành công!'); refreshCurrentTab();
+            saveDataToCloud(); alert('Đã lưu điểm danh!'); refreshCurrentTab();
         }
 
-        // ==================== SỔ ĐIỂM DANH 8 BUỔI (THEO CLASS_ID) ====================
+        // BẢNG MA TRẬN 8 BUỔI
         function renderAttendanceMatrix() {
             const stds = getFilteredStudents();
             const container = document.getElementById('attendanceCycleAccordionContainer');
             if (!container) return;
 
-            if (stds.length === 0) {
-                container.innerHTML = `<div class="p-6 text-center text-slate-400 italic text-xs">Chưa có học sinh nào trong lớp này.</div>`;
-                return;
-            }
-
             const allDates = getClassSessionDates(currentClassId);
-            if (allDates.length === 0) {
-                container.innerHTML = `<div class="p-6 text-center text-slate-400 italic text-xs">Chưa có buổi học nào được điểm danh cho lớp này.</div>`;
+            if (allDates.length === 0 || stds.length === 0) {
+                container.innerHTML = `<div class="p-6 text-center text-slate-400 italic text-xs">Chưa có dữ liệu buổi học.</div>`;
                 return;
             }
 
             const chunks = [];
-            for (let i = 0; i < allDates.length; i += 8) {
-                chunks.push(allDates.slice(i, i + 8));
-            }
+            for (let i = 0; i < allDates.length; i += 8) chunks.push(allDates.slice(i, i + 8));
 
             let html = '';
             chunks.forEach((chunkDates, cIdx) => {
                 const cycleNum = cIdx + 1;
                 const isCurrentCycle = (cIdx === chunks.length - 1);
-                const startDateStr = formatDateVN(chunkDates[0]);
-                const endDateStr = formatDateVN(chunkDates[chunkDates.length - 1]);
-                const isOpen = isCurrentCycle;
-
                 html += `
-                    <div class="border rounded-2xl overflow-hidden shadow-sm transition ${isCurrentCycle ? 'border-indigo-300 ring-2 ring-indigo-50' : 'border-slate-200'}">
-                        <div onclick="toggleCycleAccordion(${cIdx})" class="p-4 flex flex-wrap justify-between items-center cursor-pointer select-none ${isCurrentCycle ? 'bg-indigo-50/70 hover:bg-indigo-50' : 'bg-slate-50 hover:bg-slate-100'}">
-                            <div class="flex items-center space-x-3">
-                                <span class="w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs ${isCurrentCycle ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-700'}">
-                                    K${cycleNum}
-                                </span>
-                                <div>
-                                    <h3 class="font-bold text-xs sm:text-sm text-slate-800 flex items-center space-x-2">
-                                        <span>KỲ ${cycleNum}: ${startDateStr} ➔ ${endDateStr}</span>
-                                        ${isCurrentCycle ? '<span class="text-[10px] font-bold bg-indigo-600 text-white px-2 py-0.5 rounded-full">Đang Diễn Ra (' + chunkDates.length + '/8)</span>' : '<span class="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Đã Khóa Sổ (8/8)</span>'}
-                                    </h3>
-                                    <p class="text-[11px] text-slate-500 mt-0.5">Tiến độ kỳ: <b>${chunkDates.length}/8 buổi</b> • Bấm để xem chi tiết</p>
-                                </div>
-                            </div>
-                            <i data-lucide="${isOpen ? 'chevron-up' : 'chevron-down'}" id="cycle-icon-${cIdx}" class="w-5 h-5 text-slate-400"></i>
+                    <div class="border rounded-2xl overflow-hidden shadow-sm ${isCurrentCycle ? 'border-indigo-300' : 'border-slate-200'}">
+                        <div class="p-4 bg-slate-50 font-bold text-xs flex justify-between">
+                            <span>KỲ ${cycleNum}: ${formatDateVN(chunkDates[0])} ➔ ${formatDateVN(chunkDates[chunkDates.length - 1])}</span>
+                            <span>${chunkDates.length}/8 buổi</span>
                         </div>
-
-                        <div id="cycle-body-${cIdx}" class="${isOpen ? '' : 'hidden'} border-t overflow-x-auto bg-white">
+                        <div class="p-3 overflow-x-auto bg-white">
                             <table class="w-full text-left text-xs whitespace-nowrap">
                                 <thead>
-                                    <tr class="bg-slate-100/70 font-bold border-b text-slate-600">
-                                        <th class="p-2.5 sticky-col-1 bg-slate-100/90 border-r min-w-[70px]">Mã HS</th>
-                                        <th class="p-2.5 sticky-col-2 bg-slate-100/90 border-r min-w-[140px]">Học Sinh</th>
-                                        ${chunkDates.map((d, dIdx) => `
-                                            <th class="p-2 text-center min-w-[48px] border-r">
-                                                <div class="text-[10px] font-bold">B${dIdx + 1}</div>
-                                                <div class="text-[9px] text-slate-400 font-mono">${formatDateShortVN(d)}</div>
-                                            </th>
-                                        `).join('')}
-                                        ${Array.from({length: 8 - chunkDates.length}, (_, i) => `
-                                            <th class="p-2 text-center min-w-[48px] border-r opacity-40">
-                                                <div class="text-[10px]">B${chunkDates.length + i + 1}</div>
-                                                <div class="text-[9px]">--/--</div>
-                                            </th>
-                                        `).join('')}
-                                        <th class="p-2.5 text-center bg-slate-50 border-r">Chuyên Cần</th>
-                                        <th class="p-2.5 text-center bg-slate-50">Học Phí Kỳ ${cycleNum}</th>
-                                    </tr>
+                                    <tr class="bg-slate-100 font-bold"><th class="p-2 border-r">Mã HS</th><th class="p-2 border-r">Học Sinh</th>
+                                    ${chunkDates.map((d, idx)=>`<th class="p-2 text-center border-r">B${idx+1}<br><span class="text-[9px] font-normal text-slate-400">${formatDateShortVN(d)}</span></th>`).join('')}
+                                    <th class="p-2 text-center">Chuyên Cần</th></tr>
                                 </thead>
-                                <tbody class="divide-y">
+                                <tbody>
                                     ${stds.map(s => {
-                                        const c = appData.classes.find(x => x.id === s.classId);
-                                        const effFee = getEffectiveStudentFee(s, c);
-                                        const isExempt = effFee === 0;
-
-                                        let presentCount = 0;
-                                        const dayCells = chunkDates.map(d => {
+                                        let present = 0;
+                                        const cells = chunkDates.map(d => {
                                             const r = appData.attendance.find(a => a.studentId === s.id && a.date === d);
-                                            let icon = '<span class="text-slate-300">-</span>';
-                                            if (s.joinDate && d < s.joinDate) {
-                                                icon = '<span class="text-slate-300">⚪</span>';
-                                            } else if (r) {
-                                                if (r.status === 'PRESENT') { icon = '<span class="text-emerald-600 font-bold">✓</span>'; presentCount++; }
-                                                else if (r.status === 'ABSENT_PERM') icon = '<span class="text-amber-500 font-bold">P</span>';
-                                                else if (r.status === 'ABSENT_NO_PERM') icon = '<span class="text-rose-600 font-bold">KP</span>';
-                                                else if (r.status === 'LATE') { icon = '<span class="text-blue-500 font-bold">T</span>'; presentCount++; }
-                                            }
-                                            return `<td class="p-2 text-center border-r">${icon}</td>`;
+                                            let icon = '-';
+                                            if (s.joinDate && d < s.joinDate) icon = '⚪';
+                                            else if (r && (r.status === 'PRESENT' || r.status === 'LATE')) { icon = '✓'; present++; }
+                                            else if (r && r.status.includes('ABSENT')) icon = 'P';
+                                            return `<td class="p-2 text-center border-r font-bold">${icon}</td>`;
                                         }).join('');
-
-                                        const emptySlots = Array.from({length: 8 - chunkDates.length}, () => `<td class="p-2 text-center border-r text-slate-200">·</td>`).join('');
-
-                                        const p = appData.payments.find(x => x.studentId === s.id && x.cycleIndex === cIdx);
-                                        let feeBadge = '';
-                                        if (isExempt || (p && p.status === 'EXEMPT')) {
-                                            feeBadge = '<span class="text-[10px] font-bold bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">Miễn Phí</span>';
-                                        } else if (p && p.status === 'PAID') {
-                                            feeBadge = `<span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Đã nộp: ${p.amount.toLocaleString()}đ</span>`;
-                                        } else {
-                                            feeBadge = `<span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Chờ thu: ${effFee.toLocaleString()}đ</span>`;
-                                        }
-
-                                        return `
-                                            <tr>
-                                                <td class="p-2.5 sticky-col-1 bg-white border-r font-mono font-bold text-[11px]">${s.code}</td>
-                                                <td class="p-2.5 sticky-col-2 bg-white border-r font-bold">${s.name}</td>
-                                                ${dayCells}
-                                                ${emptySlots}
-                                                <td class="p-2 text-center bg-slate-50 font-bold border-r">${presentCount}/${chunkDates.length}</td>
-                                                <td class="p-2 text-center bg-slate-50">${feeBadge}</td>
-                                            </tr>
-                                        `;
+                                        return `<tr><td class="p-2 font-mono border-r">${s.code}</td><td class="p-2 font-bold border-r">${s.name}</td>${cells}<td class="p-2 text-center font-bold">${present}/${chunkDates.length}</td></tr>`;
                                     }).join('')}
                                 </tbody>
                             </table>
@@ -1831,33 +1826,10 @@
                     </div>
                 `;
             });
-
             container.innerHTML = html;
-            if (window.lucide) lucide.createIcons();
         }
 
-        function toggleCycleAccordion(idx) {
-            const body = document.getElementById(`cycle-body-${idx}`);
-            const icon = document.getElementById(`cycle-icon-${idx}`);
-            if (!body) return;
-            const isHidden = body.classList.contains('hidden');
-            if (isHidden) {
-                body.classList.remove('hidden');
-                if (icon) icon.setAttribute('data-lucide', 'chevron-up');
-            } else {
-                body.classList.add('hidden');
-                if (icon) icon.setAttribute('data-lucide', 'chevron-down');
-            }
-            if (window.lucide) lucide.createIcons();
-        }
-
-        function expandAllCycles(expand) {
-            const cards = document.querySelectorAll('[id^="cycle-body-"]');
-            cards.forEach(c => { if (expand) c.classList.remove('hidden'); else c.classList.add('hidden'); });
-            if (window.lucide) lucide.createIcons();
-        }
-
-        // ==================== BẢNG HỌC PHÍ THEO KỲ ====================
+        // BẢNG HỌC PHÍ THEO KỲ
         function renderTuitionTable() {
             const stds = getFilteredStudents(), tb = document.getElementById('tuitionTableBody');
             if(!tb) return;
@@ -1871,29 +1843,27 @@
                 const classSessions = getClassSessionDates(s.classId);
                 const totalClassSess = classSessions.length;
                 const activeCycleIdx = Math.max(0, Math.floor((totalClassSess - 1) / 8));
-                
                 const skipCount = classSessions.filter(d => d < s.joinDate).length;
                 const joinCycle = Math.floor(skipCount / 8);
 
                 let cells = '';
                 for(let i=0; i<4; i++) {
-                    const p = appData.payments.find(x => x.studentId === s.id && x.cycleIndex === i);
+                    const p = appData.payments.find(x => x.studentId === s.id && x.classId === s.classId && x.cycleIndex === i);
                     let stC = 'bg-slate-50 text-slate-400', txt = 'Chưa đến';
+                    let eff = (p && p.amount > 0) ? p.amount : effFee;
 
-                    let eff = effFee;
-                    if(i === joinCycle && skipCount > 0 && !isExempt) {
+                    if(i === joinCycle && skipCount > 0 && !isExempt && (!p || p.amount === 0)) {
                         const actualSess = 8 - (skipCount % 8);
                         eff = Math.round((effFee / 8) * actualSess);
                     }
 
                     if (isExempt || (p && p.status === 'EXEMPT')) {
                         stC = 'bg-blue-50 text-blue-700 border-blue-200 font-bold';
-                        txt = 'Miễn giảm';
+                        txt = p && p.note ? p.note : 'Miễn giảm';
                     } else if(p && p.status === 'PAID') {
                         stC = 'bg-emerald-50 text-emerald-700 border-emerald-200';
                         txt = `Đã nộp: ${p.amount.toLocaleString()}đ`;
                     } else if(i < joinCycle) {
-                        stC = 'bg-slate-100 text-slate-400';
                         txt = 'Chưa vào học';
                     } else if(i < activeCycleIdx) {
                         stC = 'bg-rose-50 text-rose-700 border-rose-200 font-bold';
@@ -1914,22 +1884,12 @@
             const s = appData.students.find(x=>x.id===sId);
             const c = appData.classes.find(x=>x.id===s.classId);
             const effFee = getEffectiveStudentFee(s, c);
-            
-            const classSessions = getClassSessionDates(s.classId);
-            const skipCount = classSessions.filter(d => d < s.joinDate).length;
-            const joinCycle = Math.floor(skipCount / 8);
-            let defaultAmount = effFee;
-            if(cIdx === joinCycle && skipCount > 0 && effFee > 0) {
-                const actualSess = 8 - (skipCount % 8);
-                defaultAmount = Math.round((effFee / 8) * actualSess);
-            }
-
-            const p = appData.payments.find(x=>x.studentId===sId && x.cycleIndex===cIdx);
+            const p = appData.payments.find(x=>x.studentId===sId && x.classId===s.classId && x.cycleIndex===cIdx);
 
             document.getElementById('payStudentId').value = sId;
             document.getElementById('payCycleIndex').value = cIdx;
             document.getElementById('payStudentInfo').value = `${s.name} - Kỳ ${cIdx + 1} (${getClassName(s.classId)})`;
-            document.getElementById('payAmount').value = p ? p.amount : defaultAmount;
+            document.getElementById('payAmount').value = p ? p.amount : effFee;
             document.getElementById('payDate').value = p && p.date ? p.date : getTodayVNString();
             document.getElementById('payMethod').value = p && p.method ? p.method : 'Chuyển khoản';
             document.getElementById('modalPayTuition').classList.remove('hidden');
@@ -1965,7 +1925,7 @@
             const m = document.getElementById('payMethod').value;
             const s = appData.students.find(x => x.id === sId);
 
-            appData.payments = appData.payments.filter(p => !(p.studentId === sId && p.cycleIndex === cIdx));
+            appData.payments = appData.payments.filter(p => !(p.studentId === sId && p.classId === s.classId && p.cycleIndex === cIdx));
             appData.payments.push({
                 id: 'p_' + Date.now(),
                 studentId: sId,
@@ -1981,7 +1941,7 @@
             saveDataToCloud();
             closePayModal();
             refreshCurrentTab();
-            alert('Đã cập nhật thu học phí thành công!');
+            alert('Đã cập nhật thu học phí!');
         }
 
         function renderPaymentHistory() {
@@ -1993,7 +1953,7 @@
             }).join('');
         }
 
-        // ==================== BÓC TÁCH ĐỀ THI & DÁN ẢNH ====================
+        // BÓC TÁCH ĐỀ THI
         function setupDirectImagePaste() {
             const ed = document.getElementById('directEditorArea');
             if(!ed) return;
@@ -2161,7 +2121,7 @@
             if(window.lucide) lucide.createIcons();
         }
 
-        // ==================== PHỔ ĐIỂM & GIAN LẬN ====================
+        // PHỔ ĐIỂM
         function renderAnalyticsReport() {
             const sel = document.getElementById('analyticsExamSelect');
             const container = document.getElementById('analyticsContent');
@@ -2209,7 +2169,7 @@
             container.innerHTML = html;
         }
 
-        // ==================== TÀI LIỆU ====================
+        // TÀI LIỆU
         function renderDocumentsTab() {
             populateClassSelectModal();
             const docs = currentClassId==='ALL' ? appData.documents : appData.documents.filter(d=>d.classId===currentClassId);
@@ -2263,7 +2223,7 @@
             alert('Đã lưu tài liệu vào chuyên đề thành công!');
         }
 
-        // ==================== BRANDING & LOGO ====================
+        // BRANDING & LOGO
         function previewAppLogo(url) {
             if(url) document.getElementById('cfgLogoPreview').src = url;
         }
@@ -2298,7 +2258,7 @@
             alert('Đã cập nhật Tên và Logo App! Cổng Học Sinh sẽ tự động áp dụng ngay lập tức.');
         }
 
-        // ==================== ĐỒNG BỘ GOOGLE CALENDAR ====================
+        // ĐỒNG BỘ GOOGLE CALENDAR
         async function syncScheduleToGoogleCalendar() {
             if (!cloudApiUrl) { alert("Vui lòng cấu hình API Web App trước!"); return; }
 
@@ -2327,7 +2287,7 @@
             } catch (e) { alert("Đã kích hoạt đồng bộ lịch dạy sang Google Calendar!"); }
         }
 
-        // ==================== TRỢ LÝ GIÁO VIÊN ====================
+        // TRỢ LÝ GIÁO VIÊN
         function toggleTeacherAssistant() {
             const win = document.getElementById('assistantChatWindow');
             win.classList.toggle('hidden');

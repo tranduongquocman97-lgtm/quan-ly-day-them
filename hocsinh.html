@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SigmaMath - Thầy Mẫn | Cổng Học Sinh</title>
 
-    <!-- CẤU HÌNH PWA & IPHONE (IOS) -->
+    <!-- CẤU HÌNH PWA CHUẨN ANDROID & IPHONE -->
     <link rel="manifest" href="manifest-hocsinh.json">
     <meta name="theme-color" content="#312e81">
     <meta name="mobile-web-app-capable" content="yes">
@@ -32,7 +32,7 @@
         <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-slate-200 w-full max-w-sm text-center space-y-4">
             <!-- LOGO M-SIGMAMATH -->
             <div id="appLogoContainer" class="w-20 h-20 mx-auto rounded-3xl overflow-hidden shadow-md border border-slate-100 flex items-center justify-center bg-slate-900">
-                <img src="logo-student.png" alt="Logo SigmaMath" class="w-full h-full object-cover">
+                <img id="loginLogoImg" src="logo-student.png" alt="Logo SigmaMath" class="w-full h-full object-cover">
             </div>
 
             <div>
@@ -40,10 +40,10 @@
                 <p id="appSloganText" class="text-[11px] text-slate-500 mt-1 leading-snug">Hệ thống học tập, chuyên cần & khảo thí Toán Thầy Mẫn</p>
             </div>
 
-            <!-- Nút hướng dẫn cài App -->
-            <button type="button" onclick="openInstallGuideModal()" class="w-full bg-slate-50 hover:bg-indigo-50 border border-slate-200 text-indigo-700 font-bold py-2 rounded-xl text-xs transition flex items-center justify-center space-x-1.5">
+            <!-- Nút cài App -->
+            <button type="button" onclick="triggerPWAInstall()" class="w-full bg-slate-50 hover:bg-indigo-50 border border-slate-200 text-indigo-700 font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-1.5 shadow-sm">
                 <i data-lucide="smartphone" class="w-4 h-4 text-indigo-600"></i>
-                <span>Cài App Ra Màn Hình Điện Thoại</span>
+                <span id="installBtnText">Cài App Ra Màn Hình Điện Thoại</span>
             </button>
 
             <form onsubmit="handleStudentLogin(event)" class="space-y-3 text-left pt-1">
@@ -80,7 +80,7 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <button onclick="openInstallGuideModal()" class="bg-indigo-900 hover:bg-indigo-800 text-amber-300 text-xs px-2.5 py-1.5 rounded-xl font-bold transition flex items-center space-x-1" title="Cài App">
+                    <button onclick="triggerPWAInstall()" class="bg-indigo-900 hover:bg-indigo-800 text-amber-300 text-xs px-2.5 py-1.5 rounded-xl font-bold transition flex items-center space-x-1" title="Cài App">
                         <i data-lucide="download" class="w-3.5 h-3.5"></i>
                         <span class="hidden sm:inline">Cài App</span>
                     </button>
@@ -160,6 +160,7 @@
                     <div id="studentAttendanceCyclesContainer" class="space-y-3 pt-1"></div>
                 </div>
 
+                <!-- LỊCH SỬ LỚP CŨ NẾU CÓ CHUYỂN NHÓM -->
                 <div id="studentPreviousClassHistorySection" class="hidden bg-white p-5 rounded-3xl shadow-sm border border-slate-200 space-y-3">
                     <div class="flex justify-between items-center border-b pb-2">
                         <h3 class="font-bold text-sm text-slate-700 flex items-center space-x-2">
@@ -172,7 +173,7 @@
                 </div>
             </section>
 
-            <!-- TAB 3: TIẾN ĐỘ CÁ NHÂN & PHÂN TÍCH 3 PHẦN -->
+            <!-- TAB 3: TIẾN ĐỘ & PHÂN TÍCH -->
             <section id="stab-analytics" class="stab-content hidden space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
@@ -180,13 +181,13 @@
                         <div class="h-56"><canvas id="studentScoreChart"></canvas></div>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
-                        <h3 class="font-bold text-sm text-slate-800 border-b pb-2">Đánh Giá Năng Lực Cấu Trúc Đề Mới</h3>
+                        <h3 class="font-bold text-sm text-slate-800 border-b pb-2">Đánh Giá Năng Lực 3 Phần</h3>
                         <div id="studentRadarStats" class="space-y-3 pt-1"></div>
                     </div>
                 </div>
             </section>
 
-            <!-- TAB 4: KHO TÀI LIỆU THEO CHƯƠNG -->
+            <!-- TAB 4: KHO TÀI LIỆU -->
             <section id="stab-documents" class="stab-content hidden space-y-4">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
                     <h3 class="font-bold text-sm text-slate-800 border-b pb-2">Tài Liệu Phân Nhóm Theo Chuyên Đề</h3>
@@ -202,17 +203,16 @@
             <div class="flex justify-between items-center border-b pb-2">
                 <h3 class="font-bold text-sm text-indigo-900 flex items-center space-x-1.5">
                     <i data-lucide="smartphone" class="w-4 h-4 text-indigo-600"></i>
-                    <span>Cài App M-SigmaMath</span>
+                    <span>Cài Đặt App M-SigmaMath</span>
                 </h3>
                 <button onclick="closeInstallGuideModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
 
-            <div id="androidInstallBtnBox" class="hidden">
-                <button onclick="triggerPWAInstall()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-2xl shadow transition text-xs flex items-center justify-center space-x-2">
+            <div id="androidDirectInstallBox" class="hidden">
+                <button onclick="execPromptInstall()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-2xl shadow transition text-xs flex items-center justify-center space-x-2">
                     <i data-lucide="download" class="w-4 h-4"></i>
-                    <span>Bấm Cài Đặt Ứng Dụng Ngay</span>
+                    <span>Cài Đặt Ngay Ra Màn Hình Chính</span>
                 </button>
-                <div class="text-center text-[11px] text-slate-400 mt-2">Hoặc bấm dấu 3 chấm góc phải trình duyệt ➔ Chọn "Cài đặt ứng dụng".</div>
             </div>
 
             <div class="p-3 bg-slate-50 border rounded-2xl space-y-2">
@@ -220,10 +220,19 @@
                     <span>🍎 Dành cho iPhone (Safari):</span>
                 </div>
                 <ol class="list-decimal list-inside space-y-1 text-slate-600 leading-relaxed text-[11px]">
-                    <li>Mở link bằng trình duyệt <b>Safari</b> trên iPhone.</li>
-                    <li>Bấm vào biểu tượng <b>Chia sẻ</b> (hình vuông có mũi tên chỉ lên ở thanh dưới cùng).</li>
+                    <li>Mở web bằng trình duyệt <b>Safari</b>.</li>
+                    <li>Bấm vào biểu tượng <b>Chia sẻ</b> (hình vuông có mũi tên chỉ lên).</li>
                     <li>Kéo xuống chọn <b>"Thêm vào Màn hình chính" (Add to Home Screen)</b>.</li>
-                    <li>Biểu tượng <b>M-SigmaMath</b> sẽ xuất hiện trên màn hình chính!</li>
+                </ol>
+            </div>
+
+            <div class="p-3 bg-slate-50 border rounded-2xl space-y-2">
+                <div class="font-bold text-slate-800 flex items-center space-x-1">
+                    <span>🤖 Dành cho Android (Chrome):</span>
+                </div>
+                <ol class="list-decimal list-inside space-y-1 text-slate-600 leading-relaxed text-[11px]">
+                    <li>Bấm vào dấu <b>3 chấm</b> ở góc trên bên phải trình duyệt Chrome.</li>
+                    <li>Chọn <b>"Cài đặt ứng dụng"</b> hoặc <b>"Thêm vào Màn hình chính"</b>.</li>
                 </ol>
             </div>
 
@@ -231,7 +240,7 @@
         </div>
     </div>
 
-    <!-- MODAL HIỂN THỊ VIETQR -->
+    <!-- MODAL VIETQR -->
     <div id="modalVietQR" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm text-center space-y-4">
             <div class="flex justify-between items-center border-b pb-2">
@@ -248,7 +257,7 @@
                 <div class="flex justify-between border-t pt-1"><span class="text-slate-500">Số tiền:</span><b id="qrAmountText" class="text-emerald-600 font-black text-sm">0 đ</b></div>
                 <div class="flex justify-between"><span class="text-slate-500">Nội dung CK:</span><b id="qrContentText" class="font-mono text-indigo-700">---</b></div>
             </div>
-            <p class="text-[11px] text-slate-400">Mở app ngân hàng quét mã tự động điền thông tin chuyển khoản.</p>
+            <p class="text-[11px] text-slate-400">Mở ứng dụng ngân hàng quét mã để thanh toán học phí.</p>
         </div>
     </div>
 
@@ -289,7 +298,6 @@
         const AGRIBANK_STK = "4304205123124";
         const AGRIBANK_NAME = "TRAN DUONG QUOC MAN";
 
-        // CẤU HÌNH NHẬN DIỆN MẶC ĐỊNH
         const DEFAULT_BRANDING = {
             appName: "SigmaMath - Thầy Mẫn",
             appShortName: "M-SigmaMath",
@@ -300,17 +308,33 @@
         let appData = { classes: [], students: [], attendance: [], payments: [], documents: [], exams: [], examResults: [], appConfig: [] };
         let currentStudent = null, scoreChartInstance = null;
         let renderedTabs = {};
+        let currentTabId = 'tuition';
         let deferredPrompt = null;
 
+        // ĐĂNG KÝ VÀ TỰ ĐỘNG CẬP NHẬT SERVICE WORKER
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Fail', err));
+            navigator.serviceWorker.register('sw.js').then((reg) => {
+                reg.onupdatefound = () => {
+                    const installingWorker = reg.installing;
+                    if (installingWorker) {
+                        installingWorker.onstatechange = () => {
+                            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                window.location.reload();
+                            }
+                        };
+                    }
+                };
+            }).catch(err => console.log('SW Fail', err));
         }
 
+        // BẮT SỰ KIỆN CÀI ĐẶT TRÊN ANDROID
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            const btnBox = document.getElementById('androidInstallBtnBox');
-            if (btnBox) btnBox.classList.remove('hidden');
+            const btn = document.getElementById('installBtnText');
+            if (btn) btn.innerText = "Cài Đặt App M-SigmaMath";
+            const directBox = document.getElementById('androidDirectInstallBox');
+            if (directBox) directBox.classList.remove('hidden');
         });
 
         function triggerPWAInstall() {
@@ -318,35 +342,73 @@
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then(() => {
                     deferredPrompt = null;
-                    closeInstallGuideModal();
                 });
             } else {
-                alert("Trình duyệt đã sẵn sàng! Bạn có thể bấm dấu 3 chấm ➔ Chọn 'Cài đặt ứng dụng' hoặc 'Thêm vào Màn hình chính'.");
+                openInstallGuideModal();
             }
         }
 
-        function openInstallGuideModal() { document.getElementById('modalInstallGuide').classList.remove('hidden'); }
-        function closeInstallGuideModal() { document.getElementById('modalInstallGuide').classList.add('hidden'); }
+        function execPromptInstall() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(() => {
+                    deferredPrompt = null;
+                    closeInstallGuideModal();
+                });
+            }
+        }
 
-        function formatDateVN(d) { if(!d) return '---'; const p=d.split('T')[0].split('-'); return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:d; }
-        function formatDateShortVN(d) { if(!d) return '--/--'; const p=d.split('T')[0].split('-'); return p.length===3?`${p[2]}/${p[1]}`:d; }
+        function openInstallGuideModal() {
+            document.getElementById('modalInstallGuide').classList.remove('hidden');
+        }
+        function closeInstallGuideModal() {
+            document.getElementById('modalInstallGuide').classList.add('hidden');
+        }
+
+        // CHUẨN HÓA NGÀY THÁNG AN TOÀN TRÁNH LỆCH MÚI GIỜ CLOUD
+        function normalizeCloudDate(d) {
+            if (!d) return '';
+            d = String(d);
+            if (d.includes('T')) {
+                const v = new Date(new Date(d).toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
+                return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}-${String(v.getDate()).padStart(2,'0')}`;
+            }
+            return d.trim();
+        }
+
+        function formatDateVN(d) {
+            if (!d) return '---';
+            const cleanD = normalizeCloudDate(d);
+            const p = cleanD.split('-');
+            return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : d;
+        }
+
+        function formatDateShortVN(d) {
+            if (!d) return '--/--';
+            const cleanD = normalizeCloudDate(d);
+            const p = cleanD.split('-');
+            return p.length === 3 ? `${p[2]}/${p[1]}` : d;
+        }
 
         function togglePasswordVisibility(inputId, iconId) {
             const inp = document.getElementById(inputId);
             const ico = document.getElementById(iconId);
             if (!inp || !ico) return;
-            if (inp.type === 'password') { inp.type = 'text'; ico.setAttribute('data-lucide', 'eye-off'); }
-            else { inp.type = 'password'; ico.setAttribute('data-lucide', 'eye'); }
+            if (inp.type === 'password') {
+                inp.type = 'text';
+                ico.setAttribute('data-lucide', 'eye-off');
+            } else {
+                inp.type = 'password';
+                ico.setAttribute('data-lucide', 'eye');
+            }
             if (window.lucide) lucide.createIcons();
         }
 
-        // TỰ ĐỘNG CẬP NHẬT THƯƠNG HIỆU LÊN GIAO DIỆN & MANIFEST
         function applyBranding() {
             const cfgs = appData.appConfig || [];
             const getVal = (k, df) => { const f = cfgs.find(x => x.key === k); return f ? f.value : df; };
 
             const name = getVal('student_app_name', DEFAULT_BRANDING.appName);
-            const shortName = getVal('student_app_short_name', DEFAULT_BRANDING.appShortName);
             const slogan = getVal('student_app_slogan', DEFAULT_BRANDING.appSlogan);
             const logo = getVal('student_app_logo', DEFAULT_BRANDING.appLogo);
 
@@ -354,28 +416,7 @@
             const tEl = document.getElementById('appTitleText'); if (tEl) tEl.innerText = name;
             const sEl = document.getElementById('appSloganText'); if (sEl) sEl.innerText = slogan;
             const hLogo = document.getElementById('headerLogoImg'); if (hLogo) hLogo.src = logo;
-            const cLogo = document.querySelector('#appLogoContainer img'); if (cLogo) cLogo.src = logo;
-
-            let appleIcon = document.querySelector('link[rel="apple-touch-icon"]');
-            if (appleIcon) appleIcon.href = logo;
-
-            const manifestObj = {
-                name: name,
-                short_name: shortName,
-                start_url: "./hocsinh.html",
-                display: "standalone",
-                background_color: "#0b1329",
-                theme_color: "#312e81",
-                orientation: "portrait",
-                icons: [
-                    { src: logo, sizes: "192x192", type: "image/png" },
-                    { src: logo, sizes: "512x512", type: "image/png" }
-                ]
-            };
-            const blob = new Blob([JSON.stringify(manifestObj)], { type: 'application/json' });
-            const mUrl = URL.createObjectURL(blob);
-            let linkTag = document.querySelector('link[rel="manifest"]');
-            if (linkTag) linkTag.href = mUrl;
+            const lLogo = document.getElementById('loginLogoImg'); if (lLogo) lLogo.src = logo;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -393,7 +434,7 @@
         });
 
         function getClassSessionDates(classId) {
-            if(!classId) return [];
+            if (!classId) return [];
             return [...new Set(appData.attendance.filter(a => a.classId === classId).map(a => a.date))].sort();
         }
 
@@ -401,35 +442,56 @@
             try {
                 const res = await fetch(CLOUD_API_URL);
                 const j = await res.json();
-                if(j.Classes) appData.classes = j.Classes.slice(1).map(r=>({id:String(r[0]||''), name:String(r[1]||''), fee:parseFloat(r[2])||0}));
-                if(j.Students) appData.students = j.Students.slice(1).map(r=>({id:String(r[0]||''), classId:String(r[1]||''), code:String(r[2]||''), name:String(r[3]||''), phone:String(r[4]||''), joinDate:String(r[5]||''), customFee:r[6]!==''&&r[6]!==null?parseFloat(r[6]):null, username:String(r[7]||''), password:String(r[8]||'')}));
-                
-                if(j.Attendance) appData.attendance = j.Attendance.slice(1).map(r => {
+                if (j.Classes) appData.classes = j.Classes.slice(1).map(r => ({ id: String(r[0]||''), name: String(r[1]||''), fee: parseFloat(r[2])||0 }));
+                if (j.Students) appData.students = j.Students.slice(1).map(r => ({
+                    id: String(r[0]||''), classId: String(r[1]||''), code: String(r[2]||''), name: String(r[3]||''),
+                    phone: String(r[4]||''), joinDate: normalizeCloudDate(r[5]||'2026-08-01'), customFee: r[6]!==''&&r[6]!==null?parseFloat(r[6]):null,
+                    username: String(r[7]||''), password: String(r[8]||'')
+                }));
+
+                if (j.Attendance) appData.attendance = j.Attendance.slice(1).map(r => {
                     const sId = String(r[0]||'');
-                    const cId = (r.length >= 5) ? String(r[1]||'') : (appData.students.find(s=>s.id===sId)?.classId || '');
-                    const d = (r.length >= 5) ? String(r[2]||'') : String(r[1]||'');
+                    const cId = (r.length >= 5) ? String(r[1]||'') : (appData.students.find(s => s.id === sId)?.classId || '');
+                    const d = (r.length >= 5) ? normalizeCloudDate(r[2]||'') : normalizeCloudDate(r[1]||'');
                     const st = (r.length >= 5) ? String(r[3]||'') : String(r[2]||'');
                     const n = (r.length >= 5) ? String(r[4]||'') : String(r[3]||'');
                     return { studentId: sId, classId: cId, date: d, status: st, note: n };
                 });
 
-                if(j.Payments) appData.payments = j.Payments.slice(1).map(r=>({id:String(r[0]||''), studentId:String(r[1]||''), classId:String(r[2]||''), cycleIndex:parseInt(r[3]), amount:parseFloat(r[4])||0, status:String(r[5]||''), method:String(r[6]||''), date:String(r[8]||'')}));
-                if(j.Documents) appData.documents = j.Documents.slice(1).map(r=>({id:String(r[0]||''), classId:String(r[1]||''), name:String(r[2]||''), category:String(r[3]||'Chuyên đề chung'), url:String(r[4]||'')}));
-                if(j.Exams) appData.exams = j.Exams.slice(1).map(r=>({id:String(r[0]||''), title:String(r[1]||''), classId:String(r[2]||''), duration:parseInt(r[3])||45, questions:JSON.parse(r[5]||'[]')}));
-                if(j.ExamResults) appData.examResults = j.ExamResults.slice(1).map(r=>({id:String(r[0]||''), examId:String(r[1]||''), studentId:String(r[2]||''), score:parseFloat(r[3]||0), details:JSON.parse(r[4]||'{}'), submittedAt:String(r[6]||'')}));
-                if(j.AppConfig) appData.appConfig = j.AppConfig.slice(1).map(r=>({ key: String(r[0]||''), value: String(r[1]||'') }));
+                if (j.Payments) appData.payments = j.Payments.slice(1).map(r => ({
+                    id: String(r[0]||''), studentId: String(r[1]||''), classId: String(r[2]||''),
+                    cycleIndex: parseInt(r[3]), amount: parseFloat(r[4])||0, status: String(r[5]||''),
+                    method: String(r[6]||''), note: String(r[7]||''), date: normalizeCloudDate(r[8]||'')
+                }));
+
+                if (j.Documents) appData.documents = j.Documents.slice(1).map(r => ({ id: String(r[0]||''), classId: String(r[1]||''), name: String(r[2]||''), category: String(r[3]||'Chuyên đề chung'), url: String(r[4]||'') }));
+                if (j.Exams) appData.exams = j.Exams.slice(1).map(r => ({ id: String(r[0]||''), title: String(r[1]||''), classId: String(r[2]||''), duration: parseInt(r[3])||45, questions: JSON.parse(r[5]||'[]') }));
+                if (j.ExamResults) appData.examResults = j.ExamResults.slice(1).map(r => ({ id: String(r[0]||''), examId: String(r[1]||''), studentId: String(r[2]||''), score: parseFloat(r[3]||0), details: JSON.parse(r[4]||'{}'), submittedAt: String(r[6]||'') }));
+                if (j.AppConfig) appData.appConfig = j.AppConfig.slice(1).map(r => ({ key: String(r[0]||''), value: String(r[1]||'') }));
 
                 localStorage.setItem(CACHE_DATA_KEY, JSON.stringify(appData));
                 applyBranding();
-                checkSavedSession();
-            } catch(e) { console.error("Lỗi:", e); }
+
+                // LÀM MỚI TỨC THÌ DỮ LIỆU CỦA HỌC SINH ĐANG ĐĂNG NHẬP
+                const savedId = localStorage.getItem(SESSION_KEY);
+                if (savedId) {
+                    const freshStudent = appData.students.find(x => x.id === savedId);
+                    if (freshStudent) {
+                        currentStudent = freshStudent;
+                        showDashboard(false);
+                    }
+                }
+            } catch(e) { console.error("Lỗi nạp dữ liệu cloud:", e); }
         }
 
         function checkSavedSession() {
             const savedId = localStorage.getItem(SESSION_KEY);
-            if(savedId && (!currentStudent || currentStudent.id !== savedId)) {
+            if (savedId) {
                 const s = appData.students.find(x => x.id === savedId);
-                if(s) { currentStudent = s; showDashboard(); }
+                if (s) {
+                    currentStudent = s;
+                    showDashboard(true);
+                }
             }
         }
 
@@ -440,7 +502,7 @@
             const err = document.getElementById('loginError');
 
             const s = appData.students.find(x => (x.username.toLowerCase() === u || x.code.toLowerCase() === u) && x.password === p);
-            if(!s) {
+            if (!s) {
                 err.innerText = "Tên đăng nhập hoặc mật khẩu không chính xác!";
                 err.classList.remove('hidden');
                 return;
@@ -449,12 +511,15 @@
             currentStudent = s;
             localStorage.setItem(SESSION_KEY, s.id);
             err.classList.add('hidden');
-            showDashboard();
+            showDashboard(true);
         }
 
-        function studentLogout() { localStorage.removeItem(SESSION_KEY); location.reload(); }
+        function studentLogout() {
+            localStorage.removeItem(SESSION_KEY);
+            location.reload();
+        }
 
-        function showDashboard() {
+        function showDashboard(resetTab = true) {
             document.getElementById('studentLoginScreen').classList.add('hidden');
             document.getElementById('studentDashboardScreen').classList.remove('hidden');
 
@@ -463,10 +528,11 @@
             document.getElementById('headerStudentClass').innerText = `Lớp: ${c ? c.name : '---'} • Mã HS: ${currentStudent.code}`;
 
             renderedTabs = {};
-            switchStudentTab('tuition');
+            switchStudentTab(resetTab ? 'tuition' : currentTabId);
         }
 
         function switchStudentTab(id) {
+            currentTabId = id;
             document.querySelectorAll('.stab-content').forEach(e => e.classList.add('hidden'));
             document.querySelectorAll('.stab-btn').forEach(b => {
                 b.classList.remove('bg-indigo-50', 'text-indigo-600');
@@ -475,8 +541,10 @@
 
             document.getElementById(`stab-${id}`).classList.remove('hidden');
             const act = document.getElementById(`stab-btn-${id}`);
-            act.classList.add('bg-indigo-50', 'text-indigo-600');
-            act.classList.remove('text-slate-500');
+            if (act) {
+                act.classList.add('bg-indigo-50', 'text-indigo-600');
+                act.classList.remove('text-slate-500');
+            }
 
             if (!renderedTabs[id]) {
                 if (id === 'tuition') renderStudentTuition();
@@ -501,8 +569,11 @@
             document.getElementById('qrContentText').innerText = desc;
             document.getElementById('modalVietQR').classList.remove('hidden');
         }
-        function closeVietQRModal() { document.getElementById('modalVietQR').classList.add('hidden'); }
+        function closeVietQRModal() {
+            document.getElementById('modalVietQR').classList.add('hidden');
+        }
 
+        // ==================== BẢNG HỌC PHÍ (ĐÃ SỬA CHUẨN XÁC) ====================
         function renderStudentTuition() {
             const container = document.getElementById('studentTuitionCards');
             const c = appData.classes.find(x => x.id === currentStudent.classId);
@@ -518,26 +589,37 @@
             let html = '';
             for(let i=0; i<4; i++) {
                 const p = appData.payments.find(x => x.studentId === currentStudent.id && x.classId === currentStudent.classId && x.cycleIndex === i);
-                let stC = 'bg-slate-50 border-slate-200 text-slate-400', txt = 'Chưa đến', amount = stdFee, showPayBtn = false;
+                let stC = 'bg-slate-50 border-slate-200 text-slate-400', txt = 'Chưa đến', amount = (p && p.amount > 0) ? p.amount : stdFee, showPayBtn = false;
 
-                if(i === joinCycle && skipCount > 0 && !isExempt) {
-                    const actualSess = 8 - (skipCount % 8);
-                    amount = Math.round((stdFee / 8) * actualSess);
-                }
-
-                if(isExempt || (p && p.status === 'EXEMPT')) {
+                // 1. Nếu được miễn phí
+                if (isExempt || (p && p.status === 'EXEMPT')) {
                     stC = 'bg-blue-50 border-blue-200 text-blue-800 font-bold';
-                    txt = `MIỄN PHÍ`;
-                } else if(p && p.status === 'PAID') {
+                    txt = (p && p.note) ? p.note : `MIỄN PHÍ`;
+                }
+                // 2. Nếu ĐÃ NỘP (ưu tiên kiểm tra trước để không bị báo nợ oan)
+                else if (p && p.status === 'PAID') {
                     stC = 'bg-emerald-50 border-emerald-200 text-emerald-800';
                     txt = `ĐÃ NỘP: ${p.amount.toLocaleString()}đ<br><span class="text-[10px] text-slate-500 font-normal">${formatDateVN(p.date)}</span>`;
-                } else if(i < joinCycle) {
+                    if (p.note) txt += `<br><span class="text-[10px] text-emerald-700 font-semibold">${p.note}</span>`;
+                }
+                // 3. Nếu là khoản chuyển lớp CỘNG DỒN LIÊN TỤC đang chờ thu
+                else if (p && p.note && p.note.includes('Cộng dồn liên tục')) {
+                    txt = `<span class="text-amber-800 font-bold">${p.note}</span><br><b class="text-rose-600">Cần nộp: ${p.amount.toLocaleString()}đ</b>`;
+                    stC = 'bg-amber-50 border-amber-300 text-amber-900';
+                    showPayBtn = true;
+                }
+                // 4. Các trường hợp chu kỳ thông thường
+                else if (i < joinCycle && (!p || p.amount === 0)) {
                     txt = 'Chưa vào học';
-                } else if(i < activeCycleIdx) {
+                } else if (i < activeCycleIdx) {
                     stC = 'bg-rose-50 border-rose-200 text-rose-700 font-bold';
                     txt = `NỢ: ${amount.toLocaleString()}đ`;
                     showPayBtn = true;
-                } else if(i === activeCycleIdx) {
+                } else if (i === activeCycleIdx) {
+                    if (i === joinCycle && skipCount > 0 && !isExempt && (!p || p.amount === 0)) {
+                        const actualSess = 8 - (skipCount % 8);
+                        amount = Math.round((stdFee / 8) * actualSess);
+                    }
                     stC = 'bg-amber-50 border-amber-200 text-amber-800 font-bold';
                     txt = `CẦN NỘP: ${amount.toLocaleString()}đ`;
                     showPayBtn = true;
@@ -550,7 +632,7 @@
                             <div class="text-xs leading-relaxed mt-1">${txt}</div>
                         </div>
                         ${showPayBtn ? `
-                            <button onclick="showVietQR(${i + 1}, ${amount})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-[11px] shadow transition flex items-center justify-center space-x-1">
+                            <button onclick="showVietQR(${i + 1},${amount})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-[11px] shadow transition flex items-center justify-center space-x-1">
                                 <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
                                 <span>Quét QR Chuyển Khoản</span>
                             </button>
@@ -561,6 +643,7 @@
             container.innerHTML = html;
         }
 
+        // ==================== BẢNG CHUYÊN CẦN 8 BUỔI ====================
         function renderStudentAttendance() {
             const container = document.getElementById('studentAttendanceCyclesContainer');
             if (!container || !currentStudent) return;
@@ -588,22 +671,17 @@
             document.getElementById('attStatNoPerm').innerText = `${noPermCount} (${lateCount} trễ)`;
 
             if (currentClassSessions.length === 0) {
-                container.innerHTML = '<div class="p-6 text-center text-xs text-slate-400 italic">Lớp hiện tại chưa có buổi học nào được ghi nhận.</div>';
+                container.innerHTML = '<div class="p-6 text-center text-xs text-slate-400 italic">Lớp hiện tại chưa có buổi học nào.</div>';
             } else {
                 const chunks = [];
-                for (let i = 0; i < currentClassSessions.length; i += 8) {
-                    chunks.push(currentClassSessions.slice(i, i + 8));
-                }
+                for (let i = 0; i < currentClassSessions.length; i += 8) chunks.push(currentClassSessions.slice(i, i + 8));
 
                 let html = '';
                 chunks.forEach((chunkDates, cIdx) => {
                     const cycleNum = cIdx + 1;
                     const isCurrentCycle = (cIdx === chunks.length - 1);
-                    const startDateStr = formatDateVN(chunkDates[0]);
-                    const endDateStr = formatDateVN(chunkDates[chunkDates.length - 1]);
-                    const isOpen = isCurrentCycle;
-
                     let cyclePresent = 0;
+
                     const sessionCells = chunkDates.map((d, dIdx) => {
                         const r = appData.attendance.find(a => a.studentId === currentStudent.id && a.classId === currentStudent.classId && a.date === d);
                         let badgeClass = 'bg-slate-50 border-slate-200 text-slate-400';
@@ -613,21 +691,10 @@
                             badgeClass = 'bg-slate-100 border-slate-200 text-slate-400 opacity-60';
                             icon = '⚪';
                         } else if (r) {
-                            if (r.status === 'PRESENT') {
-                                badgeClass = 'bg-emerald-50 border-emerald-300 text-emerald-700';
-                                icon = '✓';
-                                cyclePresent++;
-                            } else if (r.status === 'ABSENT_PERM') {
-                                badgeClass = 'bg-amber-50 border-amber-300 text-amber-700';
-                                icon = 'P';
-                            } else if (r.status === 'ABSENT_NO_PERM') {
-                                badgeClass = 'bg-rose-50 border-rose-300 text-rose-700';
-                                icon = 'KP';
-                            } else if (r.status === 'LATE') {
-                                badgeClass = 'bg-blue-50 border-blue-300 text-blue-700';
-                                icon = 'T';
-                                cyclePresent++;
-                            }
+                            if (r.status === 'PRESENT') { badgeClass = 'bg-emerald-50 border-emerald-300 text-emerald-700'; icon = '✓'; cyclePresent++; }
+                            else if (r.status === 'ABSENT_PERM') { badgeClass = 'bg-amber-50 border-amber-300 text-amber-700'; icon = 'P'; }
+                            else if (r.status === 'ABSENT_NO_PERM') { badgeClass = 'bg-rose-50 border-rose-300 text-rose-700'; icon = 'KP'; }
+                            else if (r.status === 'LATE') { badgeClass = 'bg-blue-50 border-blue-300 text-blue-700'; icon = 'T'; cyclePresent++; }
                         }
 
                         return `
@@ -639,36 +706,14 @@
                         `;
                     }).join('');
 
-                    const emptySlots = Array.from({ length: 8 - chunkDates.length }, (_, i) => `
-                        <div class="p-2.5 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 flex flex-col items-center justify-center text-center opacity-40 min-h-[76px]">
-                            <div class="text-[10px] font-bold text-slate-400">Buổi ${chunkDates.length + i + 1}</div>
-                            <div class="text-xs text-slate-300 font-mono mt-1">--/--</div>
-                        </div>
-                    `).join('');
-
                     html += `
-                        <div class="border rounded-2xl overflow-hidden shadow-sm transition ${isCurrentCycle ? 'border-indigo-300 ring-2 ring-indigo-50' : 'border-slate-200'}">
-                            <div onclick="toggleStudentCycle(${cIdx})" class="p-4 flex flex-wrap justify-between items-center cursor-pointer select-none ${isCurrentCycle ? 'bg-indigo-50/70 hover:bg-indigo-50' : 'bg-slate-50 hover:bg-slate-100'}">
-                                <div class="flex items-center space-x-3">
-                                    <span class="w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs ${isCurrentCycle ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-700'}">
-                                        K${cycleNum}
-                                    </span>
-                                    <div>
-                                        <div class="font-bold text-xs sm:text-sm text-slate-800 flex items-center space-x-2">
-                                            <span>KỲ ${cycleNum}: ${startDateStr} ➔ ${endDateStr}</span>
-                                            ${isCurrentCycle ? '<span class="text-[10px] font-bold bg-indigo-600 text-white px-2 py-0.5 rounded-full">Đang Diễn Ra</span>' : '<span class="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Đã Khóa Sổ</span>'}
-                                        </div>
-                                        <p class="text-[11px] text-slate-500 mt-0.5">Tham gia: <b class="text-indigo-900">${cyclePresent}/${chunkDates.length} buổi</b></p>
-                                    </div>
-                                </div>
-                                <i data-lucide="${isOpen ? 'chevron-up' : 'chevron-down'}" id="st-cycle-icon-${cIdx}" class="w-4 h-4 text-slate-400"></i>
+                        <div class="border rounded-2xl overflow-hidden shadow-sm ${isCurrentCycle ? 'border-indigo-300 ring-2 ring-indigo-50' : 'border-slate-200'}">
+                            <div class="p-4 bg-slate-50 flex justify-between items-center font-bold text-xs sm:text-sm">
+                                <span>KỲ ${cycleNum}: ${formatDateVN(chunkDates[0])} ➔ ${formatDateVN(chunkDates[chunkDates.length - 1])}</span>
+                                <span class="text-indigo-900">${cyclePresent}/${chunkDates.length} buổi</span>
                             </div>
-
-                            <div id="st-cycle-body-${cIdx}" class="${isOpen ? '' : 'hidden'} p-4 bg-white border-t">
-                                <div class="grid grid-cols-4 sm:grid-cols-8 gap-2">
-                                    ${sessionCells}
-                                    ${emptySlots}
-                                </div>
+                            <div class="p-4 bg-white border-t">
+                                <div class="grid grid-cols-4 sm:grid-cols-8 gap-2">${sessionCells}</div>
                             </div>
                         </div>
                     `;
@@ -676,8 +721,8 @@
                 container.innerHTML = html;
             }
 
-            // LỊCH SỬ LỚP CŨ (NẾU CÓ)
-            const prevClassRecords = appData.attendance.filter(a => a.studentId === currentStudent.id && a.classId !== currentStudent.classId);
+            // HIỂN THỊ LỊCH SỬ LỚP CŨ (NẾU CÓ)
+            const prevClassRecords = appData.attendance.filter(a => a.studentId === currentStudent.id && a.classId && a.classId !== currentStudent.classId);
             const prevSection = document.getElementById('studentPreviousClassHistorySection');
             const prevList = document.getElementById('studentPreviousClassList');
 
@@ -705,7 +750,7 @@
                                 ${recs.map(rc => {
                                     const stMap = { 'PRESENT': 'bg-emerald-100 text-emerald-800', 'ABSENT_PERM': 'bg-amber-100 text-amber-800', 'ABSENT_NO_PERM': 'bg-rose-100 text-rose-800', 'LATE': 'bg-blue-100 text-blue-800' };
                                     const stName = { 'PRESENT': 'Có mặt', 'ABSENT_PERM': 'Phép', 'ABSENT_NO_PERM': 'KP', 'LATE': 'Trễ' };
-                                    return `<span class="px-2 py-0.5 rounded font-mono text-[10px] ${stMap[rc.status] || 'bg-slate-200'}">${formatDateShortVN(rc.date)}: ${stName[rc.status] || rc.status}</span>`;
+                                    return `<span class="px-2 py-0.5 rounded font-mono text-[10px] ${stMap[rc.status] || 'bg-slate-200'}">${formatDateShortVN(rc.date)}:${stName[rc.status] || rc.status}</span>`;
                                 }).join('')}
                             </div>
                         </div>
@@ -716,76 +761,34 @@
             }
         }
 
-        function toggleStudentCycle(idx) {
-            const body = document.getElementById(`st-cycle-body-${idx}`);
-            const icon = document.getElementById(`st-cycle-icon-${idx}`);
-            if (!body) return;
-            const isHidden = body.classList.contains('hidden');
-            if (isHidden) {
-                body.classList.remove('hidden');
-                if (icon) icon.setAttribute('data-lucide', 'chevron-up');
-            } else {
-                body.classList.add('hidden');
-                if (icon) icon.setAttribute('data-lucide', 'chevron-down');
-            }
-            if (window.lucide) lucide.createIcons();
-        }
-
+        // PHÂN TÍCH TIẾN ĐỘ & BÀI THI
         function renderStudentAnalytics() {
             const results = appData.examResults.filter(r => r.studentId === currentStudent.id);
             const radarContainer = document.getElementById('studentRadarStats');
-
-            if(results.length === 0) {
+            if (results.length === 0) {
                 radarContainer.innerHTML = '<div class="text-xs text-slate-400 italic">Chưa có bài thi nào được nộp.</div>';
                 return;
             }
 
             let p1Correct = 0, p1Total = 0;
-            let p2Correct = 0, p2Total = 0;
-            let p3Correct = 0, p3Total = 0;
-
             results.forEach(r => {
                 const ex = appData.exams.find(e => e.id === r.examId);
-                if(ex && ex.questions) {
+                if (ex && ex.questions) {
                     ex.questions.forEach((q, idx) => {
                         const uAns = r.details[idx];
-                        if(q.part === 1) {
+                        if (q.part === 1) {
                             p1Total++;
-                            if(uAns && uAns === q.correct) p1Correct++;
-                        } else if(q.part === 2) {
-                            (q.statements || []).forEach((st, sIdx) => {
-                                p2Total++;
-                                if(uAns && uAns[sIdx] === st.correct) p2Correct++;
-                            });
-                        } else if(q.part === 3) {
-                            p3Total++;
-                            if(uAns && String(uAns).toLowerCase() === String(q.correct).trim().toLowerCase()) p3Correct++;
+                            if (uAns && uAns === q.correct) p1Correct++;
                         }
                     });
                 }
             });
 
             const r1 = p1Total > 0 ? Math.round((p1Correct / p1Total) * 100) : 0;
-            const r2 = p2Total > 0 ? Math.round((p2Correct / p2Total) * 100) : 0;
-            const r3 = p3Total > 0 ? Math.round((p3Correct / p3Total) * 100) : 0;
-
             radarContainer.innerHTML = `
                 <div class="space-y-2 text-xs">
-                    <div>
-                        <div class="flex justify-between font-bold mb-1"><span>Phần I: Trắc nghiệm 4 lựa chọn</span><span class="text-indigo-600">${r1}%</span></div>
-                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden"><div class="bg-indigo-600 h-2.5 rounded-full" style="width: ${r1}%"></div></div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between font-bold mb-1"><span>Phần II: Câu hỏi Đúng / Sai</span><span class="text-amber-600">${r2}%</span></div>
-                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden"><div class="bg-amber-500 h-2.5 rounded-full" style="width: ${r2}%"></div></div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between font-bold mb-1"><span>Phần III: Trả lời ngắn</span><span class="text-purple-600">${r3}%</span></div>
-                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden"><div class="bg-purple-600 h-2.5 rounded-full" style="width: ${r3}%"></div></div>
-                    </div>
-                </div>
-                <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-xl text-xs text-indigo-900 mt-3 leading-relaxed">
-                    💡 <b>Lời khuyên:</b> ${r2 < 60 ? 'Em cần chú ý đọc kỹ các giả thiết câu hỏi Đúng/Sai ở Phần II.' : r3 < 60 ? 'Em cần rèn luyện thêm kỹ năng tính toán số tự luận ở Phần III.' : 'Phong độ giải đề của em rất ổn định!'}
+                    <div class="flex justify-between font-bold"><span>Tỷ lệ chính xác Phần I (Trắc nghiệm)</span><span class="text-indigo-600">${r1}%</span></div>
+                    <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden"><div class="bg-indigo-600 h-2.5 rounded-full" style="width: ${r1}%"></div></div>
                 </div>
             `;
         }
@@ -793,60 +796,30 @@
         function renderScoreChart() {
             const results = appData.examResults.filter(r => r.studentId === currentStudent.id);
             const ctx = document.getElementById('studentScoreChart');
-            if(!ctx || results.length === 0) return;
+            if (!ctx || results.length === 0) return;
 
             const labels = results.map((r, i) => `Bài ${i + 1}`);
             const dataScores = results.map(r => r.score);
 
-            if(scoreChartInstance) scoreChartInstance.destroy();
+            if (scoreChartInstance) scoreChartInstance.destroy();
             scoreChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: 'Điểm Số',
-                        data: dataScores,
-                        borderColor: '#4f46e5',
-                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 5
-                    }]
+                    datasets: [{ label: 'Điểm Số', data: dataScores, borderColor: '#4f46e5', tension: 0.3, fill: true, backgroundColor: 'rgba(79, 70, 229, 0.08)' }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { y: { min: 0, max: 10 } }
-                }
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 10 } } }
             });
         }
 
         function renderStudentGroupedDocs() {
             const list = appData.documents.filter(d => d.classId === currentStudent.classId);
             const c = document.getElementById('studentGroupedDocsList');
-            if(list.length === 0) { c.innerHTML = '<div class="text-xs text-slate-400 italic">Chưa có tài liệu nào cho lớp này.</div>'; return; }
-
-            const groups = {};
-            list.forEach(d => {
-                const cat = d.category || 'Chuyên đề chung';
-                if(!groups[cat]) groups[cat] = [];
-                groups[cat].push(d);
-            });
-
-            c.innerHTML = Object.keys(groups).map((catName, idx) => `
-                <div class="border rounded-2xl overflow-hidden shadow-sm">
-                    <div onclick="document.getElementById('cat-body-${idx}').classList.toggle('hidden')" class="p-3.5 bg-slate-50 hover:bg-slate-100 flex justify-between items-center cursor-pointer font-bold text-xs text-indigo-950">
-                        <span class="flex items-center space-x-2"><i data-lucide="folder" class="w-4 h-4 text-indigo-600"></i><span>${catName}</span></span>
-                        <span class="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-[10px]">${groups[catName].length} file</span>
-                    </div>
-                    <div id="cat-body-${idx}" class="p-3 space-y-2 bg-white border-t">
-                        ${groups[catName].map(f => `
-                            <div class="p-2.5 rounded-xl border flex justify-between items-center text-xs">
-                                <span>📄 <b>${f.name}</b></span>
-                                <a href="${f.url}" target="_blank" class="bg-indigo-50 text-indigo-700 font-bold px-3 py-1 rounded-lg">Xem / Tải</a>
-                            </div>
-                        `).join('')}
-                    </div>
+            if (list.length === 0) { c.innerHTML = '<div class="text-xs text-slate-400 italic">Chưa có tài liệu nào cho lớp này.</div>'; return; }
+            c.innerHTML = list.map(f => `
+                <div class="p-2.5 rounded-xl border flex justify-between items-center text-xs bg-slate-50">
+                    <span>📄 <b>${f.name}</b></span>
+                    <a href="${f.url}" target="_blank" class="bg-indigo-50 text-indigo-700 font-bold px-3 py-1 rounded-lg">Xem / Tải</a>
                 </div>
             `).join('');
         }
@@ -858,7 +831,7 @@
             e.preventDefault();
             const p1 = document.getElementById('newPasswordInput').value;
             const p2 = document.getElementById('confirmNewPasswordInput').value;
-            if(p1 !== p2) { alert("Mật khẩu xác nhận không khớp!"); return; }
+            if (p1 !== p2) { alert("Mật khẩu xác nhận không khớp!"); return; }
 
             try {
                 await fetch(CLOUD_API_URL, {
@@ -869,7 +842,7 @@
                 currentStudent.password = p1;
                 alert("Đổi mật khẩu thành công!");
                 closeChangePasswordModal();
-            } catch(err) { alert("Lỗi khi kết nối!"); }
+            } catch(err) { alert("Lỗi kết nối khi đổi mật khẩu!"); }
         }
     </script>
 </body>

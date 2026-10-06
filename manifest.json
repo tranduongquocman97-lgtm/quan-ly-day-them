@@ -2,12 +2,23 @@
   "name": "SigmaMath Teacher Pro",
   "short_name": "SigmaTeacher",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0b1329",
   "theme_color": "#1e1b4b",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
   "icons": [
-    { "src": "logo-teacher-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "logo-teacher-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "logo-teacher-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo-teacher-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }
