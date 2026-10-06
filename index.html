@@ -794,10 +794,69 @@
         }
 
         // BẮT SỰ KIỆN CÀI ĐẶT APP CHO GIÁO VIÊN
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            teacherDeferredPrompt = e;
-        });
+        window.addEventListener('DOMContentLoaded', () => {
+    try {
+        checkAdminSession();
+        loadFromStorage();
+        
+        // Khởi tạo an toàn các ô input nếu tồn tại
+        const datePicker = document.getElementById('sessionDatePicker');
+        if (datePicker) datePicker.value = getTodayVNString();
+        
+        const joinInput = document.getElementById('inputStudentJoinDate');
+        if (joinInput) joinInput.value = getTodayVNString();
+        
+        const apiInput = document.getElementById('inputApiUrl');
+        if (apiInput) apiInput.value = cloudApiUrl || '';
+
+        // Khởi tạo dòng lịch an toàn
+        initScheduleRows();
+        previewFullClassName();
+        renderGlobalClassSelect();
+
+        // Luôn kích hoạt hiển thị Tab mặc định an toàn
+        switchTab('dashboard');
+
+        setupDirectImagePaste();
+        if (window.lucide) lucide.createIcons();
+
+        // Tải dữ liệu Cloud nếu có URL
+        if (cloudApiUrl) loadDataFromCloud();
+    } catch (err) {
+        console.error("Lỗi khởi tạo khi F5:", err);
+    }
+});
+
+function initScheduleRows() {
+    const c = document.getElementById('scheduleRowsContainer');
+    if (!c) return;
+    c.innerHTML = '';
+    addScheduleRow('Thứ 3', '17:30', '19:00');
+    addScheduleRow('Thứ 6', '17:30', '19:00');
+}
+
+function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
+    const c = document.getElementById('scheduleRowsContainer');
+    if (!c) return;
+    const r = document.createElement('div');
+    r.className = 'flex items-center space-x-1.5 bg-white p-2 rounded-xl border';
+    r.innerHTML = `
+        <select class="sch-day text-xs p-1.5 border rounded-lg font-bold outline-none">
+            <option value="Thứ 2" ${d==='Thứ 2'?'selected':''}>T2</option>
+            <option value="Thứ 3" ${d==='Thứ 3'?'selected':''}>T3</option>
+            <option value="Thứ 4" ${d==='Thứ 4'?'selected':''}>T4</option>
+            <option value="Thứ 5" ${d==='Thứ 5'?'selected':''}>T5</option>
+            <option value="Thứ 6" ${d==='Thứ 6'?'selected':''}>T6</option>
+            <option value="Thứ 7" ${d==='Thứ 7'?'selected':''}>T7</option>
+            <option value="Chủ Nhật" ${d==='Chủ Nhật'?'selected':''}>CN</option>
+        </select>
+        <input type="time" class="sch-start text-xs p-1 border rounded-lg font-bold" value="${s}">
+        <input type="time" class="sch-end text-xs p-1 border rounded-lg font-bold" value="${e}">
+        <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 p-1"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+    `;
+    c.appendChild(r);
+    if (window.lucide) lucide.createIcons();
+}
 
         function triggerTeacherPWAInstall() {
             if (teacherDeferredPrompt) {
