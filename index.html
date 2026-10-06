@@ -28,7 +28,7 @@
         .sticky-col-2 { position: sticky; left: 65px; z-index: 25; background-color: white; }
         .direct-editor img { max-height: 200px; border-radius: 8px; border: 1px solid #e2e8f0; margin: 6px 0; display: inline-block; }
 
-        /* TỐI ƯU ĐẶC BIỆT KHI XOAY MÀN HÌNH NGANG (LANDSCAPE) */
+        /* TỐI ƯU KHI XOAY MÀN HÌNH NGANG (LANDSCAPE) */
         @media (orientation: landscape) and (max-height: 550px) {
             body { height: auto !important; min-height: 100vh; overflow-y: auto !important; }
             #sidebar { height: auto !important; max-height: none !important; }
@@ -46,7 +46,7 @@
 </head>
 <body class="text-slate-800 flex flex-col md:flex-row min-h-screen md:h-screen md:overflow-hidden">
 
-    <!-- MÀN HÌNH KHÓA MÃ PIN QUẢN TRỊ (CHỈ HIỆN 1 LẦN) -->
+    <!-- MÀN HÌNH KHÓA MÃ PIN QUẢN TRỊ (CHỈ HIỆN 1 LẦN HOẶC KHI ĐỔI MÃ MỚI) -->
     <div id="adminPinLockScreen" class="fixed inset-0 bg-slate-950 z-[100] flex items-center justify-center p-4">
         <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl border border-slate-200 w-full max-w-sm text-center space-y-5">
             <div class="w-20 h-20 mx-auto rounded-3xl overflow-hidden shadow-md border border-slate-100 flex items-center justify-center bg-slate-900">
@@ -72,7 +72,7 @@
         </div>
     </div>
 
-    <!-- SIDEBAR TỰ ĐỘNG THÍCH ỨNG -->
+    <!-- SIDEBAR -->
     <aside id="sidebar" class="w-full md:w-64 bg-slate-900 text-slate-200 flex flex-col shrink-0 transition-all duration-300 z-50 shadow-xl">
         <div class="p-3 sm:p-4 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center space-x-3 overflow-hidden">
@@ -82,7 +82,7 @@
                     <p class="text-[10px] text-amber-300 font-semibold">Khảo Thí & Học Phí Pro</p>
                 </div>
             </div>
-            <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-white p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-white p-1"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
 
         <nav class="flex md:flex-col p-2 space-x-1 md:space-x-0 md:space-y-1 overflow-x-auto md:overflow-y-auto text-xs font-semibold shrink-0">
@@ -106,7 +106,7 @@
                 <span id="syncText" class="truncate text-[11px]">Sẵn sàng</span>
             </div>
             <div class="flex items-center space-x-1">
-                <button onclick="lockAdminNow()" class="bg-slate-800 hover:bg-rose-900 text-slate-300 p-1.5 rounded-lg shrink-0" title="Khóa màn hình"><i data-lucide="lock" class="w-3.5 h-3.5"></i></button>
+                <button onclick="lockAdminNow()" class="bg-slate-800 hover:bg-rose-900 text-slate-300 p-1.5 rounded-lg shrink-0" title="Khóa màn hình (Bắt nhập lại PIN)"><i data-lucide="lock" class="w-3.5 h-3.5"></i></button>
                 <button onclick="manualSync()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 p-1.5 rounded-lg shrink-0" title="Đồng bộ thủ công"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i></button>
             </div>
         </div>
@@ -195,7 +195,7 @@
                             <input type="text" id="inputClassName" placeholder="Tên lớp (VD: 10N1)" required class="w-full text-xs p-2.5 border rounded-xl outline-none font-bold">
                             <input type="number" id="inputClassFee" placeholder="Học phí chuẩn / 8 buổi (VD: 500000)" required class="w-full text-xs p-2.5 border rounded-xl outline-none font-bold">
                             <div class="border border-indigo-50 p-2.5 sm:p-3 rounded-xl bg-slate-50 space-y-2">
-                                <div class="flex items-center justify-between"><label class="block text-[11px] font-bold text-indigo-900">Lịch Học Tuần</label><button type="button" onclick="addScheduleRow()" class="text-indigo-600 text-xs font-bold">+ Thêm ca</button></div>
+                                <div class="flex items-center justify-between"><label class="block text-[11px] font-bold text-indigo-900">Lịch Học Tuần Cố Định</label><button type="button" onclick="addScheduleRow()" class="text-indigo-600 text-xs font-bold">+ Thêm ca</button></div>
                                 <div id="scheduleRowsContainer" class="space-y-2"></div>
                             </div>
                             <button type="submit" class="w-full bg-indigo-600 text-white font-bold text-xs py-2.5 rounded-xl shadow">Lưu Lớp Học</button>
@@ -310,12 +310,18 @@
                 </div>
             </section>
 
-            <!-- TAB 5: ĐIỂM DANH BUỔI -->
+            <!-- TAB 5: ĐIỂM DANH BUỔI (CÓ NÚT XÓA BUỔI NHẦM) -->
             <section id="tab-attendance-session" class="tab-content hidden space-y-4 sm:space-y-6">
                 <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border space-y-4">
-                    <div class="flex justify-between items-center border-b pb-3">
-                        <h2 class="font-bold text-xs sm:text-sm">Điểm Danh Buổi Học</h2>
-                        <input type="date" id="sessionDatePicker" onchange="loadSessionAttendance()" class="bg-slate-50 border p-1.5 sm:p-2 rounded-xl text-xs font-bold text-indigo-700 outline-none">
+                    <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
+                        <h2 class="font-bold text-xs sm:text-sm text-slate-800">Điểm Danh Buổi Học</h2>
+                        <div class="flex items-center space-x-2">
+                            <input type="date" id="sessionDatePicker" onchange="loadSessionAttendance()" class="bg-slate-50 border p-1.5 sm:p-2 rounded-xl text-xs font-bold text-indigo-700 outline-none">
+                            <button type="button" onclick="deleteSessionAttendanceDay()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs px-3 py-1.5 sm:py-2 rounded-xl transition flex items-center space-x-1" title="Xóa toàn bộ điểm danh ngày đã chọn nếu lỡ lưu nhầm">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                <span>Xóa Buổi Này</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="overflow-x-auto border rounded-xl">
                         <table class="w-full text-left text-xs whitespace-nowrap">
@@ -323,19 +329,20 @@
                             <tbody id="sessionAttendanceBody" class="divide-y"></tbody>
                         </table>
                     </div>
-                    <div class="flex justify-end pt-2">
-                        <button onclick="saveSessionAttendance()" class="bg-emerald-600 text-white font-bold text-xs px-5 sm:px-6 py-2.5 rounded-xl shadow">Lưu Điểm Danh</button>
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-2 pt-2">
+                        <span class="text-[11px] text-slate-400 italic text-center sm:text-left">* Mẹo: Nếu điểm danh nhầm ngày, chọn ngày đó và bấm "Xóa Buổi Này", sau đó chọn ngày đúng để lưu lại.</span>
+                        <button onclick="saveSessionAttendance()" class="bg-emerald-600 text-white font-bold text-xs px-5 sm:px-6 py-2.5 rounded-xl shadow w-full sm:w-auto">Lưu Điểm Danh</button>
                     </div>
                 </div>
             </section>
 
-            <!-- TAB 6: SỔ LƯU TRỮ ĐIỂM DANH 8 BUỔI (THEO CLASS_ID) -->
+            <!-- TAB 6: SỔ LƯU TRỮ ĐIỂM DANH 8 BUỔI (BẤM VÀO NGÀY ĐỂ ĐỔI HOẶC XÓA) -->
             <section id="tab-attendance-matrix" class="tab-content hidden space-y-4 sm:space-y-6">
                 <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
                         <div>
                             <h2 class="font-bold text-xs sm:text-sm text-slate-800">Sổ Lưu Trữ Lịch Sử Điểm Danh (8 Buổi / Chu Kỳ)</h2>
-                            <p class="text-[11px] text-slate-500">Khóa lịch sử theo lớp: Nhóm 1 và Nhóm 2 hoàn toàn độc lập, không bị lẫn ngày khi học sinh chuyển lớp.</p>
+                            <p class="text-[11px] text-slate-500">Khóa lịch sử theo lớp: Nhóm 1 và Nhóm 2 hoàn toàn độc lập. <b>Bấm vào tiêu đề ngày (cột) để sửa ngày bị nhầm.</b></p>
                         </div>
                         <div class="flex items-center space-x-2">
                             <button onclick="expandAllCycles(true)" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-2.5 sm:px-3 py-1.5 rounded-xl transition">Mở Tất Cả</button>
@@ -509,6 +516,34 @@
                 </div>
             </section>
         </main>
+    </div>
+
+    <!-- MODAL: ĐỔI NGÀY ĐIỂM DANH HOẶC XÓA BUỔI -->
+    <div id="modalEditAttendanceDate" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-slate-800">Điều Chỉnh Buổi Điểm Danh</h3>
+                <button onclick="closeEditAttendanceDateModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-600 mb-1">Ngày hiện tại (đang bị nhầm):</label>
+                    <input type="text" id="editCurrentAttDateText" readonly class="w-full p-2.5 bg-slate-100 border rounded-xl font-bold font-mono text-slate-700">
+                </div>
+                <div>
+                    <label class="block font-bold text-indigo-700 mb-1">Đổi sang ngày đúng:</label>
+                    <input type="date" id="editNewAttDateInput" class="w-full p-2.5 border rounded-xl font-bold font-mono outline-none focus:border-indigo-600">
+                </div>
+                <div class="pt-2 space-y-2">
+                    <button type="button" onclick="handleApplyChangeAttendanceDate()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow transition">
+                        Đổi Sang Ngày Này
+                    </button>
+                    <button type="button" onclick="handleDeleteEntireAttendanceDay()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold py-2 rounded-xl transition">
+                        Xóa Hẳn Buổi Học Này Khỏi Sổ
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- WIDGET TRỢ LÝ GIÁO VIÊN -->
@@ -709,6 +744,7 @@
         let currentClassId = 'ALL', currentTab = 'dashboard', tempParsedQuestions = [];
         let currentWeekOffset = 0;
         let teacherDeferredPrompt = null;
+        let selectedAttDateToChange = null;
 
         // ĐĂNG KÝ VÀ TỰ ĐỘNG CẬP NHẬT SERVICE WORKER
         if ('serviceWorker' in navigator) {
@@ -804,6 +840,39 @@
             alert('Đổi mã PIN quản trị thành công! Vui lòng xác thực lại bằng mã PIN mới.');
             e.target.reset();
             checkAdminSession();
+        }
+
+        // ==================== SINH MÃ HỌC SINH TỰ ĐỘNG THEO TOÀN KHỐI ====================
+        function generateNextStudentCode(classId) {
+            const targetClass = appData.classes.find(c => c.id === classId);
+            if (!targetClass) return 'HS001';
+
+            const gradeMatch = targetClass.name.match(/^(\d+)/);
+            const gradePrefix = gradeMatch ? gradeMatch[1] : targetClass.name.substring(0, 2).toUpperCase();
+
+            const sameGradeClassIds = appData.classes
+                .filter(c => c.name.startsWith(gradePrefix))
+                .map(c => c.id);
+
+            const activeStudentsInGrade = (appData.students || []).filter(s => sameGradeClassIds.includes(s.classId));
+            const inactiveStudentsInGrade = (appData.inactiveStudents || []).filter(s => sameGradeClassIds.includes(s.classId));
+            const allStudentsInGrade = [...activeStudentsInGrade, ...inactiveStudentsInGrade];
+
+            let maxSeq = 0;
+            const codeRegex = new RegExp(`^${gradePrefix}(\\d{3,})$`);
+
+            allStudentsInGrade.forEach(s => {
+                if (s.code) {
+                    const match = String(s.code).trim().match(codeRegex);
+                    if (match) {
+                        const seq = parseInt(match[1], 10);
+                        if (seq > maxSeq) maxSeq = seq;
+                    }
+                }
+            });
+
+            const nextSeq = maxSeq + 1;
+            return `${gradePrefix}${String(nextSeq).padStart(3, '0')}`;
         }
 
         // BACKUP 1-CLICK
@@ -1227,15 +1296,6 @@
         }
 
         // ==================== CÁC HÀM TIỆN ÍCH KHÁC ====================
-        function generateNextStudentCode(classId) {
-            const target = appData.classes.find(c => c.id === classId), name = target ? target.name : 'HS';
-            const m = name.match(/^\d+/), prefix = m ? m[0] : name.substring(0, 2).toUpperCase();
-            const stds = appData.students.filter(s => s.classId === classId);
-            let maxSeq = 0; const reg = new RegExp(`^${prefix}(\\d{3,})$`);
-            stds.forEach(s => { if(s.code) { const match = String(s.code).match(reg); if(match) { const seq = parseInt(match[1], 10); if(seq > maxSeq) maxSeq = seq; } } });
-            return `${prefix}${String(Math.max(maxSeq + 1, stds.length + 1)).padStart(3, '0')}`;
-        }
-
         function populateClassSelectModal() {
             ['inputStudentClassId', 'editStudentClassId', 'inputDocClassId'].forEach(id => {
                 const el = document.getElementById(id);
@@ -1503,7 +1563,257 @@
         function changeWeekOffset(delta) { currentWeekOffset += delta; renderScheduleTab(); }
         function resetWeekOffset() { currentWeekOffset = 0; renderScheduleTab(); }
 
-        // ĐIỂM DANH BUỔI
+        function renderScheduleTab() {
+            const monday = getStartOfWeek(new Date(), currentWeekOffset);
+            const sunday = new Date(monday);
+            sunday.setDate(sunday.getDate() + 6);
+            const formatD = (d) => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+            document.getElementById('currentWeekRangeLabel').innerText = `Tuần: ${formatD(monday)} ➔ ${formatD(sunday)}`;
+            renderFixedSchedule();
+            renderWeeklyOperational(monday);
+        }
+
+        function renderFixedSchedule() {
+            const daysOfWeek = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
+            document.getElementById('weekScheduleCardsContainer').innerHTML = daysOfWeek.map(day => {
+                const ss = [];
+                appData.classes.filter(c => currentClassId === 'ALL' || c.id === currentClassId).forEach(c => {
+                    (c.schedules || []).filter(sc => sc.day === day).forEach(sc => {
+                        ss.push({ cName: c.name, st: sc.startTime, en: sc.endTime });
+                    });
+                });
+                return `
+                    <div class="p-3.5 rounded-2xl border bg-slate-50 space-y-2">
+                        <div class="font-bold text-xs text-indigo-900 border-b pb-1.5 flex justify-between items-center">
+                            <span>${day}</span>
+                            <span class="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-[10px]">${ss.length} ca</span>
+                        </div>
+                        <div class="space-y-1.5">
+                            ${ss.length === 0 ? '<div class="text-xs text-slate-400 italic text-center py-2">Trống</div>' : ss.map(s => `
+                                <div class="p-2 bg-white rounded-xl border text-xs font-semibold">
+                                    <div class="text-slate-800">${s.cName}</div>
+                                    <div class="text-[11px] text-emerald-600 font-mono">${s.st} - ${s.en}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderWeeklyOperational(mondayDate) {
+            const daysOfWeek = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
+            const container = document.getElementById('weeklyOperationalGrid');
+            let html = '';
+
+            for (let i = 0; i < 7; i++) {
+                const curDate = new Date(mondayDate);
+                curDate.setDate(curDate.getDate() + i);
+                const curDateStr = `${curDate.getFullYear()}-${String(curDate.getMonth()+1).padStart(2,'0')}-${String(curDate.getDate()).padStart(2,'0')}`;
+                const dayName = daysOfWeek[i];
+
+                let lessons = [];
+                appData.classes.filter(c => currentClassId === 'ALL' || c.id === currentClassId).forEach(c => {
+                    (c.schedules || []).filter(sc => sc.day === dayName).forEach(sc => {
+                        lessons.push({
+                            classId: c.id,
+                            className: c.name,
+                            startTime: sc.startTime,
+                            endTime: sc.endTime,
+                            originalDate: curDateStr,
+                            isExtra: false
+                        });
+                    });
+                });
+
+                const extras = (appData.weeklyOverrides || []).filter(o => o.date === curDateStr && o.type === 'EXTRA');
+                extras.forEach(ex => {
+                    const c = appData.classes.find(x => x.id === ex.classId);
+                    lessons.push({
+                        classId: ex.classId,
+                        className: c ? c.name : 'Lớp',
+                        startTime: ex.startTime,
+                        endTime: ex.endTime,
+                        originalDate: curDateStr,
+                        isExtra: true,
+                        overrideData: ex
+                    });
+                });
+
+                html += `
+                    <div class="p-3 rounded-2xl border ${curDateStr === getTodayVNString() ? 'border-indigo-400 bg-indigo-50/40 ring-2 ring-indigo-100' : 'border-slate-200 bg-white'} space-y-2 min-h-[160px] flex flex-col">
+                        <div class="border-b pb-1 flex justify-between items-center">
+                            <span class="font-black text-xs text-slate-700">${dayName}</span>
+                            <span class="text-[10px] font-mono font-bold text-slate-500">${formatDateShortVN(curDateStr)}</span>
+                        </div>
+                        <div class="flex-1 space-y-1.5">
+                            ${lessons.length === 0 ? '<div class="text-[11px] text-slate-300 italic text-center py-3">Không có ca</div>' : lessons.map(l => {
+                                const ov = (appData.weeklyOverrides || []).find(o => o.classId === l.classId && o.date === curDateStr);
+                                if (ov && ov.type === 'CANCEL') {
+                                    return `
+                                        <div class="p-2 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 text-xs line-through flex justify-between items-center">
+                                            <span>${l.className} (${l.startTime})</span>
+                                            <span class="text-[9px] font-bold bg-rose-200 px-1 rounded">Nghỉ</span>
+                                        </div>
+                                    `;
+                                }
+                                if (ov && ov.type === 'RESCHEDULE') {
+                                    return `
+                                        <div class="p-2 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 text-xs flex justify-between items-center">
+                                            <div>
+                                                <b>${l.className}</b>
+                                                <div class="text-[10px] text-amber-700 font-bold">Dời ➔ ${ov.newDate ? formatDateShortVN(ov.newDate) : ''} (${ov.startTime})</div>
+                                            </div>
+                                            <button onclick="openOverrideModal('${l.classId}','${l.className}','${curDateStr}','${l.startTime}','${l.endTime}')" class="text-amber-700 p-1"><i data-lucide="edit-3" class="w-3 h-3"></i></button>
+                                        </div>
+                                    `;
+                                }
+                                if (l.isExtra) {
+                                    return `
+                                        <div class="p-2 rounded-xl border border-purple-300 bg-purple-50 text-purple-900 text-xs flex justify-between items-center">
+                                            <div>
+                                                <b>${l.className} (Tăng cường)</b>
+                                                <div class="text-[10px] font-mono text-purple-700">${l.startTime} - ${l.endTime}</div>
+                                            </div>
+                                            <button onclick="removeExtraLesson('${l.overrideData.id}')" class="text-purple-600 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                        </div>
+                                    `;
+                                }
+                                return `
+                                    <div class="p-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 text-xs flex justify-between items-center group hover:border-indigo-300 transition">
+                                        <div>
+                                            <b class="text-indigo-900">${l.className}</b>
+                                            <div class="text-[10px] text-emerald-600 font-mono">${l.startTime} - ${l.endTime}</div>
+                                        </div>
+                                        <button onclick="openOverrideModal('${l.classId}','${l.className}','${curDateStr}','${l.startTime}','${l.endTime}')" class="opacity-0 group-hover:opacity-100 bg-white p-1 rounded-lg border text-indigo-600 hover:bg-indigo-50 shadow-sm" title="Điều chỉnh ca này"><i data-lucide="settings-2" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function openOverrideModal(cId, cName, date, st, et) {
+            document.getElementById('overrideClassId').value = cId;
+            document.getElementById('overrideOriginalDate').value = date;
+            document.getElementById('overrideClassInfo').value = `${cName} (${formatDateVN(date)} | ${st} - ${et})`;
+            document.getElementById('overrideNewDate').value = date;
+            document.getElementById('overrideNewStart').value = st;
+            document.getElementById('overrideNewEnd').value = et;
+            toggleOverrideInputs();
+            document.getElementById('modalOverrideLesson').classList.remove('hidden');
+        }
+        function closeOverrideModal() { document.getElementById('modalOverrideLesson').classList.add('hidden'); }
+        function toggleOverrideInputs() {
+            const type = document.getElementById('overrideType').value;
+            const resFields = document.getElementById('rescheduleFields');
+            if (type === 'RESCHEDULE') resFields.classList.remove('hidden');
+            else resFields.classList.add('hidden');
+        }
+
+        async function handleSaveOverride(e) {
+            e.preventDefault();
+            const cId = document.getElementById('overrideClassId').value;
+            const origDate = document.getElementById('overrideOriginalDate').value;
+            const type = document.getElementById('overrideType').value;
+            const newDate = document.getElementById('overrideNewDate').value;
+            const newSt = document.getElementById('overrideNewStart').value;
+            const newEt = document.getElementById('overrideNewEnd').value;
+            const note = document.getElementById('overrideNote').value.trim();
+            const c = appData.classes.find(x => x.id === cId);
+
+            if (!appData.weeklyOverrides) appData.weeklyOverrides = [];
+            appData.weeklyOverrides = appData.weeklyOverrides.filter(o => !(o.classId === cId && o.date === origDate));
+
+            const overrideItem = {
+                id: 'ov_' + Date.now(),
+                classId: cId,
+                className: c ? c.name : 'Lớp',
+                date: origDate,
+                type: type,
+                newDate: newDate,
+                startTime: newSt,
+                endTime: newEt,
+                note: note
+            };
+            appData.weeklyOverrides.push(overrideItem);
+
+            saveDataToCloud();
+            closeOverrideModal();
+            renderScheduleTab();
+
+            if (cloudApiUrl) {
+                try {
+                    await fetch(cloudApiUrl, {
+                        method: 'POST',
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify({ action: 'syncWeeklyOverrideToCalendar', item: overrideItem })
+                    });
+                } catch(err){}
+            }
+            alert("Đã điều chỉnh lịch tuần này và tự động đồng bộ Google Calendar!");
+        }
+
+        function openExtraLessonModal() {
+            const sel = document.getElementById('extraLessonClassId');
+            sel.innerHTML = appData.classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            document.getElementById('extraLessonDate').value = getTodayVNString();
+            document.getElementById('modalExtraLesson').classList.remove('hidden');
+        }
+        function closeExtraModal() { document.getElementById('modalExtraLesson').classList.add('hidden'); }
+
+        async function handleSaveExtraLesson(e) {
+            e.preventDefault();
+            const cId = document.getElementById('extraLessonClassId').value;
+            const d = document.getElementById('extraLessonDate').value;
+            const st = document.getElementById('extraLessonStart').value;
+            const et = document.getElementById('extraLessonEnd').value;
+            const note = document.getElementById('extraLessonNote').value.trim();
+            const c = appData.classes.find(x => x.id === cId);
+
+            const extraItem = {
+                id: 'ov_' + Date.now(),
+                classId: cId,
+                className: c ? c.name : 'Lớp',
+                date: d,
+                type: 'EXTRA',
+                startTime: st,
+                endTime: et,
+                note: note
+            };
+
+            if (!appData.weeklyOverrides) appData.weeklyOverrides = [];
+            appData.weeklyOverrides.push(extraItem);
+
+            saveDataToCloud();
+            closeExtraModal();
+            renderScheduleTab();
+
+            if (cloudApiUrl) {
+                try {
+                    await fetch(cloudApiUrl, {
+                        method: 'POST',
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify({ action: 'syncWeeklyOverrideToCalendar', item: extraItem })
+                    });
+                } catch(err){}
+            }
+            alert("Đã thêm ca dạy tăng cường và cập nhật Google Calendar!");
+        }
+
+        function removeExtraLesson(id) {
+            if (confirm("Xóa ca tăng cường này?")) {
+                appData.weeklyOverrides = appData.weeklyOverrides.filter(o => o.id !== id);
+                saveDataToCloud();
+                renderScheduleTab();
+            }
+        }
+
+        // ==================== ĐIỂM DANH BUỔI (CÓ XÓA BUỔI NHẦM) ====================
         function loadSessionAttendance() {
             const d = document.getElementById('sessionDatePicker').value, stds = getFilteredStudents(), tbody = document.getElementById('sessionAttendanceBody');
             tbody.innerHTML = stds.length===0 ? `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Trống</td></tr>` : stds.map(s => {
@@ -1512,6 +1822,7 @@
                 return `<tr><td class="p-2.5 sm:p-3 font-bold">${getClassName(s.classId)}</td><td class="p-2.5 sm:p-3 font-mono">${s.code}</td><td class="p-2.5 sm:p-3 font-bold">${s.name}</td><td class="p-2.5 sm:p-3"><select data-student-id="${s.id}" data-class-id="${s.classId}" class="att-status p-1.5 border rounded-lg text-xs font-bold w-full"><option value="PRESENT" ${r.status==='PRESENT'?'selected':''}>🟢 Có mặt</option><option value="ABSENT_PERM" ${r.status==='ABSENT_PERM'?'selected':''}>🟡 Phép</option><option value="ABSENT_NO_PERM" ${r.status==='ABSENT_NO_PERM'?'selected':''}>🔴 KP</option><option value="LATE" ${r.status==='LATE'?'selected':''}>🔵 Trễ</option></select></td><td class="p-2.5 sm:p-3"><input type="text" data-student-id="${s.id}" value="${r.note||''}" class="att-note w-full p-1.5 border rounded-lg text-xs" placeholder="Ghi chú..."></td></tr>`;
             }).join('');
         }
+
         function saveSessionAttendance() {
             const d = document.getElementById('sessionDatePicker').value;
             document.querySelectorAll('.att-status').forEach(el => {
@@ -1524,6 +1835,81 @@
                 appData.attendance.push({ studentId: sId, classId: cId, date: d, status: status, note: note });
             });
             saveDataToCloud(); alert('Đã lưu điểm danh!'); refreshCurrentTab();
+        }
+
+        function deleteSessionAttendanceDay() {
+            const d = document.getElementById('sessionDatePicker').value;
+            if (!d) return;
+
+            const count = appData.attendance.filter(a => (currentClassId === 'ALL' || a.classId === currentClassId) && a.date === d).length;
+            if (count === 0) {
+                alert(`Ngày ${formatDateVN(d)} chưa có dữ liệu điểm danh nào để xóa!`);
+                return;
+            }
+
+            if (confirm(`Bạn có chắc chắn muốn XÓA TOÀN BỘ dữ liệu điểm danh ngày ${formatDateVN(d)} của lớp này không?\n(Dữ liệu buổi lưu nhầm sẽ bị xóa hoàn toàn).`)) {
+                appData.attendance = appData.attendance.filter(a => !( (currentClassId === 'ALL' || a.classId === currentClassId) && a.date === d ));
+                saveDataToCloud();
+                loadSessionAttendance();
+                refreshCurrentTab();
+                alert(`Đã xóa sạch dữ liệu điểm danh ngày ${formatDateVN(d)}!`);
+            }
+        }
+
+        // ==================== BẤM VÀO TIÊU ĐỀ CỘT TRONG SỔ 8 BUỔI ĐỂ ĐỔI NGÀY ====================
+        function openEditAttendanceDateModal(dateStr) {
+            selectedAttDateToChange = dateStr;
+            document.getElementById('editCurrentAttDateText').value = formatDateVN(dateStr) + ` (${dateStr})`;
+            document.getElementById('editNewAttDateInput').value = dateStr;
+            document.getElementById('modalEditAttendanceDate').classList.remove('hidden');
+        }
+
+        function closeEditAttendanceDateModal() {
+            document.getElementById('modalEditAttendanceDate').classList.add('hidden');
+            selectedAttDateToChange = null;
+        }
+
+        function handleApplyChangeAttendanceDate() {
+            const newDate = document.getElementById('editNewAttDateInput').value;
+            if (!newDate) {
+                alert("Vui lòng chọn ngày mới!");
+                return;
+            }
+            if (newDate === selectedAttDateToChange) {
+                alert("Ngày mới trùng với ngày hiện tại!");
+                return;
+            }
+
+            const existed = appData.attendance.some(a => (currentClassId === 'ALL' || a.classId === currentClassId) && a.date === newDate);
+            if (existed) {
+                if (!confirm(`Ngày ${formatDateVN(newDate)} đã có dữ liệu điểm danh từ trước. Bạn có chắc muốn gộp ngày ${formatDateVN(selectedAttDateToChange)} vào ngày này không?`)) {
+                    return;
+                }
+            }
+
+            let modifiedCount = 0;
+            appData.attendance.forEach(a => {
+                if ((currentClassId === 'ALL' || a.classId === currentClassId) && a.date === selectedAttDateToChange) {
+                    a.date = newDate;
+                    modifiedCount++;
+                }
+            });
+
+            saveDataToCloud();
+            closeEditAttendanceDateModal();
+            refreshCurrentTab();
+            alert(`Đã chuyển đổi thành công ${modifiedCount} lượt điểm danh từ ngày ${formatDateVN(selectedAttDateToChange)} sang ngày ${formatDateVN(newDate)}!`);
+        }
+
+        function handleDeleteEntireAttendanceDay() {
+            if (!selectedAttDateToChange) return;
+            if (confirm(`Xác nhận xóa TOÀN BỘ buổi học ngày ${formatDateVN(selectedAttDateToChange)} khỏi sổ lưu trữ của lớp?`)) {
+                appData.attendance = appData.attendance.filter(a => !( (currentClassId === 'ALL' || a.classId === currentClassId) && a.date === selectedAttDateToChange ));
+                saveDataToCloud();
+                closeEditAttendanceDateModal();
+                refreshCurrentTab();
+                alert(`Đã xóa buổi học ngày ${formatDateVN(selectedAttDateToChange)} thành công!`);
+            }
         }
 
         // BẢNG MA TRẬN 8 BUỔI
@@ -1549,14 +1935,22 @@
                     <div class="border rounded-2xl overflow-hidden shadow-sm ${isCurrentCycle ? 'border-indigo-300' : 'border-slate-200'}">
                         <div class="p-3.5 sm:p-4 bg-slate-50 font-bold text-xs flex justify-between items-center">
                             <span>KỲ ${cycleNum}: ${formatDateVN(chunkDates[0])} ➔ ${formatDateVN(chunkDates[chunkDates.length - 1])}</span>
-                            <span class="text-indigo-900">${chunkDates.length}/8 buổi</span>
+                            <span class="text-indigo-900">${chunkDates.length}/8 buổi (Bấm vào ngày ở cột để sửa ngày nhầm)</span>
                         </div>
                         <div class="p-2 sm:p-3 overflow-x-auto bg-white">
                             <table class="w-full text-left text-xs whitespace-nowrap">
                                 <thead>
-                                    <tr class="bg-slate-100 font-bold"><th class="p-2 border-r sticky-col-1 bg-slate-100">Mã HS</th><th class="p-2 border-r sticky-col-2 bg-slate-100">Học Sinh</th>
-                                    ${chunkDates.map((d, idx)=>`<th class="p-2 text-center border-r">B${idx+1}<br><span class="text-[9px] font-normal text-slate-400">${formatDateShortVN(d)}</span></th>`).join('')}
-                                    <th class="p-2 text-center">Chuyên Cần</th></tr>
+                                    <tr class="bg-slate-100 font-bold">
+                                        <th class="p-2 border-r sticky-col-1 bg-slate-100">Mã HS</th>
+                                        <th class="p-2 border-r sticky-col-2 bg-slate-100">Học Sinh</th>
+                                        ${chunkDates.map((d, idx)=>`
+                                            <th class="p-2 text-center border-r cursor-pointer hover:bg-amber-100 transition group" onclick="openEditAttendanceDateModal('${d}')" title="Bấm vào để đổi ngày hoặc xóa buổi nhầm">
+                                                <span class="text-indigo-950 font-black">B${idx+1}</span>
+                                                <div class="text-[9px] font-normal text-slate-500 group-hover:text-amber-800 underline">${formatDateShortVN(d)} ✏️</div>
+                                            </th>
+                                        `).join('')}
+                                        <th class="p-2 text-center">Chuyên Cần</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                     ${stds.map(s => {
