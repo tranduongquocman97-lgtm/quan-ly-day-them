@@ -41,7 +41,10 @@
             .sticky-col-2 { left: 55px !important; }
         }
     </style>
+<!-- THƯ VIỆN ĐỌC & XUẤT EXCEL TỐC ĐỘ CAO -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
+
 <body class="text-slate-800 flex flex-col md:flex-row min-h-screen md:h-screen md:overflow-hidden">
 
     <!-- MÀN HÌNH KHÓA MÃ PIN QUẢN TRỊ -->
@@ -232,16 +235,29 @@
                     <div class="lg:col-span-2 bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                         <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
                             <h2 class="font-bold text-slate-800 text-xs sm:text-sm flex items-center space-x-2"><i data-lucide="users" class="w-4 h-4 text-indigo-600"></i><span>Danh Sách Học Sinh</span></h2>
-                            <div class="flex items-center space-x-2">
-                                <button onclick="autoGenerateAccountsForOldStudents()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl shadow transition flex items-center space-x-1" title="Quét và tạo tài khoản tự động">
-                                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
-                                    <span>Tạo TK Tự Động</span>
-                                </button>
-                                <button onclick="openAddStudentModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl shadow transition flex items-center space-x-1">
-                                    <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
-                                    <span>Thêm HS</span>
-                                </button>
-                            </div>
+                            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+    <!-- Nút Xuất Excel -->
+    <button onclick="exportStudentsToExcel()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition flex items-center space-x-1" title="Xuất danh sách học sinh lớp đang chọn ra file Excel">
+        <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-emerald-600"></i>
+        <span>Xuất Excel</span>
+    </button>
+
+    <!-- Nút Nhập Excel -->
+    <button onclick="openImportExcelModal()" class="bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition flex items-center space-x-1" title="Nhập danh sách học sinh từ file Excel">
+        <i data-lucide="file-up" class="w-3.5 h-3.5 text-blue-600"></i>
+        <span>Nhập Excel</span>
+    </button>
+
+    <button onclick="autoGenerateAccountsForOldStudents()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl shadow transition flex items-center space-x-1">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
+        <span>Tạo TK</span>
+    </button>
+    
+    <button onclick="openAddStudentModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl shadow transition flex items-center space-x-1">
+        <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+        <span>+ HS</span>
+    </button>
+</div>
                         </div>
                         <div class="overflow-x-auto rounded-xl border">
                             <table class="w-full text-left text-xs whitespace-nowrap">
@@ -776,22 +792,313 @@
         let currentWeekOffset = 0;
         let teacherDeferredPrompt = null;
         let selectedAttDateToChange = null;
+	let tempImportedStudents = [];
 
-        // ĐĂNG KÝ VÀ TỰ ĐỘNG CẬP NHẬT SERVICE WORKER
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').then((reg) => {
-                reg.onupdatefound = () => {
-                    const installingWorker = reg.installing;
-                    if (installingWorker) {
-                        installingWorker.onstatechange = () => {
-                            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                window.location.reload();
-                            }
-                        };
+// ==================== 1. CHỈNH SỬA LỚP & LỊCH HỌC CỐ ĐỊNH ====================
+function openEditClassModal(classId) {
+    const c = appData.classes.find(x => x.id === classId);
+    if (!c) return;
+
+    document.getElementById('editClassId').value = c.id;
+    document.getElementById('editClassNameInput').value = c.name;
+    document.getElementById('editClassFeeInput').value = c.fee || 300000;
+
+    const container = document.getElementById('editScheduleRowsContainer');
+    container.innerHTML = '';
+    const schs = c.schedules || [];
+    if (schs.length === 0) {
+        addEditScheduleRow('Thứ 2', '17:30', '19:00');
+    } else {
+        schs.forEach(sc => addEditScheduleRow(sc.day, sc.startTime, sc.endTime));
+    }
+
+    document.getElementById('modalEditClassSchedule').classList.remove('hidden');
+    if (window.lucide) lucide.createIcons();
+}
+
+function closeEditClassModal() {
+    document.getElementById('modalEditClassSchedule').classList.add('hidden');
+}
+
+function addEditScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
+    const container = document.getElementById('editScheduleRowsContainer');
+    if (!container) return;
+    const r = document.createElement('div');
+    r.className = 'flex items-center space-x-1.5 bg-white p-2 rounded-xl border';
+    r.innerHTML = `
+        <select class="edit-sch-day text-xs p-1.5 border rounded-lg font-bold outline-none">
+            <option value="Thứ 2" ${d==='Thứ 2'?'selected':''}>T2</option>
+            <option value="Thứ 3" ${d==='Thứ 3'?'selected':''}>T3</option>
+            <option value="Thứ 4" ${d==='Thứ 4'?'selected':''}>T4</option>
+            <option value="Thứ 5" ${d==='Thứ 5'?'selected':''}>T5</option>
+            <option value="Thứ 6" ${d==='Thứ 6'?'selected':''}>T6</option>
+            <option value="Thứ 7" ${d==='Thứ 7'?'selected':''}>T7</option>
+            <option value="Chủ Nhật" ${d==='Chủ Nhật'?'selected':''}>CN</option>
+        </select>
+        <input type="time" class="edit-sch-start text-xs p-1 border rounded-lg font-bold" value="${s}">
+        <input type="time" class="edit-sch-end text-xs p-1 border rounded-lg font-bold" value="${e}">
+        <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 p-1"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+    `;
+    container.appendChild(r);
+    if (window.lucide) lucide.createIcons();
+}
+
+function handleSaveEditClass(e) {
+    e.preventDefault();
+    const classId = document.getElementById('editClassId').value;
+    const c = appData.classes.find(x => x.id === classId);
+    if (!c) return;
+
+    const newName = document.getElementById('editClassNameInput').value.trim().toUpperCase();
+    const newFee = parseFloat(document.getElementById('editClassFeeInput').value) || 300000;
+
+    const newSchedules = [];
+    document.querySelectorAll('#editScheduleRowsContainer > div').forEach(r => {
+        newSchedules.push({
+            day: r.querySelector('.edit-sch-day').value,
+            startTime: r.querySelector('.edit-sch-start').value,
+            endTime: r.querySelector('.edit-sch-end').value
+        });
+    });
+
+    c.name = newName;
+    c.fee = newFee;
+    c.schedules = newSchedules;
+
+    saveDataToCloud();
+    closeEditClassModal();
+    renderGlobalClassSelect();
+    refreshCurrentTab();
+
+    if (confirm(`Đã lưu thay đổi cho lớp ${newName}!\nThầy có muốn đồng bộ lại ngay sang Google Calendar không?`)) {
+        syncScheduleToGoogleCalendar();
+    }
+}
+
+// Cập nhật lại danh sách lớp để có nút Sửa bút chì
+function renderClassesAndStudents() {
+    document.getElementById('classListContainer').innerHTML = appData.classes.map(c => `
+        <div class="p-2.5 rounded-xl border flex justify-between items-center bg-slate-50 text-xs">
+            <span class="font-bold text-slate-800">${c.name} (${(c.fee||300000).toLocaleString()}đ)</span>
+            <div class="flex items-center space-x-1">
+                <button onclick="openEditClassModal('${c.id}')" class="text-indigo-600 hover:bg-indigo-100 p-1.5 rounded-lg" title="Sửa tên lớp & lịch học cố định"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+                <button onclick="deleteClass('${c.id}')" class="text-rose-500 hover:bg-rose-100 p-1.5 rounded-lg" title="Xóa lớp"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+            </div>
+        </div>
+    `).join('');
+
+    const stds = getFilteredStudents();
+    document.getElementById('studentTableBody').innerHTML = stds.length === 0 ? `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Trống</td></tr>` : stds.map(s => {
+        const c = appData.classes.find(x=>x.id===s.classId);
+        const fee = getEffectiveStudentFee(s, c);
+        return `
+            <tr>
+                <td class="p-2.5 sm:p-3"><span class="bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded text-[10px]">${c ? c.name : ''}</span></td>
+                <td class="p-2.5 sm:p-3 font-mono font-bold">${s.code}</td>
+                <td class="p-2.5 sm:p-3 font-bold">${s.name}</td>
+                <td class="p-2.5 sm:p-3 font-mono text-indigo-600 font-bold">${s.username || '---'}</td>
+                <td class="p-2.5 sm:p-3 font-mono">${formatDateVN(s.joinDate)}</td>
+                <td class="p-2.5 sm:p-3 font-bold ${fee===0?'text-blue-600':'text-emerald-600'}">${fee===0?'Miễn phí':fee.toLocaleString()+'đ'}</td>
+                <td class="p-2.5 sm:p-3 text-center space-x-1">
+                    <button onclick="openEditStudentModal('${s.id}')" class="text-indigo-600 hover:bg-indigo-50 p-1.5 rounded-lg" title="Sửa / Chuyển lớp"><i data-lucide="pencil" class="w-3.5 h-3.5 inline"></i></button>
+                    <button onclick="openLeaveStudentModal('${s.id}')" class="text-rose-600 hover:bg-rose-50 p-1.5 rounded-lg" title="Báo nghỉ học & Chốt nợ"><i data-lucide="user-minus" class="w-3.5 h-3.5 inline"></i></button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+    if (window.lucide) lucide.createIcons();
+}
+
+// ==================== 2. XUẤT DANH SÁCH RA EXCEL ====================
+function exportStudentsToExcel() {
+    const stds = getFilteredStudents();
+    if (stds.length === 0) {
+        alert("Danh sách học sinh đang trống!");
+        return;
+    }
+
+    const currentClassName = currentClassId === 'ALL' ? 'Tat_Ca_Cac_Lop' : getClassName(currentClassId);
+    const dataForExport = stds.map((s, idx) => {
+        const c = appData.classes.find(x => x.id === s.classId);
+        const fee = getEffectiveStudentFee(s, c);
+        return {
+            "STT": idx + 1,
+            "Lớp": c ? c.name : "",
+            "Mã HS": s.code,
+            "Họ và tên": s.name,
+            "Số điện thoại": s.phone || "",
+            "Ngày vào học": formatDateVN(s.joinDate),
+            "Học phí": fee === 0 ? "Miễn phí" : fee,
+            "Tài khoản (Username)": s.username || "",
+            "Mật khẩu": s.password || ""
+        };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(dataForExport);
+    
+    // Tự động căn chỉnh độ rộng cột
+    worksheet['!cols'] = [
+        { wch: 6 },  { wch: 10 }, { wch: 12 }, { wch: 25 }, 
+        { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 22 }, { wch: 12 }
+    ];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "DanhSachHocSinh");
+    
+    const fileName = `DanhSachHS_${currentClassName}_${getTodayVNString()}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+}
+
+// ==================== 3. NHẬP HỌC SINH TỪ EXCEL ====================
+function openImportExcelModal() {
+    const sel = document.getElementById('importTargetClassSelect');
+    sel.innerHTML = appData.classes.map(c => `
+        <option value="${c.id}" ${c.id === (currentClassId === 'ALL' ? appData.classes[0]?.id : currentClassId) ? 'selected' : ''}>${c.name}</option>
+    `).join('');
+
+    document.getElementById('excelFileInput').value = '';
+    document.getElementById('excelPreviewSection').classList.add('hidden');
+    document.getElementById('btnConfirmImportExcel').classList.add('hidden');
+    tempImportedStudents = [];
+
+    document.getElementById('modalImportExcel').classList.remove('hidden');
+    if (window.lucide) lucide.createIcons();
+}
+
+function closeImportExcelModal() {
+    document.getElementById('modalImportExcel').classList.add('hidden');
+    tempImportedStudents = [];
+}
+
+function downloadSampleExcel() {
+    const sampleData = [
+        { "Họ và tên": "Nguyễn Văn An", "Số điện thoại": "0987654321", "Ngày vào học (DD-MM-YYYY)": "01-10-2026", "Học phí riêng": "" },
+        { "Họ và tên": "Trần Thị Bé", "Số điện thoại": "0912345678", "Ngày vào học (DD-MM-YYYY)": "05-10-2026", "Học phí riêng": 0 }
+    ];
+    const ws = XLSX.utils.json_to_sheet(sampleData);
+    ws['!cols'] = [{ wch: 22 }, { wch: 15 }, { wch: 25 }, { wch: 15 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Mau_Nhap_HS");
+    XLSX.writeFile(wb, "Mau_Nhap_Hoc_Sinh.xlsx");
+}
+
+function handleExcelFileSelected(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        const data = new Uint8Array(evt.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const rawRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
+
+        if (rawRows.length === 0) {
+            alert("Tệp Excel không chứa dữ liệu!");
+            return;
+        }
+
+        const targetClassId = document.getElementById('importTargetClassSelect').value;
+        const targetClass = appData.classes.find(c => c.id === targetClassId);
+
+        tempImportedStudents = [];
+        let runningCodeSeq = null;
+
+        rawRows.forEach((row, i) => {
+            const name = (row["Họ và tên"] || row["Họ tên"] || row["Tên"] || "").trim();
+            if (!name) return;
+
+            const phone = String(row["Số điện thoại"] || row["SĐT"] || row["Điện thoại"] || "").trim();
+            let joinDate = normalizeCloudDate(row["Ngày vào học (DD-MM-YYYY)"] || row["Ngày vào học"] || row["Ngày vào"] || getTodayVNString());
+            
+            const custFeeRaw = row["Học phí riêng"] !== undefined ? row["Học phí riêng"] : null;
+            const customFee = (custFeeRaw !== null && custFeeRaw !== "") ? parseFloat(custFeeRaw) : null;
+
+            // Tự sinh mã tiếp nối
+            const code = generateNextStudentCode(targetClassId);
+            const username = generateUsername(name, targetClass ? targetClass.name : '');
+            const password = phone || '123456';
+
+            tempImportedStudents.push({
+                name, phone, joinDate, customFee, code, username, password
+            });
+        });
+
+        if (tempImportedStudents.length === 0) {
+            alert("Không tìm thấy dòng dữ liệu học sinh hợp lệ!");
+            return;
+        }
+
+        // Vẽ bảng xem trước
+        document.getElementById('excelPreviewCountText').innerText = tempImportedStudents.length;
+        document.getElementById('excelPreviewTableBody').innerHTML = tempImportedStudents.map((s, idx) => `
+            <tr>
+                <td class="p-2 font-mono">${idx + 1}</td>
+                <td class="p-2 font-bold">${s.name}</td>
+                <td class="p-2 font-mono">${s.phone || '---'}</td>
+                <td class="p-2 font-mono">${s.joinDate}</td>
+                <td class="p-2 font-mono text-indigo-700 font-bold">${s.code}</td>
+            </tr>
+        `).join('');
+
+        document.getElementById('excelPreviewSection').classList.remove('hidden');
+        document.getElementById('btnConfirmImportExcel').classList.remove('hidden');
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+async function confirmImportExcelToSystem() {
+    if (tempImportedStudents.length === 0) return;
+    const targetClassId = document.getElementById('importTargetClassSelect').value;
+    const targetClass = appData.classes.find(c => c.id === targetClassId);
+
+    tempImportedStudents.forEach(item => {
+        appData.students.push({
+            id: 's_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+            classId: targetClassId,
+            code: item.code,
+            name: item.name,
+            phone: item.phone,
+            joinDate: item.joinDate,
+            customFee: item.customFee,
+            username: item.username,
+            password: item.password
+        });
+    });
+
+    await saveDataToCloud();
+    closeImportExcelModal();
+    refreshCurrentTab();
+    alert(`✅ Đã nhập thành công ${tempImportedStudents.length} học sinh vào lớp ${targetClass ? targetClass.name : ''}!`);
+}
+        // TỰ ĐỘNG BẮT BẢN CẬP NHẬT MỚI VÀ RELOAD TRANG NGAY
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then((reg) => {
+        // Tự động kiểm tra bản mới trên server mỗi khi mở app
+        reg.update();
+
+        reg.onupdatefound = () => {
+            const installingWorker = reg.installing;
+            if (installingWorker) {
+                installingWorker.onstatechange = () => {
+                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        // Phát hiện code mới: Tự động tải lại trang ngay để áp dụng
+                        window.location.reload();
                     }
                 };
-            }).catch(err => console.log('SW Fail', err));
+            }
+        };
+    }).catch(err => console.log('SW Fail', err));
+
+    // Lắng nghe tín hiệu khi Service Worker mới đã chiếm quyền điều khiển
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
         }
+    });
+}
 
         // BẮT SỰ KIỆN CÀI ĐẶT APP CHO GIÁO VIÊN
         window.addEventListener('DOMContentLoaded', () => {
@@ -2718,5 +3025,89 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             navigator.clipboard.writeText(url).then(()=>alert('Đã copy link Cổng Khảo Thí!')).catch(()=>alert(url));
         }
     </script>
+<!-- MODAL 1: CHỈNH SỬA LỚP HỌC & LỊCH CỐ ĐỊNH -->
+<div id="modalEditClassSchedule" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-md space-y-4">
+        <div class="flex justify-between items-center border-b pb-2">
+            <h3 class="font-bold text-sm text-indigo-900 flex items-center space-x-2">
+                <i data-lucide="calendar-cog" class="w-4 h-4 text-indigo-600"></i>
+                <span>Chỉnh Sửa Lớp & Lịch Học Cố Định</span>
+            </h3>
+            <button onclick="closeEditClassModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <form id="formEditClassSchedule" onsubmit="handleSaveEditClass(event)" class="space-y-3 text-xs">
+            <input type="hidden" id="editClassId">
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">Tên Lớp Học:</label>
+                <input type="text" id="editClassNameInput" required class="w-full p-2.5 border rounded-xl font-bold uppercase outline-none focus:border-indigo-600">
+            </div>
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">Học Phí Chuẩn / 8 Buổi (VNĐ):</label>
+                <input type="number" id="editClassFeeInput" required class="w-full p-2.5 border rounded-xl font-bold text-emerald-700 outline-none">
+            </div>
+            <div class="border border-indigo-50 p-3 rounded-2xl bg-slate-50 space-y-2">
+                <div class="flex justify-between items-center">
+                    <label class="block font-bold text-indigo-950">Lịch Học Cố Định Trong Tuần:</label>
+                    <button type="button" onclick="addEditScheduleRow()" class="text-indigo-600 font-bold hover:underline">+ Thêm ca</button>
+                </div>
+                <div id="editScheduleRowsContainer" class="space-y-2"></div>
+            </div>
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow transition">Lưu Thay Đổi & Cập Nhật Lịch</button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL 2: NHẬP HỌC SINH TỪ FILE EXCEL -->
+<div id="modalImportExcel" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-xl space-y-4">
+        <div class="flex justify-between items-center border-b pb-2">
+            <h3 class="font-bold text-sm text-blue-900 flex items-center space-x-2">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4 text-blue-600"></i>
+                <span>Nhập Học Sinh Hàng Loạt Từ Excel</span>
+            </h3>
+            <button onclick="closeImportExcelModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-2xl">
+                <div>
+                    <b class="text-blue-950">Quy cách file Excel:</b>
+                    <div class="text-[11px] text-blue-800">Cột A: Họ và tên | Cột B: Số điện thoại | Cột C: Ngày vào (DD-MM-YYYY) | Cột D: Học phí riêng (nếu có)</div>
+                </div>
+                <button type="button" onclick="downloadSampleExcel()" class="bg-white border border-blue-300 text-blue-700 hover:bg-blue-100 font-bold px-3 py-1.5 rounded-xl whitespace-nowrap shadow-xs">
+                    Tải File Mẫu
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Chọn Lớp Nhập Vào:</label>
+                    <select id="importTargetClassSelect" class="w-full p-2.5 border rounded-xl font-bold bg-slate-50 outline-none"></select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Chọn Tệp Excel (.xlsx, .xls):</label>
+                    <input type="file" id="excelFileInput" accept=".xlsx, .xls" onchange="handleExcelFileSelected(event)" class="w-full p-2 border rounded-xl bg-white text-xs">
+                </div>
+            </div>
+
+            <!-- Bảng xem trước danh sách từ file -->
+            <div id="excelPreviewSection" class="hidden space-y-2">
+                <div class="flex justify-between items-center font-bold text-slate-700">
+                    <span>Xem Trước Dữ Liệu (<span id="excelPreviewCountText" class="text-indigo-600">0</span> học sinh):</span>
+                </div>
+                <div class="max-h-52 overflow-y-auto border rounded-xl">
+                    <table class="w-full text-left text-xs whitespace-nowrap">
+                        <thead><tr class="bg-slate-100 font-bold border-b"><th class="p-2">STT</th><th class="p-2">Họ Tên</th><th class="p-2">SĐT</th><th class="p-2">Ngày Vào</th><th class="p-2">Mã Dự Kiến</th></tr></thead>
+                        <tbody id="excelPreviewTableBody" class="divide-y"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <button type="button" id="btnConfirmImportExcel" onclick="confirmImportExcelToSystem()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow transition hidden">
+                Xác Nhận Lưu Vào Lớp & Tự Động Tạo Tài Khoản
+            </button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
