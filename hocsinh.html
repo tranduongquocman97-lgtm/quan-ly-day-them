@@ -3,1299 +3,1268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>SigmaMath - Thầy Mẫn | Cổng Học Sinh</title>
-
-    <!-- CẤU HÌNH PWA CHUẨN ANDROID & IPHONE -->
-    <link rel="manifest" href="manifest-hocsinh.json">
+    <title>Cổng Học Sinh - M_SigmaMath</title>
+    
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e1b4b">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="M-SigmaMath">
-    <link rel="icon" type="image/png" href="logo-student-192.png">
+    <link rel="icon" type="image/png" id="appFavicon" href="logo-student.png">
     <link rel="apple-touch-icon" href="logo-student.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- KaTeX Hỗ Trợ Công Thức Toán Học -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
+        .katex-display { margin: 0.5em 0; overflow-x: auto; overflow-y: hidden; }
+        .exam-img { max-height: 250px; border-radius: 12px; border: 1px solid #e2e8f0; margin: 8px 0; cursor: pointer; transition: transform 0.2s; }
+        .exam-img:hover { transform: scale(1.02); }
     </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col bg-slate-50 selection:bg-indigo-500 selection:text-white">
+<body class="text-slate-800 bg-slate-100/60 min-h-screen flex flex-col md:flex-row md:h-screen md:overflow-hidden">
 
-    <!-- 1. MÀN HÌNH ĐĂNG NHẬP -->
-    <div id="studentLoginScreen" class="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
-        <!-- Vòng tròn trang trí nền -->
-        <div class="absolute -top-32 -left-32 w-96 h-96 bg-indigo-200/40 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-200/40 rounded-full blur-3xl pointer-events-none"></div>
-
-        <div class="glass-card p-6 sm:p-9 rounded-3xl shadow-2xl border border-white/60 w-full max-w-sm text-center space-y-5 relative z-10">
-            <div id="appLogoContainer" class="w-20 h-20 mx-auto rounded-3xl overflow-hidden shadow-xl border-2 border-indigo-100 flex items-center justify-center bg-slate-950 ring-4 ring-indigo-50 transition-transform hover:scale-105 duration-300">
-                <img id="loginLogoImg" src="logo-student.png" alt="Logo SigmaMath" class="w-full h-full object-cover">
+    <!-- MÀN HÌNH ĐĂNG NHẬP -->
+    <div id="loginScreen" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl border border-slate-200 w-full max-w-sm text-center space-y-5">
+            <div class="w-20 h-20 mx-auto rounded-3xl overflow-hidden shadow-md border border-slate-100 flex items-center justify-center bg-indigo-950 p-2">
+                <img id="loginAppLogo" src="logo-student.png" alt="SigmaMath" class="w-full h-full object-contain">
             </div>
-
             <div>
-                <h1 id="appTitleText" class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">SigmaMath - Thầy Mẫn</h1>
-                <p id="appSloganText" class="text-xs text-slate-500 mt-1 leading-snug">Sổ học tập, điểm danh & khảo thí Toán</p>
+                <h1 class="text-lg font-black text-slate-900" id="loginAppTitle">SigmaMath - Thầy Mẫn</h1>
+                <p class="text-xs text-slate-500 mt-1" id="loginAppSlogan">Cổng tra cứu chuyên cần, học phí & khảo thí trực tuyến</p>
             </div>
+            <form onsubmit="handleStudentLogin(event)" class="space-y-3.5 text-left text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Tài khoản (Username / Mã HS):</label>
+                    <input type="text" id="loginUsername" required placeholder="VD: 10001 hoặc nguyenvana.10n1" class="w-full p-3 border-2 border-indigo-100 rounded-xl outline-none focus:border-indigo-600 bg-slate-50 font-bold">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Mật khẩu:</label>
+                    <div class="relative">
+                        <input type="password" id="loginPassword" required placeholder="Nhập mật khẩu..." class="w-full p-3 border-2 border-indigo-100 rounded-xl outline-none focus:border-indigo-600 bg-slate-50 font-bold">
+                        <button type="button" onclick="togglePasswordView()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600">
+                            <i data-lucide="eye" id="eyeIconPass" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition text-xs flex items-center justify-center space-x-1.5 mt-2">
+                    <i data-lucide="log-in" class="w-4 h-4"></i>
+                    <span>Đăng Nhập Cổng Học Sinh</span>
+                </button>
+            </form>
+            <p id="loginErrorText" class="text-rose-600 text-xs font-bold hidden"></p>
+        </div>
+    </div>
 
-            <button type="button" id="btnInstallAppDirect" onclick="triggerPWAInstall()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 rounded-2xl text-xs transition flex items-center justify-center space-x-2 shadow-lg shadow-indigo-200">
-                <i data-lucide="download-cloud" class="w-4 h-4 text-amber-300"></i>
-                <span id="installBtnText">Cài Đặt App M-SigmaMath</span>
+    <!-- MODAL BẮT BUỘC ĐỔI MẬT KHẨU LẦN ĐẦU -->
+    <div id="modalForceChangePassword" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[60] flex items-center justify-center hidden p-4">
+        <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
+            <div class="text-center space-y-1">
+                <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl mx-auto flex items-center justify-center mb-2">
+                    <i data-lucide="shield-alert" class="w-6 h-6"></i>
+                </div>
+                <h3 class="font-black text-sm text-slate-900">ĐỔI MẬT KHẨU LẦN ĐẦU</h3>
+                <p class="text-xs text-slate-500">Vì lý do bảo mật, em vui lòng đổi mật khẩu mới trước khi vào hệ thống.</p>
+            </div>
+            <form onsubmit="handleForceChangePassword(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Mật khẩu mới (ít nhất 6 ký tự):</label>
+                    <input type="password" id="inputNewPass" required minlength="6" placeholder="Nhập mật khẩu mới..." class="w-full p-2.5 border rounded-xl font-bold outline-none focus:border-indigo-600">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Xác nhận mật khẩu mới:</label>
+                    <input type="password" id="inputConfirmPass" required minlength="6" placeholder="Nhập lại mật khẩu..." class="w-full p-2.5 border rounded-xl font-bold outline-none focus:border-indigo-600">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow transition">
+                    Xác Nhận & Lưu Mật Khẩu
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SIDEBAR DỌC TRÁI -->
+    <aside id="studentSidebar" class="w-full md:w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 z-30 shadow-xs hidden md:flex">
+        <!-- Thông tin học sinh -->
+        <div class="p-4 border-b border-slate-100 flex items-center space-x-3">
+            <div class="w-11 h-11 rounded-2xl bg-indigo-950 p-1 shrink-0 overflow-hidden shadow-xs">
+                <img src="logo-student.png" class="w-full h-full object-cover rounded-xl" alt="Avatar">
+            </div>
+            <div class="overflow-hidden">
+                <h2 class="font-black text-xs sm:text-sm text-slate-900 truncate" id="sideStudentName">Học Sinh</h2>
+                <p class="text-[11px] text-slate-500 font-bold truncate" id="sideStudentInfo">Lớp: --- | Mã: ---</p>
+            </div>
+        </div>
+
+        <div class="p-3 text-[10px] font-black tracking-wider text-slate-400 uppercase">Khu vực học tập</div>
+
+        <!-- Menu các Tab chính -->
+        <nav class="flex-1 px-2 space-y-1 text-xs font-bold overflow-y-auto">
+            <button onclick="switchStudentTab('overview')" id="side-tab-overview" class="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl transition text-indigo-700 bg-indigo-50 border border-indigo-100">
+                <i data-lucide="layout-grid" class="w-4 h-4 text-indigo-600"></i><span>Tổng Quan</span>
+            </button>
+            <button onclick="switchStudentTab('tuition')" id="side-tab-tuition" class="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl transition text-slate-600 hover:bg-slate-50">
+                <i data-lucide="badge-dollar-sign" class="w-4 h-4 text-emerald-600"></i><span>Học Phí & VietQR</span>
+            </button>
+            <button onclick="switchStudentTab('attendance')" id="side-tab-attendance" class="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl transition text-slate-600 hover:bg-slate-50">
+                <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i><span>Sổ Điểm Danh 8B</span>
+            </button>
+            <button onclick="switchStudentTab('performance')" id="side-tab-performance" class="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl transition text-slate-600 hover:bg-slate-50">
+                <i data-lucide="trending-up" class="w-4 h-4 text-amber-500"></i><span>Tiến Độ & Năng Lực</span>
+            </button>
+            <button onclick="switchStudentTab('documents')" id="side-tab-documents" class="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl transition text-slate-600 hover:bg-slate-50">
+                <i data-lucide="folder-git-2" class="w-4 h-4 text-purple-600"></i><span>Kho Chuyên Đề</span>
             </button>
 
-            <form onsubmit="handleStudentLogin(event)" class="space-y-3.5 text-left pt-1">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Tài khoản (Tên đăng nhập hoặc Mã HS)</label>
-                    <input type="text" id="loginUsername" placeholder="VD: 10001 hoặc nguyenthiutman.10n1" required class="w-full p-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold font-mono outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Mật khẩu</label>
-                    <div class="relative">
-                        <input type="password" id="loginPassword" placeholder="Nhập mật khẩu..." required class="w-full p-3 pr-10 bg-white border border-slate-200 rounded-2xl text-xs font-bold outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition">
-                        <button type="button" onclick="togglePasswordVisibility('loginPassword', 'eyeIconLogin')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 p-1">
-                            <i data-lucide="eye" id="eyeIconLogin" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
-                <button type="submit" id="btnLoginSubmit" class="w-full bg-slate-900 hover:bg-indigo-950 text-white font-bold py-3.5 rounded-2xl shadow-xl transition text-xs flex items-center justify-center space-x-1.5 mt-2">
-                    <span>Đăng Nhập Vào Hệ Thống</span>
-                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </button>
-            </form>
-            <p id="loginError" class="text-rose-600 text-xs font-bold hidden"></p>
-        </div>
-    </div>
+            <div class="pt-3 pb-1">
+                <div class="px-3 text-[10px] font-black tracking-wider text-slate-400 uppercase">Cá nhân & Cài đặt</div>
+            </div>
 
-    <!-- 2. MÀN HÌNH CHÍNH (BỐ CỤC SIDEBAR BÊN TRÁI TRÊN MÁY TÍNH) -->
-    <div id="studentDashboardScreen" class="hidden min-h-screen flex flex-col lg:flex-row bg-slate-50/70">
-        
-        <!-- SIDEBAR BÊN TRÁI -->
-        <aside class="w-full lg:w-64 xl:w-72 bg-white border-b lg:border-b-0 lg:border-r border-slate-200 shrink-0 lg:h-screen lg:sticky lg:top-0 z-30 flex flex-col justify-between shadow-xs">
-            <div class="p-3.5 sm:p-4 lg:p-5 space-y-4">
-                <!-- Thông tin học sinh trên Sidebar máy tính -->
-                <div class="hidden lg:flex items-center space-x-3 pb-4 border-b border-slate-100">
-                    <div class="w-11 h-11 rounded-2xl overflow-hidden border border-indigo-200/80 shadow-md ring-2 ring-indigo-50 bg-slate-900 shrink-0">
-    <img id="sidebarLogoImg" src="logo-student.png" alt="Logo App" class="w-full h-full object-cover">
-</div>
-                    <div class="min-w-0 flex-1">
-                        <h3 class="font-black text-sm text-slate-900 truncate" id="sidebarStudentName">---</h3>
-                        <div class="flex items-center space-x-1 mt-0.5">
-                            <span class="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded" id="sidebarStudentClass">Lớp: ---</span>
-                            <span class="text-[10px] font-mono font-bold text-slate-400" id="sidebarStudentCode">---</span>
+            <!-- Mục Cài đặt & Tài khoản mới -->
+            <button onclick="switchStudentTab('settings')" id="side-tab-settings" class="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl transition text-slate-600 hover:bg-slate-50">
+                <i data-lucide="settings" class="w-4 h-4 text-slate-600"></i><span>Cài Đặt & Tài Khoản</span>
+            </button>
+        </nav>
+
+        <!-- Nút Vào phòng thi -->
+        <div class="p-3 mt-auto border-t border-slate-100">
+            <button onclick="switchStudentTab('exams')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs py-3 rounded-2xl shadow-lg transition flex items-center justify-center space-x-2">
+                <i data-lucide="pen-tool" class="w-4 h-4 text-amber-300"></i>
+                <span>Vào Phòng Thi Online</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- KHU VỰC NỘI DUNG CHÍNH (BÊN PHẢI) -->
+    <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        <!-- Mobile Header rút gọn -->
+        <div class="md:hidden bg-indigo-950 text-white p-3 flex justify-between items-center z-10 shrink-0">
+            <div class="flex items-center space-x-2">
+                <img src="logo-student.png" class="w-7 h-7 rounded-lg object-contain bg-white/10 p-0.5">
+                <span class="font-black text-xs" id="mobileHeaderStudentName">Học Sinh</span>
+            </div>
+            <button onclick="switchStudentTab('settings')" class="text-xs bg-indigo-900 px-2 py-1 rounded-lg font-bold flex items-center space-x-1">
+                <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+                <span>Cài Đặt</span>
+            </button>
+        </div>
+
+        <!-- MAIN SCROLLABLE -->
+        <main class="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6 space-y-4 sm:space-y-5">
+
+            <!-- TAB 1: TỔNG QUAN -->
+            <div id="tab-overview" class="student-tab-content space-y-4 sm:space-y-5">
+                <!-- HERO BANNER TÍM -->
+                <div class="rounded-3xl p-5 sm:p-7 text-white shadow-lg bg-gradient-to-r from-indigo-950 via-purple-950 to-indigo-900 relative overflow-hidden flex flex-col justify-between min-h-[140px]">
+                    <div class="flex justify-between items-start z-10">
+                        <div class="space-y-1">
+                            <span class="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-amber-300 flex items-center space-x-1">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                                <span>CHÀO BUỔI CHIỀU!</span>
+                            </span>
+                            <h1 class="text-xl sm:text-2xl font-black text-white" id="heroStudentName">Học Sinh</h1>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs bg-white/10 backdrop-blur-md text-white font-bold px-3 py-1 rounded-xl border border-white/20" id="heroClassBadge">Lớp: ---</span>
+                            <span class="text-xs bg-amber-400 text-indigo-950 font-black px-3 py-1 rounded-xl" id="heroCodeBadge">Mã: ---</span>
                         </div>
                     </div>
+                    <div class="z-10 mt-3 flex items-center space-x-2 text-xs text-indigo-200">
+                        <i data-lucide="bell" class="w-3.5 h-3.5 text-amber-300"></i>
+                        <span>Chúc em một buổi học Toán thật tập trung và tràn đầy năng lượng!</span>
+                    </div>
                 </div>
 
-                <!-- Danh sách Menu chuyển Tab -->
-                <div>
-                    <div class="hidden lg:block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2.5 px-2">Khu Vực Học Tập</div>
-                    <nav class="flex lg:flex-col items-center lg:items-stretch space-x-1.5 lg:space-x-0 lg:space-y-1.5 overflow-x-auto lg:overflow-x-visible pb-1 lg:pb-0">
-                        <button onclick="switchStudentTab('overview')" id="stab-btn-overview" class="stab-btn w-full px-3.5 py-2.5 rounded-2xl font-black text-xs text-indigo-600 bg-indigo-50/80 transition flex items-center space-x-2.5 shrink-0 border border-transparent">
-                            <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0 text-indigo-600"></i>
-                            <span class="whitespace-nowrap">Tổng Quan</span>
-                        </button>
-                        <button onclick="switchStudentTab('tuition')" id="stab-btn-tuition" class="stab-btn w-full px-3.5 py-2.5 rounded-2xl font-bold text-xs text-slate-600 hover:bg-slate-50 transition flex items-center space-x-2.5 shrink-0 border border-transparent">
-                            <i data-lucide="badge-dollar-sign" class="w-4 h-4 shrink-0 text-emerald-600"></i>
-                            <span class="whitespace-nowrap">Học Phí & VietQR</span>
-                        </button>
-                        <button onclick="switchStudentTab('attendance')" id="stab-btn-attendance" class="stab-btn w-full px-3.5 py-2.5 rounded-2xl font-bold text-xs text-slate-600 hover:bg-slate-50 transition flex items-center space-x-2.5 shrink-0 border border-transparent">
-                            <i data-lucide="calendar-check" class="w-4 h-4 shrink-0 text-blue-600"></i>
-                            <span class="whitespace-nowrap">Sổ Điểm Danh 8B</span>
-                        </button>
-                        <button onclick="switchStudentTab('analytics')" id="stab-btn-analytics" class="stab-btn w-full px-3.5 py-2.5 rounded-2xl font-bold text-xs text-slate-600 hover:bg-slate-50 transition flex items-center space-x-2.5 shrink-0 border border-transparent">
-                            <i data-lucide="line-chart" class="w-4 h-4 shrink-0 text-amber-500"></i>
-                            <span class="whitespace-nowrap">Tiến Độ & Năng Lực</span>
-                        </button>
-                        <button onclick="switchStudentTab('documents')" id="stab-btn-documents" class="stab-btn w-full px-3.5 py-2.5 rounded-2xl font-bold text-xs text-slate-600 hover:bg-slate-50 transition flex items-center space-x-2.5 shrink-0 border border-transparent">
-                            <i data-lucide="folder-git-2" class="w-4 h-4 shrink-0 text-purple-600"></i>
-                            <span class="whitespace-nowrap">Kho Chuyên Đề</span>
-                        </button>
-                    </nav>
-                </div>
-            </div>
-
-            <!-- Nút nhanh dưới đáy Sidebar trên máy tính -->
-            <div class="hidden lg:block p-4 border-t border-slate-100 bg-slate-50/50 space-y-2">
-                <button onclick="location.href='exam.html'" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 rounded-2xl text-xs transition shadow-md flex items-center justify-center space-x-2">
-                    <i data-lucide="pen-tool" class="w-4 h-4 text-amber-300"></i>
-                    <span>Vào Phòng Thi Online</span>
-                </button>
-            </div>
-        </aside>
-
-        <!-- KHU VỰC NỘI DUNG CHÍNH (BÊN PHẢI) -->
-        <div class="flex-1 flex flex-col min-w-0">
-            <!-- Header trên cùng -->
-            <header class="bg-indigo-950 text-white shadow-sm sticky top-0 z-20">
-                <div class="w-full px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between">
-                    <div class="flex items-center space-x-2.5">
-                        <img id="headerLogoImg" src="logo-student.png" alt="Logo" class="w-8 h-8 rounded-xl object-cover border border-indigo-700 shadow-inner lg:hidden">
+                <!-- 4 QUICK STATS CARDS -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-2">
+                        <div class="flex justify-between items-center text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                            <span>CA TIẾP THEO</span>
+                            <i data-lucide="clock" class="w-4 h-4 text-blue-500"></i>
+                        </div>
                         <div>
-                            <h2 class="font-bold text-xs sm:text-sm leading-tight" id="headerStudentName">---</h2>
-                            <p class="text-[10px] text-indigo-300" id="headerStudentClass">---</p>
+                            <div class="font-black text-xs sm:text-sm text-slate-800" id="statNextLesson">Hôm nay</div>
+                            <div class="text-[11px] font-mono text-indigo-600 font-bold" id="statNextTime">19:00 - 20:30</div>
                         </div>
+                        <div class="text-[10px] text-slate-400">Theo lịch cố định</div>
                     </div>
-                    <div class="flex items-center space-x-1.5 sm:space-x-2">
-                        <button onclick="triggerPWAInstall()" class="bg-indigo-900 hover:bg-indigo-800 text-amber-300 text-xs px-2.5 py-1.5 rounded-xl font-bold transition flex items-center space-x-1" title="Cài App">
-                            <i data-lucide="download" class="w-3.5 h-3.5"></i>
-                            <span class="hidden sm:inline">Cài App</span>
-                        </button>
-                        <button onclick="openChangePasswordModal()" class="bg-indigo-900 hover:bg-indigo-800 text-white text-xs px-2.5 py-1.5 rounded-xl font-bold transition flex items-center space-x-1">
-                            <i data-lucide="key-round" class="w-3.5 h-3.5"></i>
-                            <span class="hidden sm:inline">Đổi MK</span>
-                        </button>
-                        <button onclick="studentLogout()" class="bg-indigo-950 hover:bg-rose-600 text-white text-xs px-2.5 py-1.5 rounded-xl font-bold transition flex items-center space-x-1">
-                            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-                        </button>
+
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-2">
+                        <div class="flex justify-between items-center text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                            <span>TIẾN ĐỘ CHU KỲ</span>
+                            <i data-lucide="calendar" class="w-4 h-4 text-purple-500"></i>
+                        </div>
+                        <div>
+                            <div class="font-black text-xs sm:text-sm text-slate-800" id="statCycleProgress">Buổi 4/8</div>
+                            <div class="text-[11px] text-slate-500 font-bold" id="statCycleName">Kỳ 2</div>
+                        </div>
+                        <div class="text-[10px] text-emerald-600 font-bold" id="statAttSummary">Chuyên cần: 100%</div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-2">
+                        <div class="flex justify-between items-center text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                            <span>HỌC PHÍ</span>
+                            <i data-lucide="badge-dollar-sign" class="w-4 h-4 text-emerald-500"></i>
+                        </div>
+                        <div>
+                            <div class="font-black text-xs sm:text-sm text-emerald-600" id="statTuitionStatus">Đã hoàn thành</div>
+                            <div class="text-[11px] text-slate-500 font-bold" id="statTuitionOwe">Không còn nợ</div>
+                        </div>
+                        <button onclick="switchStudentTab('tuition')" class="text-[10px] text-indigo-600 font-bold hover:underline text-left">Chi tiết & QR ➔</button>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-2">
+                        <div class="flex justify-between items-center text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                            <span>KHẢO THÍ GẦN NHẤT</span>
+                            <i data-lucide="award" class="w-4 h-4 text-amber-500"></i>
+                        </div>
+                        <div>
+                            <div class="font-black text-xs sm:text-sm text-slate-800" id="statLastExamScore">-- đ</div>
+                            <div class="text-[11px] text-slate-500 truncate" id="statLastExamTitle">Chưa có bài thi</div>
+                        </div>
+                        <button onclick="switchStudentTab('exams')" class="text-[10px] text-indigo-600 font-bold hover:underline text-left">Phòng thi online ➔</button>
                     </div>
                 </div>
-            </header>
 
-            <!-- Main tràn đều màn hình máy tính -->
-            <main class="flex-1 w-full p-4 sm:p-6 lg:p-8 space-y-6">
-
-                <!-- ==================== TAB 0: TỔNG QUAN ==================== -->
-                <section id="stab-overview" class="stab-content space-y-5">
-                    
-                    <!-- 1. BANNER CHÀO MỪNG NGHỆ THUẬT -->
-                    <div class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 rounded-3xl p-5 sm:p-6 text-white shadow-xl relative overflow-hidden">
-                        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-indigo-500/20 rounded-full blur-2xl pointer-events-none"></div>
-                        <div class="relative z-10 space-y-3">
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                                <div>
-                                    <div class="text-[11px] text-amber-300 font-black uppercase tracking-wider flex items-center space-x-1" id="dashGreetingTime">
-                                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                                        <span>Chào mừng em!</span>
-                                    </div>
-                                    <h2 class="text-xl sm:text-3xl font-black tracking-tight mt-0.5" id="dashGreetingName">Xin chào!</h2>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <span class="bg-white/10 backdrop-blur-md px-3 py-1 rounded-xl text-xs font-mono font-bold text-indigo-100 border border-white/20" id="dashBadgeClass">Lớp: ---</span>
-                                    <span class="bg-amber-400 text-indigo-950 px-3 py-1 rounded-xl text-xs font-mono font-black" id="dashBadgeCode">MS: ---</span>
-                                </div>
-                            </div>
-                            <div id="dashNoticeAlert" class="bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/20 flex items-center space-x-2.5 text-xs text-indigo-100">
-                                <i data-lucide="bell-ring" class="w-4 h-4 text-amber-300 shrink-0 animate-bounce"></i>
-                                <span id="dashNoticeText" class="font-medium truncate">Chúc em một buổi học Toán thật tập trung và tràn đầy năng lượng!</span>
-                            </div>
-                        </div>
+                <!-- TIẾN TRÌNH 8 BUỔI CHU KỲ HIỆN TẠI -->
+                <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+                    <div class="flex justify-between items-center border-b pb-2.5">
+                        <h2 class="font-black text-xs sm:text-sm text-slate-800 flex items-center space-x-2">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+                            <span>Tiến Trình 8 Buổi Học Trong Chu Kỳ Hiện Tại</span>
+                        </h2>
+                        <span id="currentCycleBadge" class="text-xs bg-indigo-50 text-indigo-700 font-black px-2.5 py-0.5 rounded-lg border border-indigo-100">Kỳ 2</span>
                     </div>
+                    <div class="grid grid-cols-4 sm:grid-cols-8 gap-2 sm:gap-2.5" id="currentCycleBallsContainer"></div>
+                </div>
 
-                    <!-- 2. DÃY 4 THẺ CHỈ SỐ NHANH -->
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                        <!-- Ca học kế tiếp -->
-                        <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-blue-300 transition group">
-                            <div class="flex items-center justify-between text-slate-400 text-[10px] font-black uppercase">
-                                <span>Ca Tiếp Theo</span>
-                                <div class="w-7 h-7 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition"><i data-lucide="clock" class="w-4 h-4"></i></div>
-                            </div>
-                            <div class="my-2">
-                                <div class="text-sm sm:text-base font-black text-slate-900" id="dashNextLessonDay">---</div>
-                                <div class="text-xs font-mono font-bold text-blue-600" id="dashNextLessonTime">--:-- - --:--</div>
-                            </div>
-                            <div class="text-[10px] text-slate-400 font-medium truncate" id="dashNextLessonStatus">Theo thời khóa biểu</div>
-                        </div>
-
-                        <!-- Tiến độ chu kỳ 8 buổi -->
-                        <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-indigo-300 transition group">
-                            <div class="flex items-center justify-between text-slate-400 text-[10px] font-black uppercase">
-                                <span>Tiến Độ Chu Kỳ</span>
-                                <div class="w-7 h-7 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition"><i data-lucide="calendar-check-2" class="w-4 h-4"></i></div>
-                            </div>
-                            <div class="my-2">
-                                <div class="text-sm sm:text-base font-black text-indigo-600" id="dashCycleProgressText">Buổi 0/8</div>
-                                <div class="text-xs font-bold text-slate-600" id="dashCycleNumberText">Kỳ 1</div>
-                            </div>
-                            <div class="text-[10px] text-slate-400 font-medium" id="dashAttendanceRateText">Chuyên cần: 100%</div>
-                        </div>
-
-                        <!-- Tình trạng học phí -->
-                        <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-emerald-300 transition group">
-                            <div class="flex items-center justify-between text-slate-400 text-[10px] font-black uppercase">
-                                <span>Học Phí</span>
-                                <div class="w-7 h-7 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition"><i data-lucide="badge-dollar-sign" class="w-4 h-4"></i></div>
-                            </div>
-                            <div class="my-2">
-                                <div class="text-sm sm:text-base font-black" id="dashTuitionStatusText">Đang tải...</div>
-                                <div class="text-xs font-bold text-slate-600" id="dashTuitionNoteText">Kỳ hiện tại</div>
-                            </div>
-                            <button onclick="switchStudentTab('tuition')" class="text-[10px] font-bold text-indigo-600 hover:underline text-left">Chi tiết & QR →</button>
-                        </div>
-
-                        <!-- Điểm khảo thí -->
-                        <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-amber-300 transition group">
-                            <div class="flex items-center justify-between text-slate-400 text-[10px] font-black uppercase">
-                                <span>Khảo Thí Gần Nhất</span>
-                                <div class="w-7 h-7 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition"><i data-lucide="award" class="w-4 h-4"></i></div>
-                            </div>
-                            <div class="my-2">
-                                <div class="text-sm sm:text-base font-black text-amber-600" id="dashLatestExamScore">-- đ</div>
-                                <div class="text-xs font-bold text-slate-600 truncate" id="dashLatestExamTitle">Chưa có bài thi</div>
-                            </div>
-                            <button onclick="location.href='exam.html'" class="text-[10px] font-bold text-indigo-600 hover:underline text-left">Phòng thi online →</button>
-                        </div>
-                    </div>
-
-                    <!-- 3. TIẾN TRÌNH CHUYÊN CẦN 8 BUỔI (TRỰC QUAN ĐA SẮC) -->
-                    <div class="bg-white p-4 sm:p-6 rounded-3xl border border-slate-200 shadow-sm space-y-3">
-                        <div class="flex justify-between items-center border-b pb-3">
-                            <h3 class="font-bold text-xs sm:text-sm text-slate-800 flex items-center space-x-2">
-                                <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
-                                <span>Tiến Trình 8 Buổi Học Trong Chu Kỳ Hiện Tại</span>
+                <!-- 2 CỘT: LỊCH TUẦN & NỘP HỌC PHÍ NHANH -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <h3 class="font-black text-xs sm:text-sm text-slate-800 flex items-center space-x-1.5">
+                                <i data-lucide="calendar-days" class="w-4 h-4 text-indigo-600"></i>
+                                <span>Lịch Học Tuần Này Của Lớp</span>
                             </h3>
-                            <span class="text-xs font-black text-indigo-700 bg-indigo-50 px-3 py-1 rounded-xl border border-indigo-100" id="dashCycleBadge">Kỳ 1</span>
+                            <span class="text-[11px] text-slate-400 font-bold">Tuần này</span>
                         </div>
-                        <div id="dashSessionStepsContainer" class="grid grid-cols-4 sm:grid-cols-8 gap-2.5 pt-1"></div>
+                        <div id="weeklyClassScheduleList" class="space-y-2"></div>
                     </div>
 
-                    <!-- 4. LỊCH HỌC TUẦN NÀY & NÚT QUÉT NHANH VIETQR -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
-                        <!-- Lịch học tuần -->
-                        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3 flex flex-col justify-between">
-                            <div>
-                                <div class="flex justify-between items-center border-b pb-2.5">
-                                    <h3 class="font-bold text-xs sm:text-sm text-slate-800 flex items-center space-x-2">
-                                        <i data-lucide="calendar" class="w-4 h-4 text-indigo-600"></i>
-                                        <span>Lịch Học Tuần Này Của Lớp</span>
-                                    </h3>
-                                    <span class="text-[11px] text-slate-400 font-mono" id="dashWeekRangeText">Tuần này</span>
-                                </div>
-                                <div id="dashMyWeekScheduleList" class="space-y-2.5 pt-3 text-xs"></div>
-                            </div>
-                            <div class="pt-2 border-t text-[11px] text-slate-400 italic">
-                                * Thông báo dời ca hoặc nghỉ ca sẽ hiển thị trực tiếp tại đây.
-                            </div>
-                        </div>
-
-                        <!-- Quét nhanh VietQR -->
-                        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3 flex flex-col justify-between">
-                            <div>
-                                <div class="flex justify-between items-center border-b pb-2.5">
-                                    <h3 class="font-bold text-xs sm:text-sm text-slate-800 flex items-center space-x-2">
-                                        <i data-lucide="qr-code" class="w-4 h-4 text-emerald-600"></i>
-                                        <span>Nộp Học Phí Nhanh (VietQR Agribank)</span>
-                                    </h3>
-                                    <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">Agribank</span>
-                                </div>
-                                <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 my-3 space-y-2 text-xs">
-                                    <div class="flex justify-between">
-                                        <span class="text-slate-500">Khoản thu chu kỳ:</span>
-                                        <b class="text-slate-800" id="dashQuickPayCycleName">Kỳ 1</b>
-                                    </div>
-                                    <div class="flex justify-between border-t pt-2 items-center">
-                                        <span class="text-slate-500">Số tiền thực học:</span>
-                                        <b class="text-lg font-black text-rose-600" id="dashQuickPayAmount">0 đ</b>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="dashQuickPayButtonContainer">
-                                <button id="btnDashQuickPay" onclick="handleDashboardQuickPay()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-2xl text-xs shadow-md transition flex items-center justify-center space-x-2">
-                                    <i data-lucide="qr-code" class="w-4 h-4"></i>
-                                    <span>Quét Mã VietQR Chuyển Khoản Ngay</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 5. PHÒNG THI ONLINE & DANH SÁCH ĐỀ THI MỞ -->
-                    <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
-                        <div class="flex justify-between items-center border-b pb-2.5">
-                            <h3 class="font-bold text-xs sm:text-sm text-slate-800 flex items-center space-x-2">
-                                <i data-lucide="file-text" class="w-4 h-4 text-purple-600"></i>
-                                <span>Bài Khảo Thí Trực Tuyến Đang Mở</span>
-                            </h3>
-                            <button onclick="location.href='exam.html'" class="text-xs text-indigo-600 font-bold hover:underline flex items-center space-x-1">
-                                <span>Vào phòng thi</span>
-                                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-                            </button>
-                        </div>
-                        <div id="dashExamsListContainer" class="space-y-2.5 pt-1 text-xs"></div>
-                    </div>
-                </section>
-
-                <!-- ==================== TAB 1: HỌC PHÍ CHI TIẾT ==================== -->
-                <section id="stab-tuition" class="stab-content hidden space-y-5">
-                    <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-200 space-y-4">
-                        <div class="border-b pb-3">
-                            <h3 class="font-bold text-sm text-slate-800 flex items-center space-x-2">
+                    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <h3 class="font-black text-xs sm:text-sm text-slate-800 flex items-center space-x-1.5">
                                 <i data-lucide="qr-code" class="w-4 h-4 text-emerald-600"></i>
-                                <span>Chi Tiết Học Phí Các Kỳ & Mã Thanh Toán VietQR</span>
+                                <span>Nộp Học Phí Nhanh (VietQR Agribank)</span>
                             </h3>
-                            <p class="text-xs text-slate-500 mt-0.5">Học phí chuẩn 300.000đ/8 buổi. Buổi lẻ hoặc cộng dồn chuyển lớp được tính chính xác theo thực học.</p>
+                            <span class="text-[11px] font-bold text-emerald-600">Agribank</span>
                         </div>
-                        <div id="studentTuitionCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+                        <div class="flex flex-col sm:flex-row items-center gap-4">
+                            <div class="p-1.5 bg-slate-50 border rounded-2xl shrink-0">
+                                <img id="quickVietQrImg" src="" class="w-36 h-36 rounded-xl object-contain bg-white" alt="VietQR">
+                            </div>
+                            <div class="text-xs space-y-1.5 flex-1 w-full bg-slate-50 p-3 rounded-2xl border">
+                                <div>STK: <b class="font-mono text-emerald-700">4304205123124</b></div>
+                                <div>Chủ TK: <b>TRẦN DƯƠNG QUỐC MẪN</b></div>
+                                <div>Cần đóng: <b id="quickQrAmountText" class="text-emerald-600 font-black">0 đ</b></div>
+                                <div>Nội dung: <b id="quickQrContentText" class="font-mono text-indigo-700 break-all">---</b></div>
+                            </div>
+                        </div>
                     </div>
-                </section>
+                </div>
+            </div>
 
-                <!-- ==================== TAB 2: SỔ ĐIỂM DANH 8 BUỔI ==================== -->
-                <section id="stab-attendance" class="stab-content hidden space-y-5">
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                        <div class="p-4 bg-white rounded-3xl border border-slate-200 shadow-sm text-center">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase block">Tổng Buổi Lớp Này</span>
-                            <span class="text-xl font-black text-slate-800 mt-1 block" id="attStatTotal">0</span>
+            <!-- TAB 2: HỌC PHÍ & VIETQR (KÈM CỘT THỜI GIAN NỘP) -->
+            <div id="tab-tuition" class="student-tab-content hidden space-y-4">
+                <div class="bg-white p-5 rounded-2xl border shadow-xs space-y-4">
+                    <h2 class="font-black text-sm text-slate-800 border-b pb-2 flex justify-between items-center">
+                        <span>Chi Tiết Công Nợ Từng Kỳ Học</span>
+                        <span id="tuitionBalanceSummary" class="text-xs px-3 py-1 rounded-xl font-bold">---</span>
+                    </h2>
+                    <div class="overflow-x-auto border rounded-xl">
+                        <table class="w-full text-left text-xs whitespace-nowrap">
+                            <thead>
+                                <tr class="bg-slate-100 font-bold border-b text-slate-600">
+                                    <th class="p-3">Chu Kỳ Học Phí</th>
+                                    <th class="p-3">Định Mức</th>
+                                    <th class="p-3">Đã Đóng</th>
+                                    <th class="p-3">Thời Gian Nộp</th>
+                                    <th class="p-3">Tình Trạng</th>
+                                    <th class="p-3">Ghi Chú</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentTuitionTableBody" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: SỔ ĐIỂM DANH 8 BUỔI -->
+            <div id="tab-attendance" class="student-tab-content hidden space-y-4">
+                <div class="bg-white p-5 rounded-2xl border shadow-xs space-y-4">
+                    <h2 class="font-black text-sm text-slate-800 border-b pb-2">Hồ Sơ Chuyên Cần 8 Buổi / Chu Kỳ</h2>
+                    <div id="studentCyclesAccordion" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- TAB 4: TIẾN ĐỘ & NĂNG LỰC -->
+            <div id="tab-performance" class="student-tab-content hidden space-y-4">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <!-- KHỐI 1: BIỂU ĐỒ PHONG ĐỘ ĐIỂM SỐ -->
+                    <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-4 flex flex-col min-h-[360px]">
+                        <div class="border-b pb-3 flex justify-between items-center">
+                            <h3 class="font-black text-sm text-slate-800">Biểu Đồ Phong Độ Điểm Số</h3>
+                            <span class="text-xs text-slate-400 font-bold" id="perfExamCountBadge">0 bài thi</span>
                         </div>
-                        <div class="p-4 bg-white rounded-3xl border border-slate-200 shadow-sm text-center">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase block">Tỷ Lệ Chuyên Cần</span>
-                            <span class="text-xl font-black text-emerald-600 mt-1 block" id="attStatRate">0%</span>
-                        </div>
-                        <div class="p-4 bg-white rounded-3xl border border-slate-200 shadow-sm text-center">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase block">Vắng Có Phép</span>
-                            <span class="text-xl font-black text-amber-500 mt-1 block" id="attStatPerm">0</span>
-                        </div>
-                        <div class="p-4 bg-white rounded-3xl border border-slate-200 shadow-sm text-center">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase block">Vắng KP / Trễ</span>
-                            <span class="text-xl font-black text-rose-600 mt-1 block" id="attStatNoPerm">0</span>
+                        <div id="perfChartContainer" class="flex-1 flex flex-col justify-end space-y-2">
+                            <div class="text-center text-slate-400 text-xs italic my-auto">Chưa có bài thi nào được nộp.</div>
                         </div>
                     </div>
 
-                    <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-200 space-y-4">
-                        <div class="flex justify-between items-center border-b pb-3">
-                            <h3 class="font-bold text-sm text-slate-800 flex items-center space-x-2">
-                                <i data-lucide="calendar-check" class="w-4 h-4 text-indigo-600"></i>
-                                <span>Hồ Sơ Chuyên Cần Lớp Hiện Tại (8 Buổi / Chu Kỳ)</span>
-                            </h3>
-                            <span class="text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-xl" id="attCurrentClassBadge">Lớp: ---</span>
+                    <!-- KHỐI 2: ĐÁNH GIÁ NĂNG LỰC TRẮC NGHIỆM GDPT MỚI -->
+                    <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-4 flex flex-col min-h-[360px]">
+                        <div class="border-b pb-3 flex justify-between items-center">
+                            <h3 class="font-black text-sm text-slate-800">Đánh Giá Năng Lực Trắc Nghiệm GDPT Mới</h3>
+                            <span class="text-xs text-indigo-700 bg-indigo-50 font-bold px-2.5 py-0.5 rounded-lg" id="badgeSchoolYear">Năm học 2026-2027</span>
                         </div>
-                        <div id="studentAttendanceCyclesContainer" class="space-y-4 pt-1"></div>
+                        <div id="perfCompetencyContainer" class="flex-1 flex flex-col justify-center space-y-4">
+                            <div class="text-center text-slate-400 text-xs italic">Chưa có bài thi nào được nộp.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: KHO CHUYÊN ĐỀ -->
+            <div id="tab-documents" class="student-tab-content hidden space-y-4">
+                <div class="bg-white p-5 rounded-2xl border shadow-xs space-y-4">
+                    <h2 class="font-black text-sm text-slate-800 border-b pb-2">Tài Liệu Học Tập & Bài Giảng</h2>
+                    <div id="studentDocumentsContainer" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- TAB 6: KHẢO THÍ TRỰC TUYẾN -->
+            <div id="tab-exams" class="student-tab-content hidden space-y-4">
+                <div class="bg-white p-5 rounded-2xl border shadow-xs space-y-4">
+                    <h2 class="font-black text-sm text-slate-800 border-b pb-2">Danh Sách Bài Thi & Đề Kiểm Tra</h2>
+                    <div id="studentExamsListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+            </div>
+
+            <!-- TAB 7: CÀI ĐẶT & TÀI KHOẢN (THAY THẾ CHO HEADER TRÊN CÙNG) -->
+            <div id="tab-settings" class="student-tab-content hidden space-y-4 max-w-2xl mx-auto">
+                <div class="bg-white p-6 rounded-3xl border shadow-xs space-y-6">
+                    <div class="border-b pb-3">
+                        <h2 class="font-black text-base text-slate-900">Cài Đặt & Tài Khoản Cá Nhân</h2>
+                        <p class="text-xs text-slate-500">Quản lý bảo mật tài khoản và tùy chọn ứng dụng</p>
                     </div>
 
-                    <!-- Lịch sử lớp cũ nếu có chuyển lớp -->
-                    <div id="studentPreviousClassHistorySection" class="hidden bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-200 space-y-3">
-                        <div class="flex justify-between items-center border-b pb-3">
-                            <h3 class="font-bold text-sm text-slate-700 flex items-center space-x-2">
-                                <i data-lucide="history" class="w-4 h-4 text-slate-500"></i>
-                                <span>Lịch Sử Học Tại Lớp Cũ (Trước Khi Chuyển Nhóm)</span>
-                            </h3>
-                            <span class="text-xs text-slate-400">Đã lưu trữ độc lập</span>
+                    <!-- Thông tin cá nhân -->
+                    <div class="bg-slate-50 p-4 rounded-2xl border space-y-2 text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Họ và tên:</span>
+                            <b class="text-slate-800" id="settingsFullName">---</b>
                         </div>
-                        <div id="studentPreviousClassList" class="space-y-2.5 text-xs"></div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Lớp hiện tại:</span>
+                            <b class="text-indigo-700" id="settingsClass">---</b>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Mã định danh HS:</span>
+                            <b class="font-mono text-slate-800" id="settingsCode">---</b>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Tài khoản (Username):</span>
+                            <b class="font-mono text-slate-800" id="settingsUsername">---</b>
+                        </div>
                     </div>
-                </section>
 
-                <!-- ==================== TAB 3: TIẾN ĐỘ & PHÂN TÍCH ==================== -->
-                <section id="stab-analytics" class="stab-content hidden space-y-5">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-200 space-y-4">
-                            <h3 class="font-bold text-sm text-slate-800 border-b pb-3">Biểu Đồ Phong Độ Điểm Số</h3>
-                            <div class="h-60 sm:h-64"><canvas id="studentScoreChart"></canvas></div>
-                        </div>
-                        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-200 space-y-4">
-                            <h3 class="font-bold text-sm text-slate-800 border-b pb-3">Đánh Giá Năng Lực Trắc Nghiệm GDPT Mới</h3>
-                            <div id="studentRadarStats" class="space-y-3 pt-1"></div>
-                        </div>
+                    <!-- Form Đổi Mật Khẩu Trực Tiếp -->
+                    <div class="space-y-3">
+                        <h3 class="font-black text-xs text-slate-800 flex items-center space-x-1.5">
+                            <i data-lucide="key-round" class="w-4 h-4 text-indigo-600"></i>
+                            <span>Đổi Mật Khẩu</span>
+                        </h3>
+                        <form onsubmit="handleSettingsChangePassword(event)" class="space-y-3 text-xs">
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">Mật khẩu hiện tại:</label>
+                                <input type="password" id="setCurrPass" required placeholder="Nhập mật khẩu hiện tại..." class="w-full p-2.5 border rounded-xl font-bold outline-none focus:border-indigo-600">
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1">Mật khẩu mới:</label>
+                                    <input type="password" id="setNewPass" required minlength="6" placeholder="Ít nhất 6 ký tự..." class="w-full p-2.5 border rounded-xl font-bold outline-none focus:border-indigo-600">
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1">Xác nhận mật khẩu mới:</label>
+                                    <input type="password" id="setConfirmPass" required minlength="6" placeholder="Nhập lại mật khẩu mới..." class="w-full p-2.5 border rounded-xl font-bold outline-none focus:border-indigo-600">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow transition">
+                                Lưu Mật Khẩu Mới
+                            </button>
+                        </form>
                     </div>
-                </section>
 
-                <!-- ==================== TAB 4: KHO TÀI LIỆU ==================== -->
-                <section id="stab-documents" class="stab-content hidden space-y-5">
-                    <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-200 space-y-4">
-                        <h3 class="font-bold text-sm text-slate-800 border-b pb-3">Tài Liệu & Chuyên Đề Học Tập</h3>
-                        <div id="studentGroupedDocsList" class="space-y-3"></div>
+                    <!-- Cài App & Đăng Xuất -->
+                    <div class="pt-4 border-t space-y-2">
+                        <button onclick="triggerStudentPWAInstall()" id="btnSettingsInstallPWA" class="w-full bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold py-3 rounded-2xl border border-purple-200 text-xs transition flex items-center justify-center space-x-2">
+                            <i data-lucide="smartphone" class="w-4 h-4"></i>
+                            <span>Cài Ứng Dụng Ra Màn Hình Chính</span>
+                        </button>
+                        <button onclick="handleStudentLogout()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold py-3 rounded-2xl border border-rose-200 text-xs transition flex items-center justify-center space-x-2">
+                            <i data-lucide="log-out" class="w-4 h-4"></i>
+                            <span>Đăng Xuất Khỏi Tài Khoản (Sign Out)</span>
+                        </button>
                     </div>
-                </section>
-            </main>
-        </div>
+                </div>
+            </div>
+
+        </main>
     </div>
 
-    <!-- BANNER GỢI Ý CÀI ĐẶT NHANH -->
-    <div id="pwaBottomBanner" class="fixed bottom-3 inset-x-3 sm:max-w-md sm:mx-auto bg-slate-900/95 backdrop-blur-md text-white p-3.5 rounded-2xl shadow-2xl border border-indigo-500/30 flex items-center justify-between z-50 hidden transition-all">
-        <div class="flex items-center space-x-3">
-            <img src="logo-student-192.png" class="w-10 h-10 rounded-xl object-cover border border-indigo-400">
+    <!-- PHÒNG THI ONLINE -->
+    <div id="examTakingRoom" class="fixed inset-0 bg-slate-900/95 z-50 flex flex-col hidden overflow-hidden">
+        <header class="bg-white p-3 sm:p-4 border-b flex justify-between items-center shrink-0">
             <div>
-                <div class="text-xs font-bold leading-tight">Cài đặt M-SigmaMath</div>
-                <div class="text-[10px] text-slate-300">Mở toàn màn hình, tra cứu siêu mượt</div>
+                <h2 class="font-black text-sm sm:text-base text-slate-900" id="examRoomTitle">Bài Thi</h2>
+                <div class="text-[11px] text-rose-600 font-bold" id="examAntiCheatWarning">Cảnh báo: Rời màn hình sẽ bị ghi nhận gian lận!</div>
             </div>
-        </div>
-        <div class="flex items-center space-x-1.5">
-            <button onclick="triggerPWAInstall()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow">Cài Đặt</button>
-            <button onclick="document.getElementById('pwaBottomBanner').classList.add('hidden')" class="text-slate-400 hover:text-white p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
-        </div>
-    </div>
-
-    <!-- MODAL HƯỚNG DẪN DÀNH CHO IPHONE -->
-    <div id="modalInstallGuide" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4 text-xs">
-            <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-bold text-sm text-indigo-900 flex items-center space-x-1.5">
-                    <i data-lucide="smartphone" class="w-4 h-4 text-indigo-600"></i>
-                    <span>Cài Đặt App M-SigmaMath</span>
-                </h3>
-                <button onclick="closeInstallGuideModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
-            <div class="p-3.5 bg-slate-50 border rounded-2xl space-y-2">
-                <div class="font-bold text-slate-800">🍎 Hướng dẫn cho iPhone (Safari):</div>
-                <ol class="list-decimal list-inside space-y-1.5 text-slate-600 leading-relaxed text-[11px]">
-                    <li>Mở trang web bằng trình duyệt <b>Safari</b>.</li>
-                    <li>Bấm nút <b>Chia sẻ</b> (hình vuông có mũi tên chỉ lên ở thanh dưới).</li>
-                    <li>Kéo xuống chọn <b>"Thêm vào Màn hình chính" (Add to Home Screen)</b>.</li>
-                </ol>
-            </div>
-            <button onclick="closeInstallGuideModal()" class="w-full bg-slate-100 hover:bg-slate-200 font-bold py-2.5 rounded-xl text-slate-700">Đã Hiểu</button>
-        </div>
-    </div>
-
-    <!-- MODAL HIỂN THỊ VIETQR -->
-    <div id="modalVietQR" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm text-center space-y-4">
-            <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-bold text-sm text-slate-800">Quét Mã VietQR Chuyển Khoản</h3>
-                <button onclick="closeVietQRModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
-            <div class="p-2.5 bg-slate-50 border rounded-2xl inline-block mx-auto">
-                <img id="qrImageElement" src="" alt="Mã VietQR" class="w-60 h-60 sm:w-64 sm:h-64 mx-auto rounded-xl shadow-sm">
-            </div>
-            <div class="text-left text-xs bg-slate-50 p-3.5 rounded-2xl space-y-1.5">
-                <div class="flex justify-between"><span class="text-slate-500">Ngân hàng:</span><b class="text-indigo-900 font-black">Agribank</b></div>
-                <div class="flex justify-between"><span class="text-slate-500">Số tài khoản:</span><b class="font-mono text-emerald-700 text-sm">4304205123124</b></div>
-                <div class="flex justify-between"><span class="text-slate-500">Chủ tài khoản:</span><b>TRẦN DƯƠNG QUỐC MẪN</b></div>
-                <div class="flex justify-between border-t pt-1.5"><span class="text-slate-500">Số tiền:</span><b id="qrAmountText" class="text-emerald-600 font-black text-sm">0 đ</b></div>
-                <div class="flex justify-between"><span class="text-slate-500">Nội dung CK:</span><b id="qrContentText" class="font-mono text-indigo-700">---</b></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL ĐỔI MẬT KHẨU -->
-    <div id="modalChangePassword" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
-            <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm">Đổi Mật Khẩu Cá Nhân</h3><button onclick="closeChangePasswordModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
-            <form onsubmit="handleSaveNewPassword(event)" class="space-y-3 text-xs">
-                <div>
-                    <label class="block font-bold mb-1">Mật khẩu mới</label>
-                    <input type="password" id="newPasswordInput" required minlength="4" class="w-full p-2.5 border rounded-xl outline-none font-bold">
+            <div class="flex items-center space-x-3">
+                <div class="bg-rose-50 border border-rose-200 text-rose-700 font-black px-3 py-1.5 rounded-xl text-xs sm:text-sm font-mono flex items-center space-x-1">
+                    <i data-lucide="timer" class="w-4 h-4"></i>
+                    <span id="examTimerCountdown">45:00</span>
                 </div>
-                <div>
-                    <label class="block font-bold mb-1">Xác nhận mật khẩu</label>
-                    <input type="password" id="confirmNewPasswordInput" required minlength="4" class="w-full p-2.5 border rounded-xl outline-none font-bold">
-                </div>
-                <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2.5 rounded-xl shadow">Lưu Mật Khẩu</button>
-            </form>
+                <button onclick="submitExamNow()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow transition">
+                    Nộp Bài
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-100">
+            <div class="max-w-4xl mx-auto space-y-6" id="examQuestionsRenderArea"></div>
         </div>
     </div>
 
     <script>
-        const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbznfqhckK2L97z427a50oLuZ0W0nLbtdDcJROOv6S2sGQL3_OGbK0Fs7Hd8wOi_or5cXA/exec";
-        const SESSION_KEY = 'ACTIVE_STUDENT_SESSION';
-        const CACHE_DATA_KEY = 'STUDENT_PORTAL_DATA_CACHE';
+        const STORAGE_KEY = 'TUTORING_MASTER_SYSTEM_V2026';
+        const STUDENT_AUTH_KEY = 'SIGMA_STUDENT_SESSION';
+
+        let cloudApiUrl = localStorage.getItem('API_URL') || "https://script.google.com/macros/s/AKfycbznfqhckK2L97z427a50oLuZ0W0nLbtdDcJROOv6S2sGQL3_OGbK0Fs7Hd8wOi_or5cXA/exec";
 
         const AGRIBANK_BIN = "970405";
         const AGRIBANK_STK = "4304205123124";
         const AGRIBANK_NAME = "TRAN DUONG QUOC MAN";
 
-        const DEFAULT_BRANDING = {
-            appName: "SigmaMath - Thầy Mẫn",
-            appShortName: "M-SigmaMath",
-            appSlogan: "Hệ thống học tập, chuyên cần & khảo thí Toán Thầy Mẫn",
-            appLogo: "logo-student.png"
-        };
+        let appData = { classes: [], students: [], attendance: [], payments: [], documents: [], exams: [], examResults: [], appConfig: [] };
+        let currentStudent = null;
+        let studentDeferredPrompt = null;
 
-        let appData = { classes: [], students: [], attendance: [], payments: [], documents: [], exams: [], examResults: [], weeklyOverrides: [], appConfig: [] };
-        let currentStudent = null, scoreChartInstance = null;
-        let renderedTabs = {};
-        let currentTabId = 'overview';
-        let deferredPrompt = null;
-        let quickPayCycleTarget = 0, quickPayAmountTarget = 0;
-
-        // 1. TỰ ĐỘNG CẬP NHẬT SERVICE WORKER
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').then((reg) => {
-                reg.onupdatefound = () => {
-                    const installingWorker = reg.installing;
-                    if (installingWorker) {
-                        installingWorker.onstatechange = () => {
-                            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                window.location.reload();
-                            }
-                        };
-                    }
-                };
-            }).catch(err => console.log('SW Fail', err));
-        }
-
-        // 2. LẮNG NGHE SỰ KIỆN CÀI ĐẶT PWA
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-
-            const banner = document.getElementById('pwaBottomBanner');
-            if (banner) banner.classList.remove('hidden');
-
-            const btnText = document.getElementById('installBtnText');
-            if (btnText) btnText.innerText = "Cài Đặt Ngay Vào Điện Thoại";
-        });
-
-        async function triggerPWAInstall() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    const banner = document.getElementById('pwaBottomBanner');
-                    if (banner) banner.classList.add('hidden');
-                }
-                deferredPrompt = null;
-                return;
-            }
-
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-
-            if (isStandalone) {
-                alert("Ứng dụng M-SigmaMath đã được cài đặt trên thiết bị của bạn!");
-                return;
-            }
-
-            if (isIOS) {
-                openInstallGuideModal();
-            } else {
-                alert("Bạn có thể bấm vào dấu 3 chấm góc phải trên trình duyệt Chrome ➔ Chọn 'Cài đặt ứng dụng' (Install App).");
-            }
-        }
-
-        window.addEventListener('appinstalled', () => {
-            deferredPrompt = null;
-            const banner = document.getElementById('pwaBottomBanner');
-            if (banner) banner.classList.add('hidden');
-            alert("Chúc mừng! Ứng dụng M-SigmaMath đã được cài ra màn hình chính.");
-        });
-
-        function openInstallGuideModal() { document.getElementById('modalInstallGuide').classList.remove('hidden'); }
-        function closeInstallGuideModal() { document.getElementById('modalInstallGuide').classList.add('hidden'); }
+        let activeExam = null;
+        let examTimeLeft = 0;
+        let examTimerInterval = null;
+        let tabSwitchCounter = 0;
+        let studentAnswers = {};
 
         function normalizeCloudDate(d) {
             if (!d) return '';
-            d = String(d);
+            d = String(d).trim();
             if (d.includes('T')) {
                 const v = new Date(new Date(d).toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
-                return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}-${String(v.getDate()).padStart(2,'0')}`;
+                return `${String(v.getDate()).padStart(2, '0')}-${String(v.getMonth() + 1).padStart(2, '0')}-${v.getFullYear()}`;
             }
-            return d.trim();
+            if (d.includes('/')) {
+                const p = d.split('/');
+                if (p.length === 3) return `${String(p[0]).padStart(2,'0')}-${String(p[1]).padStart(2,'0')}-${p[2]}`;
+            }
+            if (d.includes('-')) {
+                const p = d.split('-');
+                if (p.length === 3) {
+                    if (p[0].length === 4) return `${String(p[2]).padStart(2,'0')}-${String(p[1]).padStart(2,'0')}-${p[0]}`;
+                    return `${String(p[0]).padStart(2,'0')}-${String(p[1]).padStart(2,'0')}-${p[2]}`;
+                }
+            }
+            return d;
         }
 
-        function formatDateVN(d) {
-            if (!d) return '---';
-            const cleanD = normalizeCloudDate(d);
-            const p = cleanD.split('-');
-            return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : d;
+        function parseDateDDMMYYYY(str) {
+            const clean = normalizeCloudDate(str);
+            const p = clean.split('-');
+            if (p.length === 3) return new Date(parseInt(p[2], 10), parseInt(p[1], 10) - 1, parseInt(p[0], 10));
+            return new Date();
         }
 
+        function compareDateDDMMYYYY(d1, d2) {
+            return parseDateDDMMYYYY(d1).getTime() - parseDateDDMMYYYY(d2).getTime();
+        }
+
+        function formatDateVN(d) { return normalizeCloudDate(d) || '---'; }
         function formatDateShortVN(d) {
-            if (!d) return '--/--';
-            const cleanD = normalizeCloudDate(d);
-            const p = cleanD.split('-');
-            return p.length === 3 ? `${p[2]}/${p[1]}` : d;
+            const clean = normalizeCloudDate(d);
+            const p = clean.split('-');
+            return p.length === 3 ? `${p[0]}/${p[1]}` : clean;
         }
-
-        function togglePasswordVisibility(inputId, iconId) {
-            const inp = document.getElementById(inputId);
-            const ico = document.getElementById(iconId);
-            if (!inp || !ico) return;
-            if (inp.type === 'password') {
-                inp.type = 'text';
-                ico.setAttribute('data-lucide', 'eye-off');
-            } else {
-                inp.type = 'password';
-                ico.setAttribute('data-lucide', 'eye');
-            }
-            if (window.lucide) lucide.createIcons();
-        }
-
-        function applyBranding() {
-    const cfgs = appData.appConfig || [];
-    const getVal = (k, df) => { const f = cfgs.find(x => x.key === k); return f ? f.value : df; };
-
-    const name = getVal('student_app_name', DEFAULT_BRANDING.appName);
-    const slogan = getVal('student_app_slogan', DEFAULT_BRANDING.appSlogan);
-    const logo = getVal('student_app_logo', DEFAULT_BRANDING.appLogo);
-
-    document.title = `${name} | Cổng Học Sinh`;
-    const tEl = document.getElementById('appTitleText'); if (tEl) tEl.innerText = name;
-    const sEl = document.getElementById('appSloganText'); if (sEl) sEl.innerText = slogan;
-    const hLogo = document.getElementById('headerLogoImg'); if (hLogo) hLogo.src = logo;
-    const lLogo = document.getElementById('loginLogoImg'); if (lLogo) lLogo.src = logo;
-    
-    // ĐỒNG BỘ LOGO SIDEBAR BÊN TRÁI:
-    const sLogo = document.getElementById('sidebarLogoImg'); if (sLogo) sLogo.src = logo;
-}
 
         window.addEventListener('DOMContentLoaded', () => {
+            loadFromStorage();
+            checkStudentSession();
+            if (cloudApiUrl) loadDataFromCloud();
             if (window.lucide) lucide.createIcons();
-            applyBranding();
-            const cached = localStorage.getItem(CACHE_DATA_KEY);
-            if (cached) {
-                try {
-                    appData = JSON.parse(cached);
-                    applyBranding();
-                    checkSavedSession();
-                } catch(e){}
-            }
-            loadStudentCloudData();
+            setupAntiCheatMonitoring();
         });
 
-        function getClassSessionDates(classId) {
-            if (!classId) return [];
-            return [...new Set(appData.attendance.filter(a => a.classId === classId).map(a => a.date))].sort();
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            studentDeferredPrompt = e;
+            const btn = document.getElementById('btnSettingsInstallPWA');
+            if (btn) btn.classList.remove('hidden');
+        });
+
+        function triggerStudentPWAInstall() {
+            if (studentDeferredPrompt) {
+                studentDeferredPrompt.prompt();
+                studentDeferredPrompt.userChoice.then(() => { studentDeferredPrompt = null; });
+            } else {
+                alert("Nếu dùng iPhone: Bấm nút Chia sẻ ➔ Chọn 'Thêm vào Màn hình chính'.\nNếu dùng Android: Bấm menu 3 chấm Chrome ➔ Chọn 'Cài đặt ứng dụng'.");
+            }
         }
 
-        async function loadStudentCloudData() {
+        function loadFromStorage() {
+            const st = localStorage.getItem(STORAGE_KEY);
+            if (st) try { appData = JSON.parse(st); } catch (e) {}
+        }
+        function saveToStorage() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
+
+        async function loadDataFromCloud() {
+            if (!cloudApiUrl) return;
             try {
-                const res = await fetch(CLOUD_API_URL);
+                const res = await fetch(cloudApiUrl);
                 const j = await res.json();
                 if (j.Classes) appData.classes = j.Classes.slice(1).map(r => ({ id: String(r[0]||''), name: String(r[1]||''), fee: parseFloat(r[2])||300000, schedules: JSON.parse(r[3]||'[]') }));
-                if (j.Students) appData.students = j.Students.slice(1).map(r => ({
-                    id: String(r[0]||''), classId: String(r[1]||''), code: String(r[2]||''), name: String(r[3]||''),
-                    phone: String(r[4]||''), joinDate: normalizeCloudDate(r[5]||'2026-08-01'), customFee: r[6]!==''&&r[6]!==null?parseFloat(r[6]):null,
-                    username: String(r[7]||''), password: String(r[8]||'')
-                }));
-
-                if (j.Attendance) appData.attendance = j.Attendance.slice(1).map(r => {
-                    const sId = String(r[0]||'');
-                    const cId = (r.length >= 5) ? String(r[1]||'') : (appData.students.find(s => s.id === sId)?.classId || '');
-                    const d = (r.length >= 5) ? normalizeCloudDate(r[2]||'') : normalizeCloudDate(r[1]||'');
-                    const st = (r.length >= 5) ? String(r[3]||'') : String(r[2]||'');
-                    const n = (r.length >= 5) ? String(r[4]||'') : String(r[3]||'');
-                    return { studentId: sId, classId: cId, date: d, status: st, note: n };
-                });
-
-                if (j.Payments) appData.payments = j.Payments.slice(1).map(r => ({
-                    id: String(r[0]||''), studentId: String(r[1]||''), classId: String(r[2]||''),
-                    cycleIndex: parseInt(r[3]), amount: parseFloat(r[4])||0, status: String(r[5]||''),
-                    method: String(r[6]||''), note: String(r[7]||''), date: normalizeCloudDate(r[8]||'')
-                }));
-
+                if (j.Students) appData.students = j.Students.slice(1).map(r => ({ id: String(r[0]||''), classId: String(r[1]||''), code: String(r[2]||''), name: String(r[3]||''), phone: String(r[4]||''), joinDate: normalizeCloudDate(r[5]||'01-08-2026'), customFee: r[6]!==''&&r[6]!==null?parseFloat(r[6]):null, username: String(r[7]||''), password: String(r[8]||'') }));
+                if (j.Attendance) appData.attendance = j.Attendance.slice(1).map(r => ({ studentId: String(r[0]||''), classId: String(r[1]||''), date: normalizeCloudDate(r[2]||''), status: String(r[3]||''), note: String(r[4]||'') }));
+                if (j.Payments) appData.payments = j.Payments.slice(1).map(r => ({ id: String(r[0]||''), studentId: String(r[1]||''), classId: String(r[2]||''), cycleIndex: parseInt(r[3]), amount: parseFloat(r[4])||0, status: String(r[5]||''), method: String(r[6]||''), note: String(r[7]||''), date: normalizeCloudDate(r[8]||'') }));
                 if (j.Documents) appData.documents = j.Documents.slice(1).map(r => ({ id: String(r[0]||''), classId: String(r[1]||''), name: String(r[2]||''), category: String(r[3]||'Chuyên đề chung'), url: String(r[4]||'') }));
-                if (j.Exams) appData.exams = j.Exams.slice(1).map(r => ({ id: String(r[0]||''), title: String(r[1]||''), classId: String(r[2]||''), duration: parseInt(r[3])||45, questions: JSON.parse(r[5]||'[]') }));
-                if (j.ExamResults) appData.examResults = j.ExamResults.slice(1).map(r => ({ id: String(r[0]||''), examId: String(r[1]||''), studentId: String(r[2]||''), score: parseFloat(r[3]||0), details: JSON.parse(r[4]||'{}'), submittedAt: String(r[6]||'') }));
-                if (j.WeeklyOverrides) appData.weeklyOverrides = j.WeeklyOverrides.slice(1).map(r => ({ id: String(r[0]||''), classId: String(r[1]||''), date: normalizeCloudDate(r[2]||''), type: String(r[3]||''), startTime: String(r[4]||''), endTime: String(r[5]||''), note: String(r[6]||'') }));
-                if (j.AppConfig) appData.appConfig = j.AppConfig.slice(1).map(r => ({ key: String(r[0]||''), value: String(r[1]||'') }));
-
-                localStorage.setItem(CACHE_DATA_KEY, JSON.stringify(appData));
-                applyBranding();
-
-                const savedId = localStorage.getItem(SESSION_KEY);
-                if (savedId) {
-                    const freshStudent = appData.students.find(x => x.id === savedId);
-                    if (freshStudent) {
-                        currentStudent = freshStudent;
-                        showDashboard(false);
-                    }
+                if (j.Exams) appData.exams = j.Exams.slice(1).map(r => ({ id: String(r[0]||''), title: String(r[1]||''), classId: String(r[2]||''), duration: parseInt(r[3])||45, questions: JSON.parse(r[5]||'[]'), status: String(r[7]||'OPEN') }));
+                if (j.ExamResults) appData.examResults = j.ExamResults.slice(1).map(r => ({ id: String(r[0]||''), examId: String(r[1]||''), studentId: String(r[2]||''), score: parseFloat(r[3]||0), details: JSON.parse(r[4]||'{}'), tabSwitchCount: parseInt(r[5]||0), submittedAt: String(r[6]||'') }));
+                
+                saveToStorage();
+                if (currentStudent) {
+                    currentStudent = appData.students.find(s => s.id === currentStudent.id) || currentStudent;
+                    renderStudentPortal();
                 }
-            } catch(e) { console.error("Lỗi nạp cloud:", e); }
+            } catch (err) {}
         }
 
-        function checkSavedSession() {
-            const savedId = localStorage.getItem(SESSION_KEY);
-            if (savedId) {
-                const s = appData.students.find(x => x.id === savedId);
-                if (s) {
-                    currentStudent = s;
-                    showDashboard(true);
-                }
+        function checkStudentSession() {
+            const savedSession = localStorage.getItem(STUDENT_AUTH_KEY);
+            if (savedSession) {
+                try {
+                    const parsed = JSON.parse(savedSession);
+                    const s = (appData.students || []).find(x => x.id === parsed.id);
+                    if (s) {
+                        currentStudent = s;
+                        document.getElementById('loginScreen').classList.add('hidden');
+                        renderStudentPortal();
+                        return;
+                    }
+                } catch (e) {}
             }
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        function togglePasswordView() {
+            const inp = document.getElementById('loginPassword');
+            const ico = document.getElementById('eyeIconPass');
+            if (inp.type === 'password') { inp.type = 'text'; ico.setAttribute('data-lucide', 'eye-off'); }
+            else { inp.type = 'password'; ico.setAttribute('data-lucide', 'eye'); }
+            if (window.lucide) lucide.createIcons();
         }
 
         function handleStudentLogin(e) {
             e.preventDefault();
             const u = document.getElementById('loginUsername').value.trim().toLowerCase();
             const p = document.getElementById('loginPassword').value.trim();
-            const err = document.getElementById('loginError');
+            const err = document.getElementById('loginErrorText');
 
-            const s = appData.students.find(x => (x.username.toLowerCase() === u || x.code.toLowerCase() === u) && x.password === p);
-            if (!s) {
-                err.innerText = "Tên đăng nhập hoặc mật khẩu không chính xác!";
+            const s = (appData.students || []).find(x => 
+                (x.username && x.username.toLowerCase() === u) || 
+                (x.code && x.code.toLowerCase() === u) ||
+                (x.phone && x.phone.trim() === u)
+            );
+
+            if (s && String(s.password).trim() === p) {
+                currentStudent = s;
+                localStorage.setItem(STUDENT_AUTH_KEY, JSON.stringify({ id: s.id }));
+                document.getElementById('loginScreen').classList.add('hidden');
+                err.classList.add('hidden');
+                renderStudentPortal();
+            } else {
+                err.innerText = "Tài khoản hoặc mật khẩu không chính xác!";
                 err.classList.remove('hidden');
+            }
+        }
+
+        function handleStudentLogout() {
+            if (confirm("Em có chắc chắn muốn đăng xuất?")) {
+                localStorage.removeItem(STUDENT_AUTH_KEY);
+                currentStudent = null;
+                document.getElementById('loginScreen').classList.remove('hidden');
+            }
+        }
+
+        async function handleSettingsChangePassword(e) {
+            e.preventDefault();
+            if (!currentStudent) return;
+
+            const oldPass = document.getElementById('setCurrPass').value.trim();
+            const newPass = document.getElementById('setNewPass').value.trim();
+            const confirmPass = document.getElementById('setConfirmPass').value.trim();
+
+            if (String(currentStudent.password).trim() !== oldPass) {
+                alert("Mật khẩu hiện tại không chính xác!");
+                return;
+            }
+            if (newPass !== confirmPass) {
+                alert("Xác nhận mật khẩu mới không khớp!");
+                return;
+            }
+            if (newPass === oldPass) {
+                alert("Mật khẩu mới không được trùng với mật khẩu cũ!");
                 return;
             }
 
-            currentStudent = s;
-            localStorage.setItem(SESSION_KEY, s.id);
-            err.classList.add('hidden');
-            showDashboard(true);
+            currentStudent.password = newPass;
+            if (cloudApiUrl) {
+                try {
+                    await fetch(cloudApiUrl, {
+                        method: 'POST',
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify({ action: 'changePassword', studentId: currentStudent.id, newPassword: newPass })
+                    });
+                } catch(err){}
+            }
+            saveToStorage();
+            document.getElementById('setCurrPass').value = '';
+            document.getElementById('setNewPass').value = '';
+            document.getElementById('setConfirmPass').value = '';
+            alert("Đổi mật khẩu thành công!");
         }
 
-        function studentLogout() {
-            localStorage.removeItem(SESSION_KEY);
-            location.reload();
-        }
-
-        function showDashboard(resetTab = true) {
-            document.getElementById('studentLoginScreen').classList.add('hidden');
-            document.getElementById('studentDashboardScreen').classList.remove('hidden');
-
-            const c = appData.classes.find(x => x.id === currentStudent.classId);
-            const cName = c ? c.name : '---';
-
-            // Cập nhật Header
-            document.getElementById('headerStudentName').innerText = currentStudent.name;
-            document.getElementById('headerStudentClass').innerText = `Lớp: ${cName} • Mã HS: ${currentStudent.code}`;
-
-            // Cập nhật Sidebar máy tính
-            document.getElementById('sidebarStudentName').innerText = currentStudent.name;
-            document.getElementById('sidebarStudentClass').innerText = `Lớp: ${cName}`;
-            document.getElementById('sidebarStudentCode').innerText = `(${currentStudent.code})`;
-            
-           
-            renderedTabs = {};
-            switchStudentTab(resetTab ? 'overview' : currentTabId);
-        }
-
-        function switchStudentTab(id) {
-            currentTabId = id;
-            document.querySelectorAll('.stab-content').forEach(e => e.classList.add('hidden'));
-            
-            // Đưa tất cả các nút về màu chữ mặc định
-            document.querySelectorAll('.stab-btn').forEach(b => {
-                b.classList.remove('bg-indigo-50/80', 'text-indigo-600', 'font-black', 'border-indigo-100');
-                b.classList.add('text-slate-600', 'font-bold');
+        function switchStudentTab(tabId) {
+            document.querySelectorAll('.student-tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('#studentSidebar nav button').forEach(btn => {
+                btn.classList.remove('text-indigo-700', 'bg-indigo-50', 'border', 'border-indigo-100');
+                btn.classList.add('text-slate-600');
             });
 
-            // Bật tab được chọn
-            const activeSection = document.getElementById(`stab-${id}`);
-            if (activeSection) activeSection.classList.remove('hidden');
-
-            // Làm sáng nút menu đang chọn
-            const act = document.getElementById(`stab-btn-${id}`);
-            if (act) {
-                act.classList.add('bg-indigo-50/80', 'text-indigo-600', 'font-black', 'border-indigo-100');
-                act.classList.remove('text-slate-600', 'font-bold');
-            }
-
-            if (!renderedTabs[id]) {
-                if (id === 'overview') renderStudentOverview();
-                if (id === 'tuition') renderStudentTuition();
-                if (id === 'attendance') renderStudentAttendance();
-                if (id === 'analytics') { renderStudentAnalytics(); renderScoreChart(); }
-                if (id === 'documents') renderStudentGroupedDocs();
-                renderedTabs[id] = true;
+            const activeContent = document.getElementById(`tab-${tabId}`);
+            const activeBtn = document.getElementById(`side-tab-${tabId}`);
+            if (activeContent) activeContent.classList.remove('hidden');
+            if (activeBtn) {
+                activeBtn.classList.add('text-indigo-700', 'bg-indigo-50', 'border', 'border-indigo-100');
+                activeBtn.classList.remove('text-slate-600');
             }
             if (window.lucide) lucide.createIcons();
         }
 
-        // ==================== TÍNH TIỀN THỰC HỌC CHUẨN XÁC TỪNG ĐỒNG ====================
-        function getStudentActualTuition(cycleIdx) {
-            if (!currentStudent) return { amount: 0, status: 'NOT_JOINED', note: '' };
-            
-            const c = appData.classes.find(x => x.id === currentStudent.classId);
-            const stdFee = currentStudent.customFee !== null ? currentStudent.customFee : (c ? c.fee : 300000);
-            const isExempt = stdFee === 0;
-
-            const p = appData.payments.find(x => x.studentId === currentStudent.id && x.classId === currentStudent.classId && x.cycleIndex === cycleIdx);
-
-            if (isExempt || (p && p.status === 'EXEMPT')) return { amount: 0, status: 'EXEMPT', note: p?.note || 'MIỄN PHÍ' };
-            if (p && p.status === 'PAID') return { amount: p.amount, status: 'PAID', note: 'Đã nộp' };
-
-            if (p && p.amount > 0) return { amount: p.amount, status: 'PENDING', note: p.note || 'Cộng dồn' };
-
-            const classSessions = getClassSessionDates(currentStudent.classId);
-            const skipCount = classSessions.filter(d => normalizeCloudDate(d) < normalizeCloudDate(currentStudent.joinDate)).length;
-            const joinCycle = Math.floor(skipCount / 8);
-
-            if (cycleIdx < joinCycle) return { amount: 0, status: 'NOT_JOINED', note: 'Chưa vào học' };
-
-            if (cycleIdx === joinCycle && skipCount > 0) {
-                const actualSess = 8 - (skipCount % 8);
-                const partialFee = Math.round((stdFee / 8) * actualSess);
-                return { amount: partialFee, status: 'PENDING', note: `Học lẻ ${actualSess} buổi` };
-            }
-
-            return { amount: stdFee, status: 'PENDING', note: 'Đủ 8 buổi' };
+        function getClassSessionDates(classId) {
+            const dates = [...new Set(
+                (appData.attendance || [])
+                    .filter(a => String(a.classId) === String(classId))
+                    .map(a => normalizeCloudDate(a.date))
+            )];
+            return dates.sort((a, b) => compareDateDDMMYYYY(a, b));
         }
 
-        // ==================== TAB 0: TỔNG QUAN (STUDENT DASHBOARD) ====================
-        function renderStudentOverview() {
+        function renderStudentPortal() {
             if (!currentStudent) return;
-            const c = appData.classes.find(x => x.id === currentStudent.classId);
-            const className = c ? c.name : '---';
+            const targetClass = (appData.classes || []).find(c => c.id === currentStudent.classId);
+            const className = targetClass ? targetClass.name : 'Chưa phân lớp';
 
-            // 1. Banner chào mừng
-            const h = new Date().getHours();
-            let greeting = 'Chào buổi sáng!';
-            if (h >= 12 && h < 18) greeting = 'Chào buổi chiều!';
-            else if (h >= 18) greeting = 'Chào buổi tối!';
+            // Sidebar & Mobile
+            document.getElementById('sideStudentName').innerText = currentStudent.name;
+            document.getElementById('sideStudentInfo').innerText = `Lớp: ${className} | Mã: ${currentStudent.code}`;
+            const mob = document.getElementById('mobileHeaderStudentName');
+            if (mob) mob.innerText = `${currentStudent.name} (${className})`;
 
-            document.getElementById('dashGreetingTime').innerHTML = `<i data-lucide="sparkles" class="w-3.5 h-3.5"></i><span>${greeting}</span>`;
-            document.getElementById('dashGreetingName').innerText = currentStudent.name;
-            document.getElementById('dashBadgeClass').innerText = `Lớp ${className}`;
-            document.getElementById('dashBadgeCode').innerText = `Mã: ${currentStudent.code}`;
+            // Hero Banner
+            document.getElementById('heroStudentName').innerText = currentStudent.name;
+            document.getElementById('heroClassBadge').innerText = `Lớp: ${className}`;
+            document.getElementById('heroCodeBadge').innerText = `Mã: ${currentStudent.code}`;
 
-            // 2. Tính toán chu kỳ & chuyên cần
-            const classSessions = getClassSessionDates(currentStudent.classId);
-            const totalClassSess = classSessions.length;
-            const activeCycleIdx = Math.max(0, Math.floor((totalClassSess - 1) / 8));
-            const sessInCycle = (totalClassSess % 8) === 0 && totalClassSess > 0 ? 8 : (totalClassSess % 8);
+            // Tab Cài đặt
+            document.getElementById('settingsFullName').innerText = currentStudent.name;
+            document.getElementById('settingsClass').innerText = className;
+            document.getElementById('settingsCode').innerText = currentStudent.code;
+            document.getElementById('settingsUsername').innerText = currentStudent.username || '---';
 
-            document.getElementById('dashCycleProgressText').innerText = `Buổi ${sessInCycle}/8`;
-            document.getElementById('dashCycleNumberText').innerText = `Kỳ ${activeCycleIdx + 1}`;
-            document.getElementById('dashCycleBadge').innerText = `Kỳ ${activeCycleIdx + 1}`;
+            const allDates = getClassSessionDates(currentStudent.classId);
+            const totalTaught = allDates.length;
 
-            const myRecords = appData.attendance.filter(a => a.studentId === currentStudent.id && a.classId === currentStudent.classId);
-            const presentCount = myRecords.filter(r => r.status === 'PRESENT' || r.status === 'LATE').length;
-            const enrolledSess = classSessions.filter(d => !currentStudent.joinDate || normalizeCloudDate(d) >= normalizeCloudDate(currentStudent.joinDate)).length;
-            const rate = enrolledSess > 0 ? Math.round((presentCount / enrolledSess) * 100) : 100;
-            document.getElementById('dashAttendanceRateText').innerText = `Chuyên cần: ${rate}% (${presentCount}/${enrolledSess}b)`;
+            const studentRecords = (appData.attendance || []).filter(a => String(a.studentId) === String(currentStudent.id));
+            const attendedCount = studentRecords.filter(a => a.status === 'PRESENT' || a.status === 'LATE').length;
 
-            // 3. Tính toán học phí & gán cho nút Quick Pay
-            const req = getStudentActualTuition(activeCycleIdx);
-            quickPayCycleTarget = activeCycleIdx + 1;
-            quickPayAmountTarget = req.amount;
+            const attRate = totalTaught > 0 ? Math.round((attendedCount / totalTaught) * 100) : 100;
+            const activeCycleIndex = Math.max(0, Math.floor((totalTaught - 1) / 8));
+            const sessInCycle = ((totalTaught - 1) % 8) + 1;
 
-            document.getElementById('dashQuickPayCycleName').innerText = `Học phí Kỳ ${activeCycleIdx + 1} (${req.note || 'Chu kỳ 8 buổi'})`;
-            document.getElementById('dashQuickPayAmount').innerText = req.amount.toLocaleString() + ' đ';
+            // 4 Quick Stats
+            document.getElementById('statCycleProgress').innerText = `Buổi ${sessInCycle}/8`;
+            document.getElementById('statCycleName').innerText = `Kỳ ${activeCycleIndex + 1}`;
+            document.getElementById('statAttSummary').innerText = `Chuyên cần: ${attRate}% (${attendedCount}/${totalTaught}b)`;
 
-            const stText = document.getElementById('dashTuitionStatusText');
-            const btnPayContainer = document.getElementById('dashQuickPayButtonContainer');
+            const todayVN = normalizeCloudDate(new Date().toISOString());
+            document.getElementById('statNextLesson').innerText = `Hôm nay (${formatDateShortVN(todayVN)})`;
 
-            if (req.status === 'PAID') {
-                stText.innerText = 'Đã hoàn thành';
-                stText.className = 'text-sm sm:text-base font-black text-emerald-600';
-                document.getElementById('dashTuitionNoteText').innerText = 'Không còn nợ';
-                btnPayContainer.innerHTML = `
-                    <div class="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200 text-center text-xs font-bold text-emerald-800 flex items-center justify-center space-x-1.5">
-                        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
-                        <span>Em đã hoàn thành học phí chu kỳ này!</span>
-                    </div>
-                `;
-            } else if (req.status === 'EXEMPT') {
-                stText.innerText = 'Miễn giảm';
-                stText.className = 'text-sm sm:text-base font-black text-blue-600';
-                document.getElementById('dashTuitionNoteText').innerText = req.note;
-                btnPayContainer.innerHTML = `<div class="p-3 bg-blue-50 rounded-2xl border border-blue-200 text-center text-xs font-bold text-blue-800">Khoản học phí được miễn phí.</div>`;
-            } else {
-                stText.innerText = `Cần nộp: ${req.amount.toLocaleString()}đ`;
-                stText.className = 'text-sm sm:text-base font-black text-rose-600';
-                document.getElementById('dashTuitionNoteText').innerText = req.note || `Kỳ ${activeCycleIdx + 1}`;
-                btnPayContainer.innerHTML = `
-                    <button onclick="handleDashboardQuickPay()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-2xl text-xs shadow-md transition flex items-center justify-center space-x-2">
-                        <i data-lucide="qr-code" class="w-4 h-4"></i>
-                        <span>Quét VietQR Nộp ${req.amount.toLocaleString()}đ</span>
-                    </button>
-                `;
-            }
+            // Lịch học tuần
+            const schedules = targetClass ? (targetClass.schedules || []) : [];
+            document.getElementById('weeklyClassScheduleList').innerHTML = schedules.length === 0 ? '<div class="text-xs text-slate-400 italic">Chưa có lịch cố định</div>' : schedules.map(sc => `
+                <div class="p-2.5 bg-slate-50 border rounded-xl flex justify-between items-center text-xs">
+                    <span class="font-bold text-slate-800">${sc.day}</span>
+                    <span class="font-mono text-indigo-700 font-bold bg-white px-2 py-0.5 rounded border">${sc.startTime} - ${sc.endTime}</span>
+                </div>
+            `).join('');
 
-            // 4. Thanh tiến trình 8 buổi (Visual Steps)
-            const currentCycleDates = classSessions.slice(activeCycleIdx * 8, (activeCycleIdx + 1) * 8);
-            let stepsHtml = '';
+            // 8 Buổi chu kỳ hiện tại
+            document.getElementById('currentCycleBadge').innerText = `Kỳ ${activeCycleIndex + 1}`;
+            const currentCycleDates = allDates.slice(activeCycleIndex * 8, (activeCycleIndex + 1) * 8);
+            let ballsHtml = '';
             for (let i = 0; i < 8; i++) {
-                const sessDate = currentCycleDates[i];
-                let cellStyle = 'bg-slate-50 border-slate-200 text-slate-400 border-dashed';
+                const dateOfSlot = currentCycleDates[i];
                 let icon = '•';
-                let dateLabel = '--/--';
+                let cardClass = 'border-dashed border-slate-200 bg-white text-slate-300';
+                let dateStr = '--/--';
 
-                if (sessDate) {
-                    dateLabel = formatDateShortVN(sessDate);
-                    const r = appData.attendance.find(a => a.studentId === currentStudent.id && a.classId === currentStudent.classId && a.date === sessDate);
-
-                    if (currentStudent.joinDate && normalizeCloudDate(sessDate) < normalizeCloudDate(currentStudent.joinDate)) {
-                        cellStyle = 'bg-slate-100 border-slate-200 text-slate-400 opacity-60';
+                if (dateOfSlot) {
+                    dateStr = formatDateShortVN(dateOfSlot);
+                    if (currentStudent.joinDate && compareDateDDMMYYYY(dateOfSlot, currentStudent.joinDate) < 0) {
                         icon = '⚪';
-                    } else if (r) {
-                        if (r.status === 'PRESENT') { cellStyle = 'bg-emerald-50 border-emerald-400 text-emerald-700 font-black'; icon = '✓'; }
-                        else if (r.status === 'ABSENT_PERM') { cellStyle = 'bg-amber-50 border-amber-400 text-amber-700 font-black'; icon = 'P'; }
-                        else if (r.status === 'ABSENT_NO_PERM') { cellStyle = 'bg-rose-50 border-rose-400 text-rose-700 font-black'; icon = 'KP'; }
-                        else if (r.status === 'LATE') { cellStyle = 'bg-blue-50 border-blue-400 text-blue-700 font-black'; icon = 'T'; }
+                        cardClass = 'border-slate-200 bg-slate-50 text-slate-400';
+                    } else {
+                        const r = studentRecords.find(a => normalizeCloudDate(a.date) === dateOfSlot);
+                        if (r && (r.status === 'PRESENT' || r.status === 'LATE')) {
+                            icon = '✓';
+                            cardClass = 'border-emerald-500 bg-emerald-50 text-emerald-700 font-bold';
+                        } else if (r && r.status === 'ABSENT_PERM') {
+                            icon = 'P';
+                            cardClass = 'border-amber-400 bg-amber-50 text-amber-700 font-bold';
+                        } else if (r && r.status === 'ABSENT_NO_PERM') {
+                            icon = 'KP';
+                            cardClass = 'border-rose-400 bg-rose-50 text-rose-700 font-bold';
+                        }
                     }
                 }
 
-                stepsHtml += `
-                    <div class="p-2.5 rounded-2xl border ${cellStyle} flex flex-col items-center justify-between text-center min-h-[72px]">
-                        <span class="text-[9px] font-bold text-slate-500">Buổi ${i + 1}</span>
-                        <span class="text-base font-black my-0.5">${icon}</span>
-                        <span class="text-[9px] font-mono leading-tight">${dateLabel}</span>
+                ballsHtml += `
+                    <div class="p-2.5 rounded-2xl border flex flex-col items-center justify-center space-y-1 ${cardClass}">
+                        <span class="text-[10px] text-slate-500 font-bold">Buổi ${i + 1}</span>
+                        <span class="text-base font-black">${icon}</span>
+                        <span class="text-[10px] font-mono">${dateStr}</span>
                     </div>
                 `;
             }
-            document.getElementById('dashSessionStepsContainer').innerHTML = stepsHtml;
+            document.getElementById('currentCycleBallsContainer').innerHTML = ballsHtml;
 
-            // 5. Ca học tiếp theo & Lịch tuần
-            renderDashboardSchedule(c);
+            // Render Học phí kèm thời gian nộp
+            renderTuitionAndQR(targetClass, className, allDates, activeCycleIndex);
 
-            // 6. Khảo thí & đề mở
-            renderDashboardExams();
+            // Render Sổ điểm danh 8B
+            renderAccordionAttendance(allDates, studentRecords);
+
+            // Render Tiến độ & Năng lực
+            renderPerformanceTab();
+
+            // Render Tài liệu & Đề thi
+            renderDocumentsTab();
+            renderExamsTab();
+
+            if (window.lucide) lucide.createIcons();
         }
 
-        function renderDashboardSchedule(classObj) {
-            const daysMap = ['Chủ Nhật','Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7'];
-            const today = new Date();
-            const fixedSchedules = (classObj && classObj.schedules) ? classObj.schedules : [];
+        function renderTuitionAndQR(targetClass, className, allDates, activeCycleIndex) {
+            const effFee = (currentStudent.customFee !== null && currentStudent.customFee !== undefined) 
+                           ? parseFloat(currentStudent.customFee) 
+                           : (targetClass ? targetClass.fee : 300000);
 
-            let nextLesson = null;
-            for (let i = 0; i < 7; i++) {
-                const targetDate = new Date();
-                targetDate.setDate(today.getDate() + i);
-                const targetDayName = daysMap[targetDate.getDay()];
-                const targetDateStr = normalizeCloudDate(targetDate.toISOString());
+            let totalDebtToPay = 0;
+            let rowsHtml = '';
 
-                const ov = (appData.weeklyOverrides || []).find(o => o.classId === currentStudent.classId && o.date === targetDateStr);
-                if (ov && ov.type === 'CANCEL') continue;
+            for (let i = 0; i < 4; i++) {
+                const p = (appData.payments || []).find(x => x.studentId === currentStudent.id && x.classId === currentStudent.classId && x.cycleIndex === i);
+                let required = effFee;
+                const skipCount = allDates.filter(d => compareDateDDMMYYYY(d, currentStudent.joinDate) < 0).length;
+                const joinCycle = Math.floor(skipCount / 8);
 
-                const matched = fixedSchedules.find(sc => sc.day === targetDayName);
-                if (matched) {
-                    nextLesson = {
-                        dayText: i === 0 ? 'Hôm nay' : (i === 1 ? 'Ngày mai' : targetDayName),
-                        dateStr: targetDateStr,
-                        time: (ov && ov.type === 'RESCHEDULE') ? `${ov.startTime} - ${ov.endTime}` : `${matched.startTime} - ${matched.endTime}`,
-                        isToday: i === 0,
-                        isOverride: !!ov
-                    };
-                    break;
+                let statusBadge = '<span class="text-slate-400 font-bold">Chưa đến</span>';
+                let paidAmount = p ? p.amount : 0;
+                let note = p ? p.note : '';
+                let payDateText = (p && p.date) ? formatDateVN(p.date) : '---';
+
+                if (effFee === 0 || (p && p.status === 'EXEMPT')) {
+                    statusBadge = '<span class="text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-lg border border-blue-200 font-bold">Miễn phí</span>';
+                } else if (p && p.status === 'PAID') {
+                    statusBadge = '<span class="text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200 font-bold">✓ Đã đóng đủ</span>';
+                } else if (i < joinCycle) {
+                    statusBadge = '<span class="text-slate-400 italic">Chưa vào học</span>';
+                } else {
+                    if (i === joinCycle && skipCount > 0) {
+                        const actualSess = 8 - (skipCount % 8);
+                        required = Math.round((effFee / 8) * actualSess);
+                    }
+                    if (paidAmount > 0 && paidAmount < required) {
+                        const owe = required - paidAmount;
+                        statusBadge = `<span class="text-amber-700 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200 font-bold">Còn nợ: ${owe.toLocaleString()}đ</span>`;
+                        totalDebtToPay += owe;
+                    } else if (i <= activeCycleIndex) {
+                        statusBadge = `<span class="text-rose-700 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200 font-bold">Cần nộp: ${required.toLocaleString()}đ</span>`;
+                        totalDebtToPay += required;
+                    }
                 }
+
+                rowsHtml += `
+                    <tr>
+                        <td class="p-3 font-bold">Kỳ ${i + 1} (Buổi ${i * 8 + 1} - ${(i + 1) * 8})</td>
+                        <td class="p-3 font-mono">${required.toLocaleString()}đ</td>
+                        <td class="p-3 font-bold text-emerald-600">${paidAmount.toLocaleString()}đ</td>
+                        <td class="p-3 font-mono text-indigo-700 font-bold">${payDateText}</td>
+                        <td class="p-3">${statusBadge}</td>
+                        <td class="p-3 text-slate-500 italic">${note || (p ? p.method : '---')}</td>
+                    </tr>
+                `;
+            }
+            document.getElementById('studentTuitionTableBody').innerHTML = rowsHtml;
+
+            if (totalDebtToPay > 0) {
+                document.getElementById('statTuitionStatus').innerText = `Còn nợ tiền`;
+                document.getElementById('statTuitionStatus').className = 'font-black text-xs sm:text-sm text-rose-600';
+                document.getElementById('statTuitionOwe').innerText = `${totalDebtToPay.toLocaleString()} đ`;
+            } else {
+                document.getElementById('statTuitionStatus').innerText = `Đã hoàn thành`;
+                document.getElementById('statTuitionStatus').className = 'font-black text-xs sm:text-sm text-emerald-600';
+                document.getElementById('statTuitionOwe').innerText = `Không còn nợ`;
             }
 
-            if (nextLesson) {
-                document.getElementById('dashNextLessonDay').innerText = `${nextLesson.dayText} (${formatDateShortVN(nextLesson.dateStr)})`;
-                document.getElementById('dashNextLessonTime').innerText = nextLesson.time;
-                document.getElementById('dashNextLessonStatus').innerText = nextLesson.isOverride ? 'Đã điều chỉnh lịch' : 'Theo lịch cố định';
-            } else {
-                document.getElementById('dashNextLessonDay').innerText = 'Chưa có ca';
-                document.getElementById('dashNextLessonTime').innerText = '--:--';
-                document.getElementById('dashNextLessonStatus').innerText = 'Chờ xếp lịch';
-            }
+            const cleanClassName = className.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const cleanUser = (currentStudent.username || currentStudent.code).toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const qrDesc = `HP ${cleanClassName} ${cleanUser} K${activeCycleIndex + 1}`;
 
-            const listEl = document.getElementById('dashMyWeekScheduleList');
-            if (fixedSchedules.length === 0) {
-                listEl.innerHTML = `<div class="p-3 text-center text-slate-400 italic">Lớp chưa có lịch học cố định.</div>`;
-            } else {
-                listEl.innerHTML = fixedSchedules.map(sc => `
-                    <div class="p-3 rounded-2xl border border-indigo-100 bg-indigo-50/40 flex justify-between items-center">
-                        <div class="flex items-center space-x-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
-                            <b class="text-indigo-950">${sc.day}</b>
-                        </div>
-                        <span class="font-mono font-bold text-indigo-700 bg-white px-2.5 py-1 rounded-xl border border-indigo-200">${sc.startTime} - ${sc.endTime}</span>
-                    </div>
-                `).join('');
-            }
+            const qrUrl = `https://img.vietqr.io/image/${AGRIBANK_BIN}-${AGRIBANK_STK}-compact2.png?amount=${totalDebtToPay}&addInfo=${encodeURIComponent(qrDesc)}&accountName=${encodeURIComponent(AGRIBANK_NAME)}`;
+
+            document.getElementById('quickVietQrImg').src = qrUrl;
+            document.getElementById('quickQrAmountText').innerText = totalDebtToPay.toLocaleString() + ' đ';
+            document.getElementById('quickQrContentText').innerText = qrDesc;
         }
 
-        function renderDashboardExams() {
-            const results = appData.examResults.filter(r => r.studentId === currentStudent.id);
-            if (results.length > 0) {
-                const latest = results[results.length - 1];
-                const ex = appData.exams.find(e => e.id === latest.examId);
-                document.getElementById('dashLatestExamScore').innerText = `${latest.score.toFixed(1)} đ`;
-                document.getElementById('dashLatestExamTitle').innerText = ex ? ex.title : 'Bài kiểm tra gần nhất';
-            }
+        function renderAccordionAttendance(allDates, studentRecords) {
+            const chunks = [];
+            for (let i = 0; i < allDates.length; i += 8) chunks.push(allDates.slice(i, i + 8));
 
-            const myExams = appData.exams.filter(e => e.classId === currentStudent.classId);
-            const container = document.getElementById('dashExamsListContainer');
+            let accHtml = '';
+            chunks.forEach((chunkDates, cIdx) => {
+                let attendedInChunk = 0;
+                const cells = chunkDates.map((d, slotIdx) => {
+                    let icon = '-';
+                    let bg = 'border-slate-200 bg-slate-50 text-slate-400';
+                    if (currentStudent.joinDate && compareDateDDMMYYYY(d, currentStudent.joinDate) < 0) {
+                        icon = '⚪';
+                    } else {
+                        const r = studentRecords.find(a => normalizeCloudDate(a.date) === d);
+                        if (r && (r.status === 'PRESENT' || r.status === 'LATE')) {
+                            icon = '✓';
+                            attendedInChunk++;
+                            bg = 'border-emerald-400 bg-emerald-50 text-emerald-700 font-bold';
+                        } else if (r && r.status === 'ABSENT_PERM') {
+                            icon = 'P';
+                            bg = 'border-amber-400 bg-amber-50 text-amber-700 font-bold';
+                        } else if (r && r.status === 'ABSENT_NO_PERM') {
+                            icon = 'KP';
+                            bg = 'border-rose-400 bg-rose-50 text-rose-700 font-bold';
+                        }
+                    }
+                    return `
+                        <div class="p-2 rounded-xl border text-center flex flex-col items-center justify-center ${bg}">
+                            <span class="text-[9px] text-slate-500 font-bold">Buổi ${slotIdx + 1}</span>
+                            <span class="text-sm font-black">${icon}</span>
+                            <span class="text-[9px] font-mono text-slate-500">${formatDateShortVN(d)}</span>
+                        </div>
+                    `;
+                }).join('');
 
-            if (myExams.length === 0) {
-                container.innerHTML = `<div class="p-3 text-center text-slate-400 italic">Hiện tại chưa có đề thi nào mở cho lớp.</div>`;
+                const cycleStart = formatDateVN(chunkDates[0]);
+                const cycleEnd = formatDateVN(chunkDates[chunkDates.length - 1]);
+
+                accHtml += `
+                    <div class="border rounded-2xl overflow-hidden">
+                        <div class="p-3 bg-slate-50 font-bold text-xs flex justify-between items-center cursor-pointer select-none border-b" onclick="this.nextElementSibling.classList.toggle('hidden')">
+                            <span>KỲ ${cIdx + 1}: ${cycleStart} ➔ ${cycleEnd}</span>
+                            <span class="text-indigo-900">${attendedInChunk}/${chunkDates.length} buổi (Bấm để xem)</span>
+                        </div>
+                        <div class="p-3 bg-white grid grid-cols-4 sm:grid-cols-8 gap-2">
+                            ${cells}
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('studentCyclesAccordion').innerHTML = accHtml || '<div class="text-xs text-slate-400 italic">Chưa có dữ liệu</div>';
+        }
+
+        // ==================== TAB TIẾN ĐỘ & NĂNG LỰC ====================
+        function renderPerformanceTab() {
+            const studentExams = (appData.examResults || []).filter(r => String(r.studentId) === String(currentStudent.id));
+            const countBadge = document.getElementById('perfExamCountBadge');
+            if (countBadge) countBadge.innerText = `${studentExams.length} bài thi`;
+
+            const chartBox = document.getElementById('perfChartContainer');
+            const compBox = document.getElementById('perfCompetencyContainer');
+
+            if (studentExams.length === 0) {
+                chartBox.innerHTML = `<div class="text-center text-slate-400 text-xs italic my-auto">Chưa có bài thi nào được nộp.</div>`;
+                compBox.innerHTML = `<div class="text-center text-slate-400 text-xs italic my-auto">Chưa có bài thi nào được nộp.</div>`;
                 return;
             }
 
-            container.innerHTML = myExams.slice(0, 3).map(ex => {
-                const res = appData.examResults.find(r => r.examId === ex.id && r.studentId === currentStudent.id);
-                const isDone = !!res;
+            // Biểu đồ điểm số
+            let chartBars = '';
+            studentExams.forEach((r, idx) => {
+                const ex = (appData.exams || []).find(e => e.id === r.examId) || { title: `Đề ${idx + 1}` };
+                const heightPercent = Math.min(100, Math.max(10, (r.score / 10) * 100));
+                let barColor = 'bg-indigo-600';
+                if (r.score >= 8) barColor = 'bg-emerald-500';
+                else if (r.score < 5) barColor = 'bg-rose-500';
 
+                chartBars += `
+                    <div class="flex-1 flex flex-col items-center justify-end h-48 space-y-1.5 group relative">
+                        <span class="text-[10px] font-black text-slate-700">${r.score.toFixed(1)}</span>
+                        <div class="w-full max-w-[28px] ${barColor} rounded-t-lg transition-all duration-300" style="height: ${heightPercent}%;"></div>
+                        <span class="text-[9px] text-slate-400 font-mono truncate w-full text-center" title="${ex.title}">${r.submittedAt ? formatDateShortVN(r.submittedAt) : `B${idx+1}`}</span>
+                    </div>
+                `;
+            });
+
+            chartBox.innerHTML = `
+                <div class="flex items-end space-x-2 pt-4 px-2 border-b border-slate-100 flex-1">
+                    ${chartBars}
+                </div>
+                <div class="flex justify-between items-center text-[10px] text-slate-400 font-bold pt-1">
+                    <span>Bài thi cũ</span>
+                    <span>Mới nhất ➔</span>
+                </div>
+            `;
+
+            const lastExam = studentExams[studentExams.length - 1];
+            const lastExamObj = (appData.exams || []).find(e => e.id === lastExam.examId);
+            document.getElementById('statLastExamScore').innerText = `${lastExam.score.toFixed(1)} đ`;
+            document.getElementById('statLastExamTitle').innerText = lastExamObj ? lastExamObj.title : 'Đã nộp bài';
+
+            // Phân tích năng lực 3 phần GDPT mới
+            let p1Correct = 0, p1Total = 0;
+            let p2Points = 0, p2Max = 0;
+            let p3Correct = 0, p3Total = 0;
+
+            studentExams.forEach(r => {
+                const ex = (appData.exams || []).find(e => e.id === r.examId);
+                if (!ex || !ex.questions) return;
+                const details = r.details || {};
+
+                ex.questions.forEach(q => {
+                    if (q.part === 1) {
+                        p1Total++;
+                        if (details[q.id] && String(details[q.id]).toUpperCase() === String(q.correct).toUpperCase()) p1Correct++;
+                    } else if (q.part === 2) {
+                        p2Max += 1.0;
+                        let c = 0;
+                        (q.statements || []).forEach(st => {
+                            if (details[q.id] && details[q.id][st.letter] === st.correct) c++;
+                        });
+                        if (c === 1) p2Points += 0.1;
+                        else if (c === 2) p2Points += 0.25;
+                        else if (c === 3) p2Points += 0.5;
+                        else if (c === 4) p2Points += 1.0;
+                    } else if (q.part === 3) {
+                        p3Total++;
+                        if (details[q.id] && String(details[q.id]).trim().toLowerCase() === String(q.correct).trim().toLowerCase()) p3Correct++;
+                    }
+                });
+            });
+
+            const p1Rate = p1Total > 0 ? Math.round((p1Correct / p1Total) * 100) : 0;
+            const p2Rate = p2Max > 0 ? Math.round((p2Points / p2Max) * 100) : 0;
+            const p3Rate = p3Total > 0 ? Math.round((p3Correct / p3Total) * 100) : 0;
+
+            compBox.innerHTML = `
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-bold">
+                        <span class="text-slate-700">Phần I: Trắc nghiệm 4 lựa chọn</span>
+                        <span class="text-indigo-600 font-mono">${p1Rate}% (${p1Correct}/${p1Total} câu)</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                        <div class="bg-indigo-600 h-full rounded-full transition-all duration-500" style="width: ${p1Rate}%"></div>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-bold">
+                        <span class="text-slate-700">Phần II: Câu hỏi Đúng / Sai</span>
+                        <span class="text-emerald-600 font-mono">${p2Rate}% (${p2Points.toFixed(1)}/${p2Max} điểm)</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                        <div class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: ${p2Rate}%"></div>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-bold">
+                        <span class="text-slate-700">Phần III: Trả lời ngắn</span>
+                        <span class="text-amber-600 font-mono">${p3Rate}% (${p3Correct}/${p3Total} câu)</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                        <div class="bg-amber-500 h-full rounded-full transition-all duration-500" style="width: ${p3Rate}%"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderDocumentsTab() {
+            const allDocs = (appData.documents || []).filter(d => d.classId === currentStudent.classId);
+            const container = document.getElementById('studentDocumentsContainer');
+
+            if (allDocs.length === 0) {
+                container.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs italic">Chưa có tài liệu nào cho lớp này.</div>`;
+                return;
+            }
+
+            const groups = {};
+            allDocs.forEach(d => {
+                const cat = d.category || 'Chuyên đề chung';
+                if (!groups[cat]) groups[cat] = [];
+                groups[cat].push(d);
+            });
+
+            container.innerHTML = Object.keys(groups).map(catName => `
+                <div class="border rounded-2xl overflow-hidden shadow-xs">
+                    <div class="p-3 bg-slate-50 border-b font-bold text-xs text-indigo-950 flex justify-between items-center">
+                        <span class="flex items-center space-x-2"><i data-lucide="folder" class="w-4 h-4 text-indigo-600"></i><span>${catName}</span></span>
+                        <span class="text-[10px] bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded font-bold">${groups[catName].length} file</span>
+                    </div>
+                    <div class="p-2 space-y-1 bg-white divide-y">
+                        ${groups[catName].map(f => `
+                            <div class="p-2.5 flex justify-between items-center text-xs">
+                                <span class="font-bold text-slate-800">📄 ${f.name}</span>
+                                <a href="${f.url}" target="_blank" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1 rounded-xl font-bold transition flex items-center space-x-1">
+                                    <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                                    <span>Tải Về</span>
+                                </a>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderExamsTab() {
+            const exams = (appData.exams || []).filter(e => e.classId === currentStudent.classId);
+            const container = document.getElementById('studentExamsListContainer');
+
+            if (exams.length === 0) {
+                container.innerHTML = `<div class="col-span-2 p-6 text-center text-slate-400 text-xs italic">Chưa có bài thi nào được giao.</div>`;
+                return;
+            }
+
+            container.innerHTML = exams.map(e => {
+                const result = (appData.examResults || []).find(r => r.examId === e.id && r.studentId === currentStudent.id);
                 return `
-                    <div class="p-3.5 rounded-2xl border ${isDone ? 'bg-slate-50 border-slate-200' : 'bg-indigo-50/40 border-indigo-200'} flex justify-between items-center">
+                    <div class="p-4 bg-slate-50 border rounded-2xl space-y-3 flex flex-col justify-between">
                         <div>
-                            <div class="font-bold text-slate-800">${ex.title}</div>
-                            <div class="text-[10px] text-slate-500">${ex.duration} phút • ${ex.questions ? ex.questions.length : 0} câu 3 phần GDPT</div>
+                            <div class="font-bold text-sm text-slate-900">${e.title}</div>
+                            <div class="text-[11px] text-slate-500 font-mono mt-1">Thời gian: ${e.duration} phút | ${e.questions ? e.questions.length : 0} câu</div>
+                            ${result ? `
+                                <div class="mt-2 text-xs font-black text-emerald-600 bg-emerald-50 border border-emerald-200 p-2 rounded-xl flex justify-between items-center">
+                                    <span>Điểm: ${result.score.toFixed(1)} đ</span>
+                                    <span>Đã nộp: ${result.submittedAt || ''}</span>
+                                </div>
+                            ` : ''}
                         </div>
-                        <div>
-                            ${isDone ? `
-                                <span class="text-xs font-black text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">${res.score.toFixed(1)} đ</span>
-                            ` : `
-                                <button onclick="location.href='exam.html'" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] px-3.5 py-1.5 rounded-xl shadow transition">Làm bài</button>
-                            `}
-                        </div>
+                        ${result ? `
+                            <button disabled class="w-full bg-slate-200 text-slate-500 font-bold py-2.5 rounded-xl text-xs text-center cursor-not-allowed">
+                                Đã Nộp Bài Thi
+                            </button>
+                        ` : `
+                            <button onclick="startTakingExam('${e.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition text-center block">
+                                Vào Làm Bài Thi Ngay
+                            </button>
+                        `}
                     </div>
                 `;
             }).join('');
         }
 
-        function handleDashboardQuickPay() {
-            if (quickPayAmountTarget <= 0) {
-                alert("Khoản học phí này không có dư nợ cần thanh toán!");
-                return;
-            }
-            showVietQR(quickPayCycleTarget, quickPayAmountTarget);
+        function setupAntiCheatMonitoring() {
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden && activeExam) {
+                    tabSwitchCounter++;
+                    const w = document.getElementById('examAntiCheatWarning');
+                    if (w) w.innerText = `CẢNH BÁO: Rời màn hình ${tabSwitchCounter} lần! Hệ thống sẽ ghi nhận vi phạm.`;
+                }
+            });
         }
 
-        // ==================== TAB 1: BẢNG HỌC PHÍ CHI TIẾT ====================
-        function renderStudentTuition() {
-            const container = document.getElementById('studentTuitionCards');
-            if (!container || !currentStudent) return;
+        function startTakingExam(examId) {
+            const ex = (appData.exams || []).find(e => e.id === examId);
+            if (!ex) return;
 
-            const classSessions = getClassSessionDates(currentStudent.classId);
-            const totalClassSess = classSessions.length;
-            const activeCycleIdx = Math.max(0, Math.floor((totalClassSess - 1) / 8));
+            activeExam = ex;
+            studentAnswers = {};
+            tabSwitchCounter = 0;
+            examTimeLeft = (ex.duration || 45) * 60;
 
-            let html = '';
-            for (let i = 0; i < 4; i++) {
-                const req = getStudentActualTuition(i);
-                const p = appData.payments.find(x => x.studentId === currentStudent.id && x.classId === currentStudent.classId && x.cycleIndex === i);
-                
-                let stC = 'bg-slate-50 border-slate-200 text-slate-400', txt = 'Chưa đến', showPayBtn = false;
-                let actualAmount = req.amount;
+            document.getElementById('examRoomTitle').innerText = ex.title;
+            document.getElementById('examTakingRoom').classList.remove('hidden');
 
-                if (req.status === 'EXEMPT') {
-                    stC = 'bg-blue-50 border-blue-200 text-blue-800 font-bold';
-                    txt = req.note;
-                } else if (req.status === 'PAID') {
-                    stC = 'bg-emerald-50 border-emerald-200 text-emerald-800';
-                    txt = `ĐÃ NỘP: ${req.amount.toLocaleString()}đ<br><span class="text-[10px] text-slate-500 font-normal">${formatDateVN(p ? p.date : '')}</span>`;
-                    if (p && p.note) txt += `<br><span class="text-[10px] text-emerald-700 font-semibold">${p.note}</span>`;
-                } else if (req.status === 'NOT_JOINED') {
-                    txt = 'Chưa vào học';
-                } else if (i < activeCycleIdx) {
-                    stC = 'bg-rose-50 border-rose-200 text-rose-700 font-bold';
-                    txt = `NỢ: ${actualAmount.toLocaleString()}đ`;
-                    if (req.note && req.note.includes('Học lẻ')) txt += `<br><span class="text-[10px] text-rose-500 font-semibold">(${req.note})</span>`;
-                    showPayBtn = true;
-                } else if (i === activeCycleIdx) {
-                    stC = 'bg-amber-50 border-amber-200 text-amber-800 font-bold';
-                    txt = `CẦN NỘP: ${actualAmount.toLocaleString()}đ`;
-                    if (req.note && req.note.includes('Học lẻ')) txt += `<br><span class="text-[10px] text-amber-700 font-semibold">(${req.note})</span>`;
-                    showPayBtn = true;
+            renderExamQuestions(ex.questions || []);
+
+            clearInterval(examTimerInterval);
+            examTimerInterval = setInterval(() => {
+                examTimeLeft--;
+                const m = Math.floor(examTimeLeft / 60);
+                const s = examTimeLeft % 60;
+                document.getElementById('examTimerCountdown').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+                if (examTimeLeft <= 0) {
+                    clearInterval(examTimerInterval);
+                    alert("Đã hết thời gian làm bài! Tự động nộp bài.");
+                    submitExamNow();
+                }
+            }, 1000);
+
+            if (window.renderMathInElement) {
+                renderMathInElement(document.getElementById('examQuestionsRenderArea'), {
+                    delimiters: [{left: '$', right: '$', display: false}],
+                    throwOnError: false
+                });
+            }
+        }
+
+        function renderExamQuestions(questions) {
+            const area = document.getElementById('examQuestionsRenderArea');
+            area.innerHTML = questions.map((q, idx) => {
+                let bodyHtml = '';
+                if (q.part === 1) {
+                    bodyHtml = `
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                            ${(q.options || []).map(opt => `
+                                <label class="flex items-center space-x-2 p-2.5 border rounded-xl bg-white hover:bg-indigo-50 cursor-pointer">
+                                    <input type="radio" name="q_${q.id}" value="${opt.letter}" onchange="recordAnswer('${q.id}', '${opt.letter}')" class="text-indigo-600">
+                                    <span class="font-bold">${opt.letter}.</span>
+                                    <span>${opt.content}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    `;
+                } else if (q.part === 2) {
+                    bodyHtml = `
+                        <div class="space-y-2 pt-2">
+                            ${(q.statements || []).map(st => `
+                                <div class="flex items-center justify-between p-2.5 border rounded-xl bg-white">
+                                    <span class="flex-1 mr-2"><b>${st.letter})</b>${st.content}</span>
+                                    <div class="flex space-x-2 shrink-0">
+                                        <label class="px-2.5 py-1 border rounded-lg cursor-pointer hover:bg-emerald-50"><input type="radio" name="q_${q.id}_${st.letter}" value="Đ" onchange="recordSubAnswer('${q.id}', '${st.letter}', 'Đ')"> Đúng</label>
+                                        <label class="px-2.5 py-1 border rounded-lg cursor-pointer hover:bg-rose-50"><input type="radio" name="q_${q.id}_${st.letter}" value="S" onchange="recordSubAnswer('${q.id}', '${st.letter}', 'S')"> Sai</label>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else if (q.part === 3) {
+                    bodyHtml = `<div class="pt-2"><input type="text" placeholder="Nhập đáp án..." oninput="recordAnswer('${q.id}', this.value)" class="w-full p-2.5 border rounded-xl bg-white font-mono font-bold outline-none"></div>`;
                 }
 
-                html += `
-                    <div class="p-4 rounded-3xl border ${stC} space-y-2 flex flex-col justify-between shadow-xs">
-                        <div>
-                            <div class="text-[11px] font-black uppercase tracking-wider">Kỳ ${i + 1}</div>
-                            <div class="text-xs leading-relaxed mt-1">${txt}</div>
+                return `
+                    <div class="p-4 sm:p-5 bg-white border rounded-2xl space-y-2 shadow-xs">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-black text-indigo-700">Câu ${idx + 1}</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700">Phần ${q.part}</span>
                         </div>
-                        ${showPayBtn ? `
-                            <button onclick="showVietQR(${i + 1},${actualAmount})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-2xl text-[11px] shadow transition flex items-center justify-center space-x-1">
-                                <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
-                                <span>Quét QR (${actualAmount.toLocaleString()}đ)</span>
-                            </button>
-                        ` : ''}
+                        <div class="text-xs sm:text-sm leading-relaxed">${q.prompt}</div>
+                        ${bodyHtml}
                     </div>
                 `;
-            }
-            container.innerHTML = html;
-            if (window.lucide) lucide.createIcons();
+            }).join('');
         }
 
-        // BẬT MODAL VIETQR VỚI ĐÚNG SỐ TIỀN THỰC TẾ
-        function showVietQR(cycleNum, amount) {
-            const c = appData.classes.find(x => x.id === currentStudent.classId);
-            const className = (c ? c.name : 'LOP').toUpperCase().replace(/[^A-Z0-9]/g, '');
-            const rawUsername = (currentStudent.username || currentStudent.code).toUpperCase().replace(/[^A-Z0-9]/g, '');
-            const desc = `HP ${className} ${rawUsername} K${cycleNum}`;
-
-            const qrUrl = `https://img.vietqr.io/image/${AGRIBANK_BIN}-${AGRIBANK_STK}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(desc)}&accountName=${encodeURIComponent(AGRIBANK_NAME)}`;
-
-            document.getElementById('qrImageElement').src = qrUrl;
-            document.getElementById('qrAmountText').innerText = amount.toLocaleString() + ' đ';
-            document.getElementById('qrContentText').innerText = desc;
-            document.getElementById('modalVietQR').classList.remove('hidden');
-        }
-        function closeVietQRModal() {
-            document.getElementById('modalVietQR').classList.add('hidden');
+        function recordAnswer(qId, val) { studentAnswers[qId] = val.trim(); }
+        function recordSubAnswer(qId, letter, val) {
+            if (!studentAnswers[qId]) studentAnswers[qId] = {};
+            studentAnswers[qId][letter] = val;
         }
 
-        // ==================== TAB 2: SỔ ĐIỂM DANH 8 BUỔI ====================
-        function renderStudentAttendance() {
-            const container = document.getElementById('studentAttendanceCyclesContainer');
-            if (!container || !currentStudent) return;
+        async function submitExamNow() {
+            if (!activeExam) return;
+            clearInterval(examTimerInterval);
 
-            const c = appData.classes.find(x => x.id === currentStudent.classId);
-            document.getElementById('attCurrentClassBadge').innerText = `Lớp: ${c ? c.name : '---'}`;
+            let totalScore = 0;
+            const questions = activeExam.questions || [];
 
-            const currentClassSessions = getClassSessionDates(currentStudent.classId);
-            const myCurrentClassRecords = appData.attendance.filter(a => a.studentId === currentStudent.id && a.classId === currentStudent.classId);
-            let presentCount = 0, permCount = 0, noPermCount = 0, lateCount = 0;
-
-            myCurrentClassRecords.forEach(r => {
-                if (r.status === 'PRESENT') presentCount++;
-                else if (r.status === 'ABSENT_PERM') permCount++;
-                else if (r.status === 'ABSENT_NO_PERM') noPermCount++;
-                else if (r.status === 'LATE') { lateCount++; presentCount++; }
-            });
-
-            const sessionsEnrolled = currentClassSessions.filter(d => !currentStudent.joinDate || normalizeCloudDate(d) >= normalizeCloudDate(currentStudent.joinDate)).length;
-            const rate = sessionsEnrolled > 0 ? Math.round((presentCount / sessionsEnrolled) * 100) : 100;
-
-            document.getElementById('attStatTotal').innerText = `${presentCount}/${sessionsEnrolled}`;
-            document.getElementById('attStatRate').innerText = `${rate}%`;
-            document.getElementById('attStatPerm').innerText = permCount;
-            document.getElementById('attStatNoPerm').innerText = `${noPermCount} (${lateCount} trễ)`;
-
-            if (currentClassSessions.length === 0) {
-                container.innerHTML = '<div class="p-6 text-center text-xs text-slate-400 italic">Lớp hiện tại chưa có buổi học nào.</div>';
-            } else {
-                const chunks = [];
-                for (let i = 0; i < currentClassSessions.length; i += 8) chunks.push(currentClassSessions.slice(i, i + 8));
-
-                let html = '';
-                chunks.forEach((chunkDates, cIdx) => {
-                    const cycleNum = cIdx + 1;
-                    const isCurrentCycle = (cIdx === chunks.length - 1);
-                    let cyclePresent = 0;
-
-                    const sessionCells = chunkDates.map((d, dIdx) => {
-                        const r = appData.attendance.find(a => a.studentId === currentStudent.id && a.classId === currentStudent.classId && a.date === d);
-                        let badgeClass = 'bg-slate-50 border-slate-200 text-slate-400';
-                        let icon = '•';
-
-                        if (currentStudent.joinDate && normalizeCloudDate(d) < normalizeCloudDate(currentStudent.joinDate)) {
-                            badgeClass = 'bg-slate-100 border-slate-200 text-slate-400 opacity-60';
-                            icon = '⚪';
-                        } else if (r) {
-                            if (r.status === 'PRESENT') { badgeClass = 'bg-emerald-50 border-emerald-300 text-emerald-700'; icon = '✓'; cyclePresent++; }
-                            else if (r.status === 'ABSENT_PERM') { badgeClass = 'bg-amber-50 border-amber-300 text-amber-700'; icon = 'P'; }
-                            else if (r.status === 'ABSENT_NO_PERM') { badgeClass = 'bg-rose-50 border-rose-300 text-rose-700'; icon = 'KP'; }
-                            else if (r.status === 'LATE') { badgeClass = 'bg-blue-50 border-blue-300 text-blue-700'; icon = 'T'; cyclePresent++; }
-                        }
-
-                        return `
-                            <div class="p-2 sm:p-2.5 rounded-2xl border ${badgeClass} flex flex-col items-center justify-between text-center min-h-[70px] sm:min-h-[76px]">
-                                <div class="text-[10px] font-bold text-slate-500">Buổi ${dIdx + 1}</div>
-                                <div class="text-sm sm:text-base font-black my-0.5">${icon}</div>
-                                <div class="text-[9px] font-mono leading-tight">${formatDateShortVN(d)}</div>
-                            </div>
-                        `;
-                    }).join('');
-
-                    html += `
-                        <div class="border rounded-2xl overflow-hidden shadow-sm ${isCurrentCycle ? 'border-indigo-300 ring-2 ring-indigo-50' : 'border-slate-200'}">
-                            <div class="p-3 sm:p-4 bg-slate-50 flex justify-between items-center font-bold text-xs sm:text-sm">
-                                <span>KỲ ${cycleNum}: ${formatDateVN(chunkDates[0])} ➔ ${formatDateVN(chunkDates[chunkDates.length - 1])}</span>
-                                <span class="text-indigo-900">${cyclePresent}/${chunkDates.length} buổi</span>
-                            </div>
-                            <div class="p-3 sm:p-4 bg-white border-t">
-                                <div class="grid grid-cols-4 sm:grid-cols-8 gap-1.5 sm:gap-2">${sessionCells}</div>
-                            </div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-            }
-
-            // Lịch sử học lớp cũ
-            const prevClassRecords = appData.attendance.filter(a => a.studentId === currentStudent.id && a.classId && a.classId !== currentStudent.classId);
-            const prevSection = document.getElementById('studentPreviousClassHistorySection');
-            const prevList = document.getElementById('studentPreviousClassList');
-
-            if (prevClassRecords.length > 0) {
-                prevSection.classList.remove('hidden');
-                const prevByClass = {};
-                prevClassRecords.forEach(r => {
-                    if (!prevByClass[r.classId]) prevByClass[r.classId] = [];
-                    prevByClass[r.classId].push(r);
-                });
-
-                prevList.innerHTML = Object.keys(prevByClass).map(oldCId => {
-                    const oldC = appData.classes.find(x => x.id === oldCId);
-                    const oldClassName = oldC ? oldC.name : 'Lớp cũ';
-                    const recs = prevByClass[oldCId].sort((a,b)=>b.date.localeCompare(a.date));
-                    const pres = recs.filter(x => x.status === 'PRESENT' || x.status === 'LATE').length;
-
-                    return `
-                        <div class="p-3.5 bg-slate-50 rounded-2xl border space-y-1.5">
-                            <div class="flex justify-between items-center font-bold">
-                                <span class="text-indigo-900">📚 ${oldClassName}</span>
-                                <span class="text-slate-500">Đã tham gia: ${pres}/${recs.length} buổi</span>
-                            </div>
-                            <div class="flex flex-wrap gap-1.5 pt-1">
-                                ${recs.map(rc => {
-                                    const stMap = { 'PRESENT': 'bg-emerald-100 text-emerald-800', 'ABSENT_PERM': 'bg-amber-100 text-amber-800', 'ABSENT_NO_PERM': 'bg-rose-100 text-rose-800', 'LATE': 'bg-blue-100 text-blue-800' };
-                                    const stName = { 'PRESENT': 'Có mặt', 'ABSENT_PERM': 'Phép', 'ABSENT_NO_PERM': 'KP', 'LATE': 'Trễ' };
-                                    return `<span class="px-2 py-0.5 rounded-lg font-mono text-[10px] ${stMap[rc.status] || 'bg-slate-200'}">${formatDateShortVN(rc.date)}:${stName[rc.status] || rc.status}</span>`;
-                                }).join('')}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            } else {
-                prevSection.classList.add('hidden');
-            }
-        }
-
-        // ==================== TAB 3: TIẾN ĐỘ & PHÂN TÍCH ====================
-        function renderStudentAnalytics() {
-            const results = appData.examResults.filter(r => r.studentId === currentStudent.id);
-            const radarContainer = document.getElementById('studentRadarStats');
-            if (results.length === 0) {
-                radarContainer.innerHTML = '<div class="text-xs text-slate-400 italic">Chưa có bài thi nào được nộp.</div>';
-                return;
-            }
-
-            let p1Correct = 0, p1Total = 0;
-            results.forEach(r => {
-                const ex = appData.exams.find(e => e.id === r.examId);
-                if (ex && ex.questions) {
-                    ex.questions.forEach((q, idx) => {
-                        const uAns = r.details[idx];
-                        if (q.part === 1) {
-                            p1Total++;
-                            if (uAns && uAns === q.correct) p1Correct++;
-                        }
+            questions.forEach(q => {
+                const userAns = studentAnswers[q.id];
+                if (q.part === 1) {
+                    if (userAns && String(userAns).toUpperCase() === String(q.correct).toUpperCase()) {
+                        totalScore += (10 / questions.length);
+                    }
+                } else if (q.part === 2) {
+                    let correctCount = 0;
+                    (q.statements || []).forEach(st => {
+                        if (userAns && userAns[st.letter] === st.correct) correctCount++;
                     });
+                    if (correctCount === 1) totalScore += 0.1;
+                    else if (correctCount === 2) totalScore += 0.25;
+                    else if (correctCount === 3) totalScore += 0.5;
+                    else if (correctCount === 4) totalScore += 1.0;
+                } else if (q.part === 3) {
+                    if (userAns && String(userAns).trim().toLowerCase() === String(q.correct).trim().toLowerCase()) {
+                        totalScore += (10 / questions.length);
+                    }
                 }
             });
 
-            const r1 = p1Total > 0 ? Math.round((p1Correct / p1Total) * 100) : 0;
-            radarContainer.innerHTML = `
-                <div class="space-y-2 text-xs">
-                    <div class="flex justify-between font-bold"><span>Tỷ lệ chính xác Phần I (Trắc nghiệm)</span><span class="text-indigo-600">${r1}%</span></div>
-                    <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden"><div class="bg-indigo-600 h-3 rounded-full" style="width: ${r1}%"></div></div>
-                </div>
-            `;
-        }
+            totalScore = Math.min(10, Math.round(totalScore * 10) / 10);
 
-        function renderScoreChart() {
-            const results = appData.examResults.filter(r => r.studentId === currentStudent.id);
-            const ctx = document.getElementById('studentScoreChart');
-            if (!ctx || results.length === 0) return;
+            const resultItem = {
+                id: 'res_' + Date.now(),
+                examId: activeExam.id,
+                studentId: currentStudent.id,
+                score: totalScore,
+                details: studentAnswers,
+                tabSwitchCount: tabSwitchCounter,
+                submittedAt: formatDateVN(new Date())
+            };
 
-            if (scoreChartInstance) scoreChartInstance.destroy();
-            scoreChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: results.map((r, i) => `Bài ${i + 1}`),
-                    datasets: [{ label: 'Điểm Số', data: results.map(r => r.score), borderColor: '#4f46e5', tension: 0.3, fill: true, backgroundColor: 'rgba(79, 70, 229, 0.08)' }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 10 } } }
-            });
-        }
+            if (!appData.examResults) appData.examResults = [];
+            appData.examResults.push(resultItem);
 
-        // ==================== TAB 4: KHO TÀI LIỆU ====================
-        function renderStudentGroupedDocs() {
-            const list = appData.documents.filter(d => d.classId === currentStudent.classId);
-            const c = document.getElementById('studentGroupedDocsList');
-            if (list.length === 0) { c.innerHTML = '<div class="text-xs text-slate-400 italic">Chưa có tài liệu nào.</div>'; return; }
-            c.innerHTML = list.map(f => `
-                <div class="p-3 rounded-2xl border flex justify-between items-center text-xs bg-slate-50">
-                    <span>📄 <b>${f.name}</b></span>
-                    <a href="${f.url}" target="_blank" class="bg-indigo-50 text-indigo-700 font-bold px-3.5 py-1.5 rounded-xl border border-indigo-100 hover:bg-indigo-100 transition">Xem / Tải</a>
-                </div>
-            `).join('');
-        }
+            if (cloudApiUrl) {
+                try {
+                    await fetch(cloudApiUrl, {
+                        method: 'POST',
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify({ action: 'submitExamResult', payload: resultItem })
+                    });
+                } catch(err){}
+            }
 
-        function openChangePasswordModal() { document.getElementById('modalChangePassword').classList.remove('hidden'); }
-        function closeChangePasswordModal() { document.getElementById('modalChangePassword').classList.add('hidden'); }
-
-        async function handleSaveNewPassword(e) {
-            e.preventDefault();
-            const p1 = document.getElementById('newPasswordInput').value;
-            const p2 = document.getElementById('confirmNewPasswordInput').value;
-            if (p1 !== p2) { alert("Mật khẩu xác nhận không khớp!"); return; }
-
-            try {
-                await fetch(CLOUD_API_URL, {
-                    method: 'POST',
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({ action: 'changePassword', studentId: currentStudent.id, newPassword: p1 })
-                });
-                currentStudent.password = p1;
-                alert("Đổi mật khẩu thành công!");
-                closeChangePasswordModal();
-            } catch(err) { alert("Lỗi kết nối khi đổi mật khẩu!"); }
+            saveToStorage();
+            document.getElementById('examTakingRoom').classList.add('hidden');
+            activeExam = null;
+            renderStudentPortal();
+            alert(`Nộp bài thành công!\nĐiểm số: ${totalScore.toFixed(1)} đ.`);
         }
     </script>
 </body>

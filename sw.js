@@ -1,61 +1,52 @@
-// ==================== SERVICE WORKER SIGMAMATH ====================
-const CACHE_NAME = 'sigmamath-pwa-v2026.2';
+const CACHE_NAME = 'msigma-cache-v3'; // <-- Đổi v2, v3... mỗi khi Thầy sửa code
+
 const STATIC_ASSETS = [
-  './',
-  './index.html',
-  './hocsinh.html',
-  './exam.html',
-  './manifest.json',
-  './manifest-hocsinh.json',
-  './logo-teacher.png',
-  './logo-student.png',
-  './logo-teacher-192.png',
-  './logo-student-192.png',
-  './logo-teacher-512.png',
-  './logo-student-512.png'
+    './',
+    './index.html',
+    './hocsinh.html',
+    './manifest.json',
+    './logo-teacher.png',
+    './logo-student.png'
 ];
 
-// Cài đặt và ép kích hoạt ngay phiên bản mới
-self.addEventListener('install', (event) => {
-  self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS)).catch(() => {})
-  );
+// Cài đặt SW mới và kích hoạt ngay lập tức (không chờ đóng tab cũ)
+self.addEventListener('install', (e) => {
+    self.skipWaiting();
+    e.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
+    );
 });
 
-// Xóa sạch cache cũ để nạp code mới ngay lập tức
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
-  );
+// Kích hoạt SW mới và xóa sạch toàn bộ cache phiên bản cũ
+self.addEventListener('activate', (e) => {
+    e.waitUntil(
+        caches.keys().then((keys) => {
+            return Promise.all(
+                keys.map((k) => {
+                    if (k !== CACHE_NAME) {
+                        return caches.delete(k); // Xóa cache cũ
+                    }
+                })
+            );
+        }).then(() => self.clients.claim()) // Chiếm quyền điều khiển trang ngay lập tức
+    );
 });
 
-// Chiến lược Network-First: Ưu tiên tải dữ liệu mới nhất từ mạng
-self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
-  
-  // Bỏ qua các API Google Apps Script và VietQR để lấy dữ liệu thời gian thực
-  if (event.request.url.includes('script.google.com') || event.request.url.includes('vietqr.io')) {
-    return;
-  }
+// Chiến lược: Network First (Ưu tiên nạp bản mới từ mạng, nếu mất mạng mới dùng cache)
+self.addEventListener('fetch', (e) => {
+    // Không cache các request gửi dữ liệu lên Google Apps Script
+    if (e.request.url.includes('script.google.com') || e.request.method !== 'GET') {
+        return;
+    }
 
-  event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
-        }
-        return networkResponse;
-      })
-      .catch(() => caches.match(event.request))
-  );
+    e.respondWith(
+        fetch(e.request)
+            .then((res) => {
+                // Nếu kết nối mạng tốt, sao lưu bản mới vào cache rồi trả về cho giao diện
+                const clone = res.clone();
+                caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+                return res;
+            })
+            .catch(() => caches.match(e.request)) // Khi mất mạng hoàn toàn mới dùng cache
+    );
 });
