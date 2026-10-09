@@ -1,39 +1,25 @@
 {
-  "id": "sigmamath-student-app",
+  "id": "sigmamath-student-app-2026",
   "name": "SigmaMath - Thầy Mẫn",
   "short_name": "M-SigmaMath",
-  "description": "Cổng tra cứu chuyên cần, học phí và khảo thí trực tuyến",
   "start_url": "./hocsinh.html",
-  "scope": "./hocsinh.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0b1329",
-  "theme_color": "#312e81",
+  "theme_color": "#1e1b4b",
   "orientation": "portrait-primary",
-  "categories": ["education"],
   "icons": [
     {
-      "src": "logo-student-192.png",
+      "src": "logo-student.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
-      "src": "logo-student-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "logo-student-512.png",
+      "src": "logo-student.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "logo-student-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
   ]
 }
