@@ -19,6 +19,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <!-- THƯ VIỆN ĐỌC & XUẤT EXCEL TỐC ĐỘ CAO -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
@@ -41,8 +44,6 @@
             .sticky-col-2 { left: 55px !important; }
         }
     </style>
-<!-- THƯ VIỆN ĐỌC & XUẤT EXCEL TỐC ĐỘ CAO -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 
 <body class="text-slate-800 flex flex-col md:flex-row min-h-screen md:h-screen md:overflow-hidden">
@@ -236,28 +237,23 @@
                         <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
                             <h2 class="font-bold text-slate-800 text-xs sm:text-sm flex items-center space-x-2"><i data-lucide="users" class="w-4 h-4 text-indigo-600"></i><span>Danh Sách Học Sinh</span></h2>
                             <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-    <!-- Nút Xuất Excel -->
-    <button onclick="exportStudentsToExcel()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition flex items-center space-x-1" title="Xuất danh sách học sinh lớp đang chọn ra file Excel">
-        <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-emerald-600"></i>
-        <span>Xuất Excel</span>
-    </button>
-
-    <!-- Nút Nhập Excel -->
-    <button onclick="openImportExcelModal()" class="bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition flex items-center space-x-1" title="Nhập danh sách học sinh từ file Excel">
-        <i data-lucide="file-up" class="w-3.5 h-3.5 text-blue-600"></i>
-        <span>Nhập Excel</span>
-    </button>
-
-    <button onclick="autoGenerateAccountsForOldStudents()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl shadow transition flex items-center space-x-1">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
-        <span>Tạo TK</span>
-    </button>
-    
-    <button onclick="openAddStudentModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl shadow transition flex items-center space-x-1">
-        <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
-        <span>+ HS</span>
-    </button>
-</div>
+                                <button onclick="exportStudentsToExcel()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition flex items-center space-x-1" title="Xuất danh sách học sinh ra file Excel">
+                                    <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-emerald-600"></i>
+                                    <span>Xuất Excel</span>
+                                </button>
+                                <button onclick="openImportExcelModal()" class="bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition flex items-center space-x-1" title="Nhập danh sách học sinh từ file Excel">
+                                    <i data-lucide="file-up" class="w-3.5 h-3.5 text-blue-600"></i>
+                                    <span>Nhập Excel</span>
+                                </button>
+                                <button onclick="autoGenerateAccountsForOldStudents()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl shadow transition flex items-center space-x-1">
+                                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
+                                    <span>Tạo TK</span>
+                                </button>
+                                <button onclick="openAddStudentModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl shadow transition flex items-center space-x-1">
+                                    <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                                    <span>+ HS</span>
+                                </button>
+                            </div>
                         </div>
                         <div class="overflow-x-auto rounded-xl border">
                             <table class="w-full text-left text-xs whitespace-nowrap">
@@ -314,7 +310,7 @@
                 </div>
             </section>
 
-            <!-- TAB 4: LỊCH DẠY 2 TẦNG (CHUẨN DD-MM-YYYY & MÀU TƯƠNG PHẢN) -->
+            <!-- TAB 4: LỊCH DẠY 2 TẦNG -->
             <section id="tab-schedule" class="tab-content hidden space-y-4 sm:space-y-6">
                 <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
                     <div class="flex items-center space-x-1.5 sm:space-x-2">
@@ -352,7 +348,7 @@
                 </div>
             </section>
 
-            <!-- TAB 5: ĐIỂM DANH BUỔI (XÓA BUỔI NHẦM) -->
+            <!-- TAB 5: ĐIỂM DANH BUỔI -->
             <section id="tab-attendance-session" class="tab-content hidden space-y-4 sm:space-y-6">
                 <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
@@ -378,7 +374,7 @@
                 </div>
             </section>
 
-            <!-- TAB 6: SỔ LƯU TRỮ ĐIỂM DANH 8 BUỔI (SỬA NGÀY TRỰC TIẾP TRÊN CỘT) -->
+            <!-- TAB 6: SỔ LƯU TRỮ ĐIỂM DANH 8 BUỔI -->
             <section id="tab-attendance-matrix" class="tab-content hidden space-y-4 sm:space-y-6">
                 <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
@@ -679,7 +675,7 @@
     <!-- MODAL: BÁO NGHỈ HỌC & CHỐT NỢ -->
     <div id="modalLeaveStudent" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
-            <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm text-rose-800">Báo Nghỉ Học & Chốt Nợ</h3><button onclick="closeLeaveModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+            <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm text-rose-800">Báo Nghỉ Học & Chốt NỢ</h3><button onclick="closeLeaveModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
             <form onsubmit="handleConfirmStudentLeave(event)" class="space-y-3 text-xs">
                 <input type="hidden" id="leaveStudentId">
                 <div><label class="block font-bold mb-1 text-slate-700">Học sinh:</label><input type="text" id="leaveStudentInfo" readonly class="w-full p-2.5 bg-slate-50 border rounded-xl font-bold"></div>
@@ -776,6 +772,87 @@
         </div>
     </div>
 
+    <!-- MODAL: CHỈNH SỬA LỚP HỌC & LỊCH CỐ ĐỊNH -->
+    <div id="modalEditClassSchedule" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-md space-y-4">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-indigo-900 flex items-center space-x-2">
+                    <i data-lucide="calendar-cog" class="w-4 h-4 text-indigo-600"></i>
+                    <span>Chỉnh Sửa Lớp & Lịch Học Cố Định</span>
+                </h3>
+                <button onclick="closeEditClassModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <form id="formEditClassSchedule" onsubmit="handleSaveEditClass(event)" class="space-y-3 text-xs">
+                <input type="hidden" id="editClassId">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Tên Lớp Học:</label>
+                    <input type="text" id="editClassNameInput" required class="w-full p-2.5 border rounded-xl font-bold uppercase outline-none focus:border-indigo-600">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Học Phí Chuẩn / 8 Buổi (VNĐ):</label>
+                    <input type="number" id="editClassFeeInput" required class="w-full p-2.5 border rounded-xl font-bold text-emerald-700 outline-none">
+                </div>
+                <div class="border border-indigo-50 p-3 rounded-2xl bg-slate-50 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="block font-bold text-indigo-950">Lịch Học Cố Định Trong Tuần:</label>
+                        <button type="button" onclick="addEditScheduleRow()" class="text-indigo-600 font-bold hover:underline">+ Thêm ca</button>
+                    </div>
+                    <div id="editScheduleRowsContainer" class="space-y-2"></div>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow transition">Lưu Thay Đổi & Cập Nhật Lịch</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: NHẬP HỌC SINH TỪ FILE EXCEL -->
+    <div id="modalImportExcel" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-xl space-y-4">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-blue-900 flex items-center space-x-2">
+                    <i data-lucide="file-spreadsheet" class="w-4 h-4 text-blue-600"></i>
+                    <span>Nhập Học Sinh Hàng Loạt Từ Excel</span>
+                </h3>
+                <button onclick="closeImportExcelModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-2xl">
+                    <div>
+                        <b class="text-blue-950">Quy cách file Excel:</b>
+                        <div class="text-[11px] text-blue-800">Cột A: Họ và tên | Cột B: Số điện thoại | Cột C: Ngày vào (DD-MM-YYYY) | Cột D: Học phí riêng (nếu có)</div>
+                    </div>
+                    <button type="button" onclick="downloadSampleExcel()" class="bg-white border border-blue-300 text-blue-700 hover:bg-blue-100 font-bold px-3 py-1.5 rounded-xl whitespace-nowrap shadow-xs">
+                        Tải File Mẫu
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Chọn Lớp Nhập Vào:</label>
+                        <select id="importTargetClassSelect" class="w-full p-2.5 border rounded-xl font-bold bg-slate-50 outline-none"></select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Chọn Tệp Excel (.xlsx, .xls):</label>
+                        <input type="file" id="excelFileInput" accept=".xlsx, .xls" onchange="handleExcelFileSelected(event)" class="w-full p-2 border rounded-xl bg-white text-xs">
+                    </div>
+                </div>
+                <div id="excelPreviewSection" class="hidden space-y-2">
+                    <div class="flex justify-between items-center font-bold text-slate-700">
+                        <span>Xem Trước Dữ Liệu (<span id="excelPreviewCountText" class="text-indigo-600">0</span> học sinh):</span>
+                    </div>
+                    <div class="max-h-52 overflow-y-auto border rounded-xl">
+                        <table class="w-full text-left text-xs whitespace-nowrap">
+                            <thead><tr class="bg-slate-100 font-bold border-b"><th class="p-2">STT</th><th class="p-2">Họ Tên</th><th class="p-2">SĐT</th><th class="p-2">Ngày Vào</th><th class="p-2">Mã Dự Kiến</th></tr></thead>
+                            <tbody id="excelPreviewTableBody" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <button type="button" id="btnConfirmImportExcel" onclick="confirmImportExcelToSystem()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow transition hidden">
+                    Xác Nhận Lưu Vào Lớp & Tự Động Tạo Tài Khoản
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KHỐI MÃ JAVASCRIPT HỆ THỐNG -->
     <script>
         const STORAGE_KEY = 'TUTORING_MASTER_SYSTEM_V2026';
         const ADMIN_PIN_KEY = 'MASTER_SYSTEM_ADMIN_PIN';
@@ -792,378 +869,344 @@
         let currentWeekOffset = 0;
         let teacherDeferredPrompt = null;
         let selectedAttDateToChange = null;
-	let tempImportedStudents = [];
+        let tempImportedStudents = [];
 
-// ==================== 1. CHỈNH SỬA LỚP & LỊCH HỌC CỐ ĐỊNH ====================
-function openEditClassModal(classId) {
-    const c = appData.classes.find(x => x.id === classId);
-    if (!c) return;
-
-    document.getElementById('editClassId').value = c.id;
-    document.getElementById('editClassNameInput').value = c.name;
-    document.getElementById('editClassFeeInput').value = c.fee || 300000;
-
-    const container = document.getElementById('editScheduleRowsContainer');
-    container.innerHTML = '';
-    const schs = c.schedules || [];
-    if (schs.length === 0) {
-        addEditScheduleRow('Thứ 2', '17:30', '19:00');
-    } else {
-        schs.forEach(sc => addEditScheduleRow(sc.day, sc.startTime, sc.endTime));
-    }
-
-    document.getElementById('modalEditClassSchedule').classList.remove('hidden');
-    if (window.lucide) lucide.createIcons();
-}
-
-function closeEditClassModal() {
-    document.getElementById('modalEditClassSchedule').classList.add('hidden');
-}
-
-function addEditScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
-    const container = document.getElementById('editScheduleRowsContainer');
-    if (!container) return;
-    const r = document.createElement('div');
-    r.className = 'flex items-center space-x-1.5 bg-white p-2 rounded-xl border';
-    r.innerHTML = `
-        <select class="edit-sch-day text-xs p-1.5 border rounded-lg font-bold outline-none">
-            <option value="Thứ 2" ${d==='Thứ 2'?'selected':''}>T2</option>
-            <option value="Thứ 3" ${d==='Thứ 3'?'selected':''}>T3</option>
-            <option value="Thứ 4" ${d==='Thứ 4'?'selected':''}>T4</option>
-            <option value="Thứ 5" ${d==='Thứ 5'?'selected':''}>T5</option>
-            <option value="Thứ 6" ${d==='Thứ 6'?'selected':''}>T6</option>
-            <option value="Thứ 7" ${d==='Thứ 7'?'selected':''}>T7</option>
-            <option value="Chủ Nhật" ${d==='Chủ Nhật'?'selected':''}>CN</option>
-        </select>
-        <input type="time" class="edit-sch-start text-xs p-1 border rounded-lg font-bold" value="${s}">
-        <input type="time" class="edit-sch-end text-xs p-1 border rounded-lg font-bold" value="${e}">
-        <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 p-1"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
-    `;
-    container.appendChild(r);
-    if (window.lucide) lucide.createIcons();
-}
-
-function handleSaveEditClass(e) {
-    e.preventDefault();
-    const classId = document.getElementById('editClassId').value;
-    const c = appData.classes.find(x => x.id === classId);
-    if (!c) return;
-
-    const newName = document.getElementById('editClassNameInput').value.trim().toUpperCase();
-    const newFee = parseFloat(document.getElementById('editClassFeeInput').value) || 300000;
-
-    const newSchedules = [];
-    document.querySelectorAll('#editScheduleRowsContainer > div').forEach(r => {
-        newSchedules.push({
-            day: r.querySelector('.edit-sch-day').value,
-            startTime: r.querySelector('.edit-sch-start').value,
-            endTime: r.querySelector('.edit-sch-end').value
-        });
-    });
-
-    c.name = newName;
-    c.fee = newFee;
-    c.schedules = newSchedules;
-
-    saveDataToCloud();
-    closeEditClassModal();
-    renderGlobalClassSelect();
-    refreshCurrentTab();
-
-    if (confirm(`Đã lưu thay đổi cho lớp ${newName}!\nThầy có muốn đồng bộ lại ngay sang Google Calendar không?`)) {
-        syncScheduleToGoogleCalendar();
-    }
-}
-
-// Cập nhật lại danh sách lớp để có nút Sửa bút chì
-function renderClassesAndStudents() {
-    document.getElementById('classListContainer').innerHTML = appData.classes.map(c => `
-        <div class="p-2.5 rounded-xl border flex justify-between items-center bg-slate-50 text-xs">
-            <span class="font-bold text-slate-800">${c.name} (${(c.fee||300000).toLocaleString()}đ)</span>
-            <div class="flex items-center space-x-1">
-                <button onclick="openEditClassModal('${c.id}')" class="text-indigo-600 hover:bg-indigo-100 p-1.5 rounded-lg" title="Sửa tên lớp & lịch học cố định"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
-                <button onclick="deleteClass('${c.id}')" class="text-rose-500 hover:bg-rose-100 p-1.5 rounded-lg" title="Xóa lớp"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-            </div>
-        </div>
-    `).join('');
-
-    const stds = getFilteredStudents();
-    document.getElementById('studentTableBody').innerHTML = stds.length === 0 ? `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Trống</td></tr>` : stds.map(s => {
-        const c = appData.classes.find(x=>x.id===s.classId);
-        const fee = getEffectiveStudentFee(s, c);
-        return `
-            <tr>
-                <td class="p-2.5 sm:p-3"><span class="bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded text-[10px]">${c ? c.name : ''}</span></td>
-                <td class="p-2.5 sm:p-3 font-mono font-bold">${s.code}</td>
-                <td class="p-2.5 sm:p-3 font-bold">${s.name}</td>
-                <td class="p-2.5 sm:p-3 font-mono text-indigo-600 font-bold">${s.username || '---'}</td>
-                <td class="p-2.5 sm:p-3 font-mono">${formatDateVN(s.joinDate)}</td>
-                <td class="p-2.5 sm:p-3 font-bold ${fee===0?'text-blue-600':'text-emerald-600'}">${fee===0?'Miễn phí':fee.toLocaleString()+'đ'}</td>
-                <td class="p-2.5 sm:p-3 text-center space-x-1">
-                    <button onclick="openEditStudentModal('${s.id}')" class="text-indigo-600 hover:bg-indigo-50 p-1.5 rounded-lg" title="Sửa / Chuyển lớp"><i data-lucide="pencil" class="w-3.5 h-3.5 inline"></i></button>
-                    <button onclick="openLeaveStudentModal('${s.id}')" class="text-rose-600 hover:bg-rose-50 p-1.5 rounded-lg" title="Báo nghỉ học & Chốt nợ"><i data-lucide="user-minus" class="w-3.5 h-3.5 inline"></i></button>
-                </td>
-            </tr>
-        `;
-    }).join('');
-    if (window.lucide) lucide.createIcons();
-}
-
-// ==================== 2. XUẤT DANH SÁCH RA EXCEL ====================
-function exportStudentsToExcel() {
-    const stds = getFilteredStudents();
-    if (stds.length === 0) {
-        alert("Danh sách học sinh đang trống!");
-        return;
-    }
-
-    const currentClassName = currentClassId === 'ALL' ? 'Tat_Ca_Cac_Lop' : getClassName(currentClassId);
-    const dataForExport = stds.map((s, idx) => {
-        const c = appData.classes.find(x => x.id === s.classId);
-        const fee = getEffectiveStudentFee(s, c);
-        return {
-            "STT": idx + 1,
-            "Lớp": c ? c.name : "",
-            "Mã HS": s.code,
-            "Họ và tên": s.name,
-            "Số điện thoại": s.phone || "",
-            "Ngày vào học": formatDateVN(s.joinDate),
-            "Học phí": fee === 0 ? "Miễn phí" : fee,
-            "Tài khoản (Username)": s.username || "",
-            "Mật khẩu": s.password || ""
-        };
-    });
-
-    const worksheet = XLSX.utils.json_to_sheet(dataForExport);
-    
-    // Tự động căn chỉnh độ rộng cột
-    worksheet['!cols'] = [
-        { wch: 6 },  { wch: 10 }, { wch: 12 }, { wch: 25 }, 
-        { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 22 }, { wch: 12 }
-    ];
-
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "DanhSachHocSinh");
-    
-    const fileName = `DanhSachHS_${currentClassName}_${getTodayVNString()}.xlsx`;
-    XLSX.writeFile(workbook, fileName);
-}
-
-// ==================== 3. NHẬP HỌC SINH TỪ EXCEL ====================
-function openImportExcelModal() {
-    const sel = document.getElementById('importTargetClassSelect');
-    sel.innerHTML = appData.classes.map(c => `
-        <option value="${c.id}" ${c.id === (currentClassId === 'ALL' ? appData.classes[0]?.id : currentClassId) ? 'selected' : ''}>${c.name}</option>
-    `).join('');
-
-    document.getElementById('excelFileInput').value = '';
-    document.getElementById('excelPreviewSection').classList.add('hidden');
-    document.getElementById('btnConfirmImportExcel').classList.add('hidden');
-    tempImportedStudents = [];
-
-    document.getElementById('modalImportExcel').classList.remove('hidden');
-    if (window.lucide) lucide.createIcons();
-}
-
-function closeImportExcelModal() {
-    document.getElementById('modalImportExcel').classList.add('hidden');
-    tempImportedStudents = [];
-}
-
-function downloadSampleExcel() {
-    const sampleData = [
-        { "Họ và tên": "Nguyễn Văn An", "Số điện thoại": "0987654321", "Ngày vào học (DD-MM-YYYY)": "01-10-2026", "Học phí riêng": "" },
-        { "Họ và tên": "Trần Thị Bé", "Số điện thoại": "0912345678", "Ngày vào học (DD-MM-YYYY)": "05-10-2026", "Học phí riêng": 0 }
-    ];
-    const ws = XLSX.utils.json_to_sheet(sampleData);
-    ws['!cols'] = [{ wch: 22 }, { wch: 15 }, { wch: 25 }, { wch: 15 }];
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Mau_Nhap_HS");
-    XLSX.writeFile(wb, "Mau_Nhap_Hoc_Sinh.xlsx");
-}
-
-function handleExcelFileSelected(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(evt) {
-        const data = new Uint8Array(evt.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const firstSheetName = workbook.SheetNames[0];
-        const rawRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
-
-        if (rawRows.length === 0) {
-            alert("Tệp Excel không chứa dữ liệu!");
-            return;
+        // ==================== TÍNH NĂNG GIẢ LẬP HỌC SINH TỪ TRANG GV ====================
+        function impersonateStudent(studentId) {
+            const s = appData.students.find(x => x.id === studentId);
+            if (!s) {
+                alert("Không tìm thấy thông tin học sinh!");
+                return;
+            }
+            const sessionData = { id: s.id };
+            localStorage.setItem('SIGMA_STUDENT_SESSION', JSON.stringify(sessionData));
+            const studentUrl = `hocsinh.html?impersonate=${s.id}`;
+            window.open(studentUrl, '_blank');
         }
 
-        const targetClassId = document.getElementById('importTargetClassSelect').value;
-        const targetClass = appData.classes.find(c => c.id === targetClassId);
+        // ==================== 1. CHỈNH SỬA LỚP & LỊCH HỌC CỐ ĐỊNH ====================
+        function openEditClassModal(classId) {
+            const c = appData.classes.find(x => x.id === classId);
+            if (!c) return;
 
-        tempImportedStudents = [];
-        let runningCodeSeq = null;
+            document.getElementById('editClassId').value = c.id;
+            document.getElementById('editClassNameInput').value = c.name;
+            document.getElementById('editClassFeeInput').value = c.fee || 300000;
 
-        rawRows.forEach((row, i) => {
-            const name = (row["Họ và tên"] || row["Họ tên"] || row["Tên"] || "").trim();
-            if (!name) return;
+            const container = document.getElementById('editScheduleRowsContainer');
+            container.innerHTML = '';
+            const schs = c.schedules || [];
+            if (schs.length === 0) {
+                addEditScheduleRow('Thứ 2', '17:30', '19:00');
+            } else {
+                schs.forEach(sc => addEditScheduleRow(sc.day, sc.startTime, sc.endTime));
+            }
 
-            const phone = String(row["Số điện thoại"] || row["SĐT"] || row["Điện thoại"] || "").trim();
-            let joinDate = normalizeCloudDate(row["Ngày vào học (DD-MM-YYYY)"] || row["Ngày vào học"] || row["Ngày vào"] || getTodayVNString());
-            
-            const custFeeRaw = row["Học phí riêng"] !== undefined ? row["Học phí riêng"] : null;
-            const customFee = (custFeeRaw !== null && custFeeRaw !== "") ? parseFloat(custFeeRaw) : null;
+            document.getElementById('modalEditClassSchedule').classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
+        }
 
-            // Tự sinh mã tiếp nối
-            const code = generateNextStudentCode(targetClassId);
-            const username = generateUsername(name, targetClass ? targetClass.name : '');
-            const password = phone || '123456';
+        function closeEditClassModal() {
+            document.getElementById('modalEditClassSchedule').classList.add('hidden');
+        }
 
-            tempImportedStudents.push({
-                name, phone, joinDate, customFee, code, username, password
+        function addEditScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
+            const container = document.getElementById('editScheduleRowsContainer');
+            if (!container) return;
+            const r = document.createElement('div');
+            r.className = 'flex items-center space-x-1.5 bg-white p-2 rounded-xl border';
+            r.innerHTML = `
+                <select class="edit-sch-day text-xs p-1.5 border rounded-lg font-bold outline-none">
+                    <option value="Thứ 2" ${d==='Thứ 2'?'selected':''}>T2</option>
+                    <option value="Thứ 3" ${d==='Thứ 3'?'selected':''}>T3</option>
+                    <option value="Thứ 4" ${d==='Thứ 4'?'selected':''}>T4</option>
+                    <option value="Thứ 5" ${d==='Thứ 5'?'selected':''}>T5</option>
+                    <option value="Thứ 6" ${d==='Thứ 6'?'selected':''}>T6</option>
+                    <option value="Thứ 7" ${d==='Thứ 7'?'selected':''}>T7</option>
+                    <option value="Chủ Nhật" ${d==='Chủ Nhật'?'selected':''}>CN</option>
+                </select>
+                <input type="time" class="edit-sch-start text-xs p-1 border rounded-lg font-bold" value="${s}">
+                <input type="time" class="edit-sch-end text-xs p-1 border rounded-lg font-bold" value="${e}">
+                <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 p-1"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+            `;
+            container.appendChild(r);
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function handleSaveEditClass(e) {
+            e.preventDefault();
+            const classId = document.getElementById('editClassId').value;
+            const c = appData.classes.find(x => x.id === classId);
+            if (!c) return;
+
+            const newName = document.getElementById('editClassNameInput').value.trim().toUpperCase();
+            const newFee = parseFloat(document.getElementById('editClassFeeInput').value) || 300000;
+
+            const newSchedules = [];
+            document.querySelectorAll('#editScheduleRowsContainer > div').forEach(r => {
+                newSchedules.push({
+                    day: r.querySelector('.edit-sch-day').value,
+                    startTime: r.querySelector('.edit-sch-start').value,
+                    endTime: r.querySelector('.edit-sch-end').value
+                });
             });
-        });
 
-        if (tempImportedStudents.length === 0) {
-            alert("Không tìm thấy dòng dữ liệu học sinh hợp lệ!");
-            return;
+            c.name = newName;
+            c.fee = newFee;
+            c.schedules = newSchedules;
+
+            saveDataToCloud();
+            closeEditClassModal();
+            renderGlobalClassSelect();
+            refreshCurrentTab();
+
+            if (confirm(`Đã lưu thay đổi cho lớp ${newName}!\nThầy có muốn đồng bộ lại ngay sang Google Calendar không?`)) {
+                syncScheduleToGoogleCalendar();
+            }
         }
 
-        // Vẽ bảng xem trước
-        document.getElementById('excelPreviewCountText').innerText = tempImportedStudents.length;
-        document.getElementById('excelPreviewTableBody').innerHTML = tempImportedStudents.map((s, idx) => `
-            <tr>
-                <td class="p-2 font-mono">${idx + 1}</td>
-                <td class="p-2 font-bold">${s.name}</td>
-                <td class="p-2 font-mono">${s.phone || '---'}</td>
-                <td class="p-2 font-mono">${s.joinDate}</td>
-                <td class="p-2 font-mono text-indigo-700 font-bold">${s.code}</td>
-            </tr>
-        `).join('');
+        // ==================== 2. XUẤT DANH SÁCH RA EXCEL ====================
+        function exportStudentsToExcel() {
+            const stds = getFilteredStudents();
+            if (stds.length === 0) {
+                alert("Danh sách học sinh đang trống!");
+                return;
+            }
 
-        document.getElementById('excelPreviewSection').classList.remove('hidden');
-        document.getElementById('btnConfirmImportExcel').classList.remove('hidden');
-    };
-    reader.readAsArrayBuffer(file);
-}
+            const currentClassName = currentClassId === 'ALL' ? 'Tat_Ca_Cac_Lop' : getClassName(currentClassId);
+            const dataForExport = stds.map((s, idx) => {
+                const c = appData.classes.find(x => x.id === s.classId);
+                const fee = getEffectiveStudentFee(s, c);
+                return {
+                    "STT": idx + 1,
+                    "Lớp": c ? c.name : "",
+                    "Mã HS": s.code,
+                    "Họ và tên": s.name,
+                    "Số điện thoại": s.phone || "",
+                    "Ngày vào học": formatDateVN(s.joinDate),
+                    "Học phí": fee === 0 ? "Miễn phí" : fee,
+                    "Tài khoản (Username)": s.username || "",
+                    "Mật khẩu": s.password || ""
+                };
+            });
 
-async function confirmImportExcelToSystem() {
-    if (tempImportedStudents.length === 0) return;
-    const targetClassId = document.getElementById('importTargetClassSelect').value;
-    const targetClass = appData.classes.find(c => c.id === targetClassId);
+            const worksheet = XLSX.utils.json_to_sheet(dataForExport);
+            worksheet['!cols'] = [
+                { wch: 6 },  { wch: 10 }, { wch: 12 }, { wch: 25 }, 
+                { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 22 }, { wch: 12 }
+            ];
 
-    tempImportedStudents.forEach(item => {
-        appData.students.push({
-            id: 's_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-            classId: targetClassId,
-            code: item.code,
-            name: item.name,
-            phone: item.phone,
-            joinDate: item.joinDate,
-            customFee: item.customFee,
-            username: item.username,
-            password: item.password
-        });
-    });
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "DanhSachHocSinh");
+            const fileName = `DanhSachHS_${currentClassName}_${getTodayVNString()}.xlsx`;
+            XLSX.writeFile(workbook, fileName);
+        }
 
-    await saveDataToCloud();
-    closeImportExcelModal();
-    refreshCurrentTab();
-    alert(`✅ Đã nhập thành công ${tempImportedStudents.length} học sinh vào lớp ${targetClass ? targetClass.name : ''}!`);
-}
+        // ==================== 3. NHẬP HỌC SINH TỪ EXCEL ====================
+        function openImportExcelModal() {
+            const sel = document.getElementById('importTargetClassSelect');
+            sel.innerHTML = appData.classes.map(c => `
+                <option value="${c.id}" ${c.id === (currentClassId === 'ALL' ? appData.classes[0]?.id : currentClassId) ? 'selected' : ''}>${c.name}</option>
+            `).join('');
+
+            document.getElementById('excelFileInput').value = '';
+            document.getElementById('excelPreviewSection').classList.add('hidden');
+            document.getElementById('btnConfirmImportExcel').classList.add('hidden');
+            tempImportedStudents = [];
+
+            document.getElementById('modalImportExcel').classList.remove('hidden');
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function closeImportExcelModal() {
+            document.getElementById('modalImportExcel').classList.add('hidden');
+            tempImportedStudents = [];
+        }
+
+        function downloadSampleExcel() {
+            const sampleData = [
+                { "Họ và tên": "Nguyễn Văn An", "Số điện thoại": "0987654321", "Ngày vào học (DD-MM-YYYY)": "01-10-2026", "Học phí riêng": "" },
+                { "Họ và tên": "Trần Thị Bé", "Số điện thoại": "0912345678", "Ngày vào học (DD-MM-YYYY)": "05-10-2026", "Học phí riêng": 0 }
+            ];
+            const ws = XLSX.utils.json_to_sheet(sampleData);
+            ws['!cols'] = [{ wch: 22 }, { wch: 15 }, { wch: 25 }, { wch: 15 }];
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Mau_Nhap_HS");
+            XLSX.writeFile(wb, "Mau_Nhap_Hoc_Sinh.xlsx");
+        }
+
+        function handleExcelFileSelected(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const data = new Uint8Array(evt.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const rawRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
+
+                if (rawRows.length === 0) {
+                    alert("Tệp Excel không chứa dữ liệu!");
+                    return;
+                }
+
+                const targetClassId = document.getElementById('importTargetClassSelect').value;
+                const targetClass = appData.classes.find(c => c.id === targetClassId);
+
+                tempImportedStudents = [];
+
+                rawRows.forEach((row, i) => {
+                    const name = (row["Họ và tên"] || row["Họ tên"] || row["Tên"] || "").trim();
+                    if (!name) return;
+
+                    const phone = String(row["Số điện thoại"] || row["SĐT"] || row["Điện thoại"] || "").trim();
+                    let joinDate = normalizeCloudDate(row["Ngày vào học (DD-MM-YYYY)"] || row["Ngày vào học"] || row["Ngày vào"] || getTodayVNString());
+                    
+                    const custFeeRaw = row["Học phí riêng"] !== undefined ? row["Học phí riêng"] : null;
+                    const customFee = (custFeeRaw !== null && custFeeRaw !== "") ? parseFloat(custFeeRaw) : null;
+
+                    const code = generateNextStudentCode(targetClassId);
+                    const username = generateUsername(name, targetClass ? targetClass.name : '');
+                    const password = phone || '123456';
+
+                    tempImportedStudents.push({
+                        name, phone, joinDate, customFee, code, username, password
+                    });
+                });
+
+                if (tempImportedStudents.length === 0) {
+                    alert("Không tìm thấy dòng dữ liệu học sinh hợp lệ!");
+                    return;
+                }
+
+                document.getElementById('excelPreviewCountText').innerText = tempImportedStudents.length;
+                document.getElementById('excelPreviewTableBody').innerHTML = tempImportedStudents.map((s, idx) => `
+                    <tr>
+                        <td class="p-2 font-mono">${idx + 1}</td>
+                        <td class="p-2 font-bold">${s.name}</td>
+                        <td class="p-2 font-mono">${s.phone || '---'}</td>
+                        <td class="p-2 font-mono">${s.joinDate}</td>
+                        <td class="p-2 font-mono text-indigo-700 font-bold">${s.code}</td>
+                    </tr>
+                `).join('');
+
+                document.getElementById('excelPreviewSection').classList.remove('hidden');
+                document.getElementById('btnConfirmImportExcel').classList.remove('hidden');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        async function confirmImportExcelToSystem() {
+            if (tempImportedStudents.length === 0) return;
+            const targetClassId = document.getElementById('importTargetClassSelect').value;
+            const targetClass = appData.classes.find(c => c.id === targetClassId);
+
+            tempImportedStudents.forEach(item => {
+                appData.students.push({
+                    id: 's_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                    classId: targetClassId,
+                    code: item.code,
+                    name: item.name,
+                    phone: item.phone,
+                    joinDate: item.joinDate,
+                    customFee: item.customFee,
+                    username: item.username,
+                    password: item.password
+                });
+            });
+
+            await saveDataToCloud();
+            closeImportExcelModal();
+            refreshCurrentTab();
+            alert(`✅ Đã nhập thành công ${tempImportedStudents.length} học sinh vào lớp ${targetClass ? targetClass.name : ''}!`);
+        }
+
         // TỰ ĐỘNG BẮT BẢN CẬP NHẬT MỚI VÀ RELOAD TRANG NGAY
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then((reg) => {
-        // Tự động kiểm tra bản mới trên server mỗi khi mở app
-        reg.update();
-
-        reg.onupdatefound = () => {
-            const installingWorker = reg.installing;
-            if (installingWorker) {
-                installingWorker.onstatechange = () => {
-                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        // Phát hiện code mới: Tự động tải lại trang ngay để áp dụng
-                        window.location.reload();
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then((reg) => {
+                reg.update();
+                reg.onupdatefound = () => {
+                    const installingWorker = reg.installing;
+                    if (installingWorker) {
+                        installingWorker.onstatechange = () => {
+                            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                window.location.reload();
+                            }
+                        };
                     }
                 };
-            }
-        };
-    }).catch(err => console.log('SW Fail', err));
+            }).catch(err => console.log('SW Fail', err));
 
-    // Lắng nghe tín hiệu khi Service Worker mới đã chiếm quyền điều khiển
-    let refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) {
-            refreshing = true;
-            window.location.reload();
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
+            });
         }
-    });
-}
 
         // BẮT SỰ KIỆN CÀI ĐẶT APP CHO GIÁO VIÊN
         window.addEventListener('DOMContentLoaded', () => {
-    try {
-        checkAdminSession();
-        loadFromStorage();
-        
-        // Khởi tạo an toàn các ô input nếu tồn tại
-        const datePicker = document.getElementById('sessionDatePicker');
-        if (datePicker) datePicker.value = getTodayVNString();
-        
-        const joinInput = document.getElementById('inputStudentJoinDate');
-        if (joinInput) joinInput.value = getTodayVNString();
-        
-        const apiInput = document.getElementById('inputApiUrl');
-        if (apiInput) apiInput.value = cloudApiUrl || '';
+            try {
+                checkAdminSession();
+                loadFromStorage();
+                
+                const datePicker = document.getElementById('sessionDatePicker');
+                if (datePicker) datePicker.value = getTodayVNString();
+                
+                const joinInput = document.getElementById('inputStudentJoinDate');
+                if (joinInput) joinInput.value = getTodayVNString();
+                
+                const apiInput = document.getElementById('inputApiUrl');
+                if (apiInput) apiInput.value = cloudApiUrl || '';
 
-        // Khởi tạo dòng lịch an toàn
-        initScheduleRows();
-        previewFullClassName();
-        renderGlobalClassSelect();
+                initScheduleRows();
+                previewFullClassName();
+                renderGlobalClassSelect();
 
-        // Luôn kích hoạt hiển thị Tab mặc định an toàn
-        switchTab('dashboard');
+                switchTab('dashboard');
 
-        setupDirectImagePaste();
-        if (window.lucide) lucide.createIcons();
+                setupDirectImagePaste();
+                if (window.lucide) lucide.createIcons();
 
-        // Tải dữ liệu Cloud nếu có URL
-        if (cloudApiUrl) loadDataFromCloud();
-    } catch (err) {
-        console.error("Lỗi khởi tạo khi F5:", err);
-    }
-});
+                if (cloudApiUrl) loadDataFromCloud();
+            } catch (err) {
+                console.error("Lỗi khởi tạo khi F5:", err);
+            }
+        });
 
-function initScheduleRows() {
-    const c = document.getElementById('scheduleRowsContainer');
-    if (!c) return;
-    c.innerHTML = '';
-    addScheduleRow('Thứ 3', '17:30', '19:00');
-    addScheduleRow('Thứ 6', '17:30', '19:00');
-}
+        function initScheduleRows() {
+            const c = document.getElementById('scheduleRowsContainer');
+            if (!c) return;
+            c.innerHTML = '';
+            addScheduleRow('Thứ 3', '17:30', '19:00');
+            addScheduleRow('Thứ 6', '17:30', '19:00');
+        }
 
-function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
-    const c = document.getElementById('scheduleRowsContainer');
-    if (!c) return;
-    const r = document.createElement('div');
-    r.className = 'flex items-center space-x-1.5 bg-white p-2 rounded-xl border';
-    r.innerHTML = `
-        <select class="sch-day text-xs p-1.5 border rounded-lg font-bold outline-none">
-            <option value="Thứ 2" ${d==='Thứ 2'?'selected':''}>T2</option>
-            <option value="Thứ 3" ${d==='Thứ 3'?'selected':''}>T3</option>
-            <option value="Thứ 4" ${d==='Thứ 4'?'selected':''}>T4</option>
-            <option value="Thứ 5" ${d==='Thứ 5'?'selected':''}>T5</option>
-            <option value="Thứ 6" ${d==='Thứ 6'?'selected':''}>T6</option>
-            <option value="Thứ 7" ${d==='Thứ 7'?'selected':''}>T7</option>
-            <option value="Chủ Nhật" ${d==='Chủ Nhật'?'selected':''}>CN</option>
-        </select>
-        <input type="time" class="sch-start text-xs p-1 border rounded-lg font-bold" value="${s}">
-        <input type="time" class="sch-end text-xs p-1 border rounded-lg font-bold" value="${e}">
-        <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 p-1"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
-    `;
-    c.appendChild(r);
-    if (window.lucide) lucide.createIcons();
-}
+        function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
+            const c = document.getElementById('scheduleRowsContainer');
+            if (!c) return;
+            const r = document.createElement('div');
+            r.className = 'flex items-center space-x-1.5 bg-white p-2 rounded-xl border';
+            r.innerHTML = `
+                <select class="sch-day text-xs p-1.5 border rounded-lg font-bold outline-none">
+                    <option value="Thứ 2" ${d==='Thứ 2'?'selected':''}>T2</option>
+                    <option value="Thứ 3" ${d==='Thứ 3'?'selected':''}>T3</option>
+                    <option value="Thứ 4" ${d==='Thứ 4'?'selected':''}>T4</option>
+                    <option value="Thứ 5" ${d==='Thứ 5'?'selected':''}>T5</option>
+                    <option value="Thứ 6" ${d==='Thứ 6'?'selected':''}>T6</option>
+                    <option value="Thứ 7" ${d==='Thứ 7'?'selected':''}>T7</option>
+                    <option value="Chủ Nhật" ${d==='Chủ Nhật'?'selected':''}>CN</option>
+                </select>
+                <input type="time" class="sch-start text-xs p-1 border rounded-lg font-bold" value="${s}">
+                <input type="time" class="sch-end text-xs p-1 border rounded-lg font-bold" value="${e}">
+                <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 p-1"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+            `;
+            c.appendChild(r);
+            if (window.lucide) lucide.createIcons();
+        }
 
         function triggerTeacherPWAInstall() {
             if (teacherDeferredPrompt) {
@@ -1174,7 +1217,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             }
         }
 
-        // ==================== HÀM TIỆN ÍCH NGÀY CHUẨN DD-MM-YYYY ====================
         function getTodayVNString() {
             const v = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
             return `${String(v.getDate()).padStart(2, '0')}-${String(v.getMonth() + 1).padStart(2, '0')}-${v.getFullYear()}`;
@@ -1221,7 +1263,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             return p.length === 3 ? `${p[0]}/${p[1]}` : clean;
         }
 
-        // ==================== BẢO MẬT MÃ PIN QUẢN TRỊ ====================
         function getStoredAdminPin() { return localStorage.getItem(ADMIN_PIN_KEY) || '123456'; }
 
         function checkAdminSession() {
@@ -1289,7 +1330,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             checkAdminSession();
         }
 
-        // ==================== XEM TRƯỚC VÀ THÊM LỚP HỌC MỚI ====================
         function previewFullClassName() {
             const grade = document.getElementById('inputClassGrade').value;
             const subName = document.getElementById('inputClassSubName').value.trim().toUpperCase();
@@ -1335,7 +1375,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             alert(`Đã thêm lớp ${fullName} thành công!`);
         }
 
-        // ==================== BẢNG PHỐI MÀU LỊCH HỌC TRỰC QUAN ====================
         function getClassBadgeTheme(className, isExtra = false) {
             if (isExtra) {
                 return {
@@ -1380,7 +1419,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             return { cardBg, timeBadge, dot };
         }
 
-        // ==================== SINH MÃ HỌC SINH TỰ ĐỘNG THEO TOÀN KHỐI ====================
         function generateNextStudentCode(classId) {
             const targetClass = appData.classes.find(c => c.id === classId);
             if (!targetClass) return 'HS001';
@@ -1445,7 +1483,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
 
         function updateSyncStatus(t, msg) { const x=document.getElementById('syncText'); if(x) x.innerText=msg; const d=document.getElementById('syncDot'); if(d) d.className='w-2 h-2 rounded-full shrink-0 '+(t==='syncing'?'bg-amber-400 animate-ping':t==='success'?'bg-emerald-400':'bg-rose-400'); }
         
-        // ==================== TỰ ĐỘNG LƯU API URL ====================
         function autoSaveApiUrl(val) {
             const url = (val || '').trim();
             if (url) {
@@ -1492,7 +1529,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             return classObj ? classObj.fee : 300000;
         }
 
-        // ==================== TẢI VÀ LƯU CLOUD ====================
         async function loadDataFromCloud() {
             if(!cloudApiUrl) return; updateSyncStatus('syncing', 'Đang tải...');
             try {
@@ -1601,7 +1637,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             if(window.lucide) lucide.createIcons();
         }
 
-        // ==================== DASHBOARD & CHI TIẾT ====================
         function renderDashboard() {
             const stds = getFilteredStudents();
             document.getElementById('dashTotalStudents').innerText = stds.length;
@@ -1627,9 +1662,7 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
                 }
             });
 
-            // SẮP XẾP CA HỌC THEO THỜI GIAN SỚM ĐẾN MUỘN
             todayLessons.sort((a, b) => (a.schedule.startTime || '').localeCompare(b.schedule.startTime || ''));
-
             document.getElementById('dashTodayLessonsCount').innerText = `${todayLessons.length} Ca`;
 
             const lessonContainer = document.getElementById('dashTodayLessonsContainer');
@@ -1679,7 +1712,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             document.getElementById('dashTuitionRate').innerText = `${rate}%`;
         }
 
-        // ==================== CÁC HÀM TIỆN ÍCH KHÁC ====================
         function populateClassSelectModal() {
             ['inputStudentClassId', 'editStudentClassId', 'inputDocClassId'].forEach(id => {
                 const el = document.getElementById(id);
@@ -1849,7 +1881,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             alert(`Đã cập nhật thông tin học sinh!`);
         }
 
-        // ==================== CỘNG DỒN HỌC PHÍ KHI CHUYỂN LỚP ====================
         function calculateTransferTuition(studentId, oldClassId, newClassId) {
             if (!oldClassId || !newClassId || oldClassId === newClassId) return null;
 
@@ -1891,7 +1922,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             };
         }
 
-        // ==================== HỒ SƠ NGHỈ HỌC & CHỐT NỢ ====================
         function openLeaveStudentModal(id) {
             const s = appData.students.find(x => x.id === id);
             if(!s) return;
@@ -2010,8 +2040,11 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
         function renderClassesAndStudents() {
             document.getElementById('classListContainer').innerHTML = appData.classes.map(c => `
                 <div class="p-2.5 rounded-xl border flex justify-between items-center bg-slate-50 text-xs">
-                    <span class="font-bold">${c.name} (${c.fee.toLocaleString()}đ)</span>
-                    <button onclick="deleteClass('${c.id}')" class="text-rose-500 hover:bg-rose-100 p-1 rounded"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                    <span class="font-bold text-slate-800">${c.name} (${(c.fee||300000).toLocaleString()}đ)</span>
+                    <div class="flex items-center space-x-1">
+                        <button onclick="openEditClassModal('${c.id}')" class="text-indigo-600 hover:bg-indigo-100 p-1.5 rounded-lg" title="Sửa tên lớp & lịch học cố định"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+                        <button onclick="deleteClass('${c.id}')" class="text-rose-500 hover:bg-rose-100 p-1.5 rounded-lg" title="Xóa lớp"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                    </div>
                 </div>
             `).join('');
 
@@ -2028,27 +2061,28 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
                         <td class="p-2.5 sm:p-3 font-mono">${formatDateVN(s.joinDate)}</td>
                         <td class="p-2.5 sm:p-3 font-bold ${fee===0?'text-blue-600':'text-emerald-600'}">${fee===0?'Miễn phí':fee.toLocaleString()+'đ'}</td>
                         <td class="p-2.5 sm:p-3 text-center space-x-1">
+                            <!-- NÚT GIẢ LẬP HỌC SINH -->
+                            <button onclick="impersonateStudent('${s.id}')" class="text-teal-600 hover:bg-teal-50 p-1.5 rounded-lg transition" title="Xem Cổng Học Sinh (Giả lập em ${s.name})">
+                                <i data-lucide="eye" class="w-3.5 h-3.5 inline"></i>
+                            </button>
                             <button onclick="openEditStudentModal('${s.id}')" class="text-indigo-600 hover:bg-indigo-50 p-1.5 rounded-lg" title="Sửa / Chuyển lớp"><i data-lucide="pencil" class="w-3.5 h-3.5 inline"></i></button>
                             <button onclick="openLeaveStudentModal('${s.id}')" class="text-rose-600 hover:bg-rose-50 p-1.5 rounded-lg" title="Báo nghỉ học & Chốt nợ"><i data-lucide="user-minus" class="w-3.5 h-3.5 inline"></i></button>
                         </td>
                     </tr>
                 `;
             }).join('');
+            if (window.lucide) lucide.createIcons();
         }
 
-        // ==================== LỊCH DẠY 2 TẦNG (SẮP XẾP GIỜ & MÀU TƯƠNG PHẢN) ====================
-        function initScheduleRows() {
-            const c = document.getElementById('scheduleRowsContainer');
-            if(c) { c.innerHTML=''; addScheduleRow('Thứ 3','17:30','19:00'); addScheduleRow('Thứ 6','17:30','19:00'); }
+        function deleteClass(id) { 
+            if(confirm('Xóa lớp này?')) { 
+                appData.classes = appData.classes.filter(x=>x.id!==id); 
+                appData.students = appData.students.filter(x=>x.classId!==id); 
+                saveDataToCloud(); 
+                renderGlobalClassSelect(); 
+                refreshCurrentTab(); 
+            } 
         }
-        function addScheduleRow(d='Thứ 2', s='17:30', e='19:00') {
-            const c = document.getElementById('scheduleRowsContainer'); if(!c) return;
-            const r = document.createElement('div'); r.className = 'flex items-center space-x-1.5 bg-white p-2 rounded-xl border';
-            r.innerHTML = `<select class="sch-day text-xs p-1.5 border rounded-lg font-bold outline-none"><option value="Thứ 2" ${d==='Thứ 2'?'selected':''}>T2</option><option value="Thứ 3" ${d==='Thứ 3'?'selected':''}>T3</option><option value="Thứ 4" ${d==='Thứ 4'?'selected':''}>T4</option><option value="Thứ 5" ${d==='Thứ 5'?'selected':''}>T5</option><option value="Thứ 6" ${d==='Thứ 6'?'selected':''}>T6</option><option value="Thứ 7" ${d==='Thứ 7'?'selected':''}>T7</option><option value="Chủ Nhật" ${d==='Chủ Nhật'?'selected':''}>CN</option></select><input type="time" class="sch-start text-xs p-1 border rounded-lg font-bold" value="${s}"><input type="time" class="sch-end text-xs p-1 border rounded-lg font-bold" value="${e}"><button type="button" onclick="this.parentElement.remove()" class="text-rose-500 p-1"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>`;
-            c.appendChild(r); if(window.lucide) lucide.createIcons();
-        }
-
-        function deleteClass(id) { if(confirm('Xóa lớp này?')) { appData.classes = appData.classes.filter(x=>x.id!==id); appData.students = appData.students.filter(x=>x.classId!==id); saveDataToCloud(); renderGlobalClassSelect(); refreshCurrentTab(); } }
 
         function getStartOfWeek(date, offsetWeeks = 0) {
             const d = new Date(date);
@@ -2082,7 +2116,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
                     });
                 });
 
-                // Sắp xếp ca dạy theo giờ sớm đến muộn
                 ss.sort((a, b) => (a.st || '').localeCompare(b.st || ''));
 
                 return `
@@ -2152,7 +2185,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
                     });
                 });
 
-                // Sắp xếp ca học theo mốc giờ từ sớm đến muộn
                 lessons.sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
 
                 html += `
@@ -2324,7 +2356,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             }
         }
 
-        // ==================== ĐIỂM DANH BUỔI (XÓA BUỔI NHẦM) ====================
         function loadSessionAttendance() {
             const d = normalizeCloudDate(document.getElementById('sessionDatePicker').value.trim());
             const stds = getFilteredStudents();
@@ -2372,7 +2403,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             }
         }
 
-        // ==================== BẤM TIÊU ĐỀ CỘT TRÊN SỔ 8 BUỔI ĐỂ ĐỔI NGÀY ====================
         function openEditAttendanceDateModal(dateStr) {
             selectedAttDateToChange = normalizeCloudDate(dateStr);
             document.getElementById('editCurrentAttDateText').value = selectedAttDateToChange;
@@ -2493,7 +2523,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             container.innerHTML = html;
         }
 
-        // ==================== TÍNH TIỀN NỢ THỰC TẾ & BẢNG HỌC PHÍ ====================
         function getRequiredTuitionForCycle(s, cycleIdx) {
             const c = appData.classes.find(x => x.id === s.classId);
             const effFee = getEffectiveStudentFee(s, c);
@@ -2503,7 +2532,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             
             if (isExempt || (p && p.status === 'EXEMPT')) return { amount: 0, status: 'EXEMPT', note: p?.note || 'Miễn phí' };
             if (p && p.status === 'PAID') return { amount: p.amount, status: 'PAID', note: 'Đã nộp' };
-
             if (p && p.amount > 0) return { amount: p.amount, status: 'PENDING', note: p.note || 'Cần thu' };
 
             const classSessions = getClassSessionDates(s.classId);
@@ -2634,7 +2662,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             }).join('');
         }
 
-        // ==================== BÓC TÁCH ĐỀ THI ====================
         function setupDirectImagePaste() {
             const ed = document.getElementById('directEditorArea');
             if(!ed) return;
@@ -2847,7 +2874,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             container.innerHTML = html;
         }
 
-        // ==================== TÀI LIỆU ====================
         function renderDocumentsTab() {
             populateClassSelectModal();
             const docs = currentClassId==='ALL' ? appData.documents : appData.documents.filter(d=>d.classId===currentClassId);
@@ -2901,7 +2927,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             alert('Đã lưu tài liệu vào chuyên đề thành công!');
         }
 
-        // ==================== CẤU HÌNH THƯƠNG HIỆU ====================
         function previewAppLogo(url) {
             if(url) document.getElementById('cfgLogoPreview').src = url;
         }
@@ -2936,7 +2961,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             alert('Đã cập nhật Tên và Logo App!');
         }
 
-        // ==================== TRỢ LÝ GIÁO VIÊN (TEACHER ASSISTANT) ====================
         function toggleTeacherAssistant() {
             const win = document.getElementById('assistantChatWindow');
             if (!win) return;
@@ -2987,7 +3011,6 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             list.scrollTop = list.scrollHeight;
         }
 
-        // ==================== ĐỒNG BỘ GOOGLE CALENDAR ====================
         async function syncScheduleToGoogleCalendar() {
             if (!cloudApiUrl) { alert("Vui lòng cấu hình API Web App trước!"); return; }
 
@@ -3024,90 +3047,15 @@ function addScheduleRow(d = 'Thứ 2', s = '17:30', e = '19:00') {
             const url = window.location.href.split('?')[0].split('index.html')[0].replace(/\/$/, "") + `/exam.html`;
             navigator.clipboard.writeText(url).then(()=>alert('Đã copy link Cổng Khảo Thí!')).catch(()=>alert(url));
         }
+
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            if (sb) sb.classList.toggle('hidden');
+        }
+        function toggleMobileSidebar() {
+            const sb = document.getElementById('sidebar');
+            if (sb) sb.classList.toggle('hidden');
+        }
     </script>
-<!-- MODAL 1: CHỈNH SỬA LỚP HỌC & LỊCH CỐ ĐỊNH -->
-<div id="modalEditClassSchedule" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-    <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-md space-y-4">
-        <div class="flex justify-between items-center border-b pb-2">
-            <h3 class="font-bold text-sm text-indigo-900 flex items-center space-x-2">
-                <i data-lucide="calendar-cog" class="w-4 h-4 text-indigo-600"></i>
-                <span>Chỉnh Sửa Lớp & Lịch Học Cố Định</span>
-            </h3>
-            <button onclick="closeEditClassModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
-        </div>
-        <form id="formEditClassSchedule" onsubmit="handleSaveEditClass(event)" class="space-y-3 text-xs">
-            <input type="hidden" id="editClassId">
-            <div>
-                <label class="block font-bold text-slate-700 mb-1">Tên Lớp Học:</label>
-                <input type="text" id="editClassNameInput" required class="w-full p-2.5 border rounded-xl font-bold uppercase outline-none focus:border-indigo-600">
-            </div>
-            <div>
-                <label class="block font-bold text-slate-700 mb-1">Học Phí Chuẩn / 8 Buổi (VNĐ):</label>
-                <input type="number" id="editClassFeeInput" required class="w-full p-2.5 border rounded-xl font-bold text-emerald-700 outline-none">
-            </div>
-            <div class="border border-indigo-50 p-3 rounded-2xl bg-slate-50 space-y-2">
-                <div class="flex justify-between items-center">
-                    <label class="block font-bold text-indigo-950">Lịch Học Cố Định Trong Tuần:</label>
-                    <button type="button" onclick="addEditScheduleRow()" class="text-indigo-600 font-bold hover:underline">+ Thêm ca</button>
-                </div>
-                <div id="editScheduleRowsContainer" class="space-y-2"></div>
-            </div>
-            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow transition">Lưu Thay Đổi & Cập Nhật Lịch</button>
-        </form>
-    </div>
-</div>
-
-<!-- MODAL 2: NHẬP HỌC SINH TỪ FILE EXCEL -->
-<div id="modalImportExcel" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-    <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-xl space-y-4">
-        <div class="flex justify-between items-center border-b pb-2">
-            <h3 class="font-bold text-sm text-blue-900 flex items-center space-x-2">
-                <i data-lucide="file-spreadsheet" class="w-4 h-4 text-blue-600"></i>
-                <span>Nhập Học Sinh Hàng Loạt Từ Excel</span>
-            </h3>
-            <button onclick="closeImportExcelModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
-        </div>
-
-        <div class="space-y-3 text-xs">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-2xl">
-                <div>
-                    <b class="text-blue-950">Quy cách file Excel:</b>
-                    <div class="text-[11px] text-blue-800">Cột A: Họ và tên | Cột B: Số điện thoại | Cột C: Ngày vào (DD-MM-YYYY) | Cột D: Học phí riêng (nếu có)</div>
-                </div>
-                <button type="button" onclick="downloadSampleExcel()" class="bg-white border border-blue-300 text-blue-700 hover:bg-blue-100 font-bold px-3 py-1.5 rounded-xl whitespace-nowrap shadow-xs">
-                    Tải File Mẫu
-                </button>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Chọn Lớp Nhập Vào:</label>
-                    <select id="importTargetClassSelect" class="w-full p-2.5 border rounded-xl font-bold bg-slate-50 outline-none"></select>
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Chọn Tệp Excel (.xlsx, .xls):</label>
-                    <input type="file" id="excelFileInput" accept=".xlsx, .xls" onchange="handleExcelFileSelected(event)" class="w-full p-2 border rounded-xl bg-white text-xs">
-                </div>
-            </div>
-
-            <!-- Bảng xem trước danh sách từ file -->
-            <div id="excelPreviewSection" class="hidden space-y-2">
-                <div class="flex justify-between items-center font-bold text-slate-700">
-                    <span>Xem Trước Dữ Liệu (<span id="excelPreviewCountText" class="text-indigo-600">0</span> học sinh):</span>
-                </div>
-                <div class="max-h-52 overflow-y-auto border rounded-xl">
-                    <table class="w-full text-left text-xs whitespace-nowrap">
-                        <thead><tr class="bg-slate-100 font-bold border-b"><th class="p-2">STT</th><th class="p-2">Họ Tên</th><th class="p-2">SĐT</th><th class="p-2">Ngày Vào</th><th class="p-2">Mã Dự Kiến</th></tr></thead>
-                        <tbody id="excelPreviewTableBody" class="divide-y"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <button type="button" id="btnConfirmImportExcel" onclick="confirmImportExcelToSystem()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow transition hidden">
-                Xác Nhận Lưu Vào Lớp & Tự Động Tạo Tài Khoản
-            </button>
-        </div>
-    </div>
-</div>
 </body>
 </html>

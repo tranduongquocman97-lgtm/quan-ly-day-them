@@ -1,4 +1,4 @@
-const CACHE_NAME = 'msigma-cache-v3'; // <-- Đổi v2, v3... mỗi khi Thầy sửa code
+const CACHE_NAME = 'msigma-cache-v4'; // <-- Đổi v2, v3... mỗi khi Thầy sửa code
 
 const STATIC_ASSETS = [
     './',
