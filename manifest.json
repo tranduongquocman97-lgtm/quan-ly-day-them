@@ -1,24 +1,85 @@
 {
+  "id": "msigmateacher-admin-app-2026",
   "name": "M_SigmaTeacher - Quản Lý Dạy Thêm & Khảo Thí",
   "short_name": "M_SigmaTeacher",
+  "description": "Hệ thống quản lý lớp học, điểm danh chuyên cần, công nợ học phí và ngân hàng đề thi Toán",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
+  "display_override": [
+    "standalone",
+    "window-controls-overlay"
+  ],
   "background_color": "#0b1329",
   "theme_color": "#1e1b4b",
   "orientation": "any",
+  "lang": "vi",
+  "categories": [
+    "education",
+    "productivity"
+  ],
   "icons": [
     {
       "src": "logo-teacher-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "logo-teacher-512.png",
+      "src": "logo-teacher-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "logo-teacher.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "logo-teacher.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Điểm Danh Buổi Học",
+      "short_name": "Điểm Danh",
+      "description": "Mở nhanh sổ điểm danh buổi học hôm nay",
+      "url": "./index.html#attendance-session",
+      "icons": [
+        {
+          "src": "logo-teacher-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Thu Học Phí",
+      "short_name": "Học Phí",
+      "description": "Theo dõi và thu học phí các chu kỳ",
+      "url": "./index.html#tuition",
+      "icons": [
+        {
+          "src": "logo-teacher-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Ngân Hàng Đề Thi",
+      "short_name": "Đề Thi",
+      "description": "Tạo đề thi mới và dán đề từ Word",
+      "url": "./index.html#qbank",
+      "icons": [
+        {
+          "src": "logo-teacher-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

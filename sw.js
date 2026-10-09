@@ -1,75 +1,97 @@
-// Đổi chuỗi phiên bản này (VD: v2026.1, v2026.2...) mỗi khi Thầy sửa code để máy học sinh tự cập nhật ngay
-const CACHE_VERSION = 'v2026.10.09.1';
+// ============================================================================
+// FILE 1: sw.js - SERVICE WORKER CHUẨN HÓA CHO SIGMAMATH & SIGMATEACHER
+// ============================================================================
+
+// Đổi chuỗi phiên bản này mỗi khi cập nhật code để thiết bị tự động làm mới
+const CACHE_VERSION = 'v2026.10.10.1';
 const CACHE_NAME = `msigma-cache-${CACHE_VERSION}`;
 
+// Danh sách các tài nguyên tĩnh cốt lõi cần nạp sẵn vào bộ nhớ đệm
 const STATIC_ASSETS = [
     './',
     './index.html',
     './hocsinh.html',
+    './exam.html',
+    './test_parser.html',
     './manifest.json',
     './manifest-hocsinh.json',
     './logo-teacher.png',
-    './logo-student.png'
+    './logo-teacher-192.png',
+    './logo-student.png',
+    './logo-student-192.png'
 ];
 
-// 1. Cài đặt SW mới và kích hoạt ngay lập tức
-self.addEventListener('install', (e) => {
+// 1. CÀI ĐẶT SERVICE WORKER MỚI VÀ NẠP CACHE
+self.addEventListener('install', (event) => {
     self.skipWaiting();
-    e.waitUntil(
+    event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(STATIC_ASSETS).catch((err) => {
-                console.warn('Lỗi lưu cache tĩnh:', err);
-            });
+            return Promise.allSettled(
+                STATIC_ASSETS.map((asset) =>
+                    cache.add(asset).catch((err) => {
+                        console.warn(`[SW] Bỏ qua file chưa có sẵn khi nạp cache: ${asset}`, err);
+                    })
+                )
+            );
         })
     );
 });
 
-// 2. Kích hoạt SW mới và xóa sạch toàn bộ cache cũ
-self.addEventListener('activate', (e) => {
-    e.waitUntil(
+// 2. KÍCH HOẠT VÀ TỰ ĐỘNG XÓA BỎ BỘ NHỚ ĐỆM PHIÊN BẢN CŨ
+self.addEventListener('activate', (event) => {
+    event.waitUntil(
         caches.keys().then((keys) => {
             return Promise.all(
-                keys.map((k) => {
-                    if (k !== CACHE_NAME) {
-                        return caches.delete(k); // Xóa sạch phiên bản cũ
+                keys.map((key) => {
+                    if (key !== CACHE_NAME) {
+                        return caches.delete(key);
                     }
                 })
             );
-        }).then(() => self.clients.claim()) // Chiếm quyền điều khiển trang ngay
+        }).then(() => self.clients.claim())
     );
 });
 
-// 3. Lắng nghe thông điệp từ client để cập nhật tức thì
+// 3. LẮNG NGHE THÔNG ĐIỆP ĐỂ ÉP CẬP NHẬT TỨC THÌ
 self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
         self.skipWaiting();
     }
 });
 
-// 4. Chiến lược Fetch: Luôn ưu tiên mạng đối với trang HTML để đảm bảo code mới nhất
-self.addEventListener('fetch', (e) => {
-    const url = e.request.url;
+// 4. ĐIỀU PHỐI DỮ LIỆU MẠNG (FETCH STRATEGY)
+self.addEventListener('fetch', (event) => {
+    const request = event.request;
+    const url = request.url;
 
-    // Không can thiệp API Google Apps Script hoặc request gửi dữ liệu POST
-    if (url.includes('script.google.com') || e.request.method !== 'GET') {
+    // Không can thiệp các request không phải GET, API Google Apps Script, hoặc VietQR
+    if (
+        request.method !== 'GET' ||
+        url.includes('script.google.com') ||
+        url.includes('vietqr.io') ||
+        !url.startsWith('http')
+    ) {
         return;
     }
 
-    // Với các trang HTML hoặc điều hướng: Network-First (Ưu tiên mạng, mất mạng mới dùng cache)
-    if (e.request.mode === 'navigate' || url.endsWith('.html')) {
-        e.respondWith(
-            fetch(e.request)
+    // CHIẾN LƯỢC 1: Network-First đối với các trang HTML (Ưu tiên mạng để luôn có bản mới nhất)
+    if (request.mode === 'navigate' || url.endsWith('.html') || url === self.registration.scope) {
+        event.respondWith(
+            fetch(request)
                 .then((networkRes) => {
                     if (networkRes && networkRes.status === 200) {
                         const resClone = networkRes.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(e.request, resClone));
+                        caches.open(CACHE_NAME).then((cache) => cache.put(request, resClone));
                     }
                     return networkRes;
                 })
                 .catch(() => {
-                    return caches.match(e.request).then((cachedRes) => {
+                    // Xử lý khi mất mạng: Fallback chính xác theo từng trang
+                    return caches.match(request).then((cachedRes) => {
                         if (cachedRes) return cachedRes;
+                        if (url.includes('exam')) return caches.match('./exam.html');
                         if (url.includes('hocsinh')) return caches.match('./hocsinh.html');
+                        if (url.includes('test_parser')) return caches.match('./test_parser.html');
                         return caches.match('./index.html');
                     });
                 })
@@ -77,20 +99,30 @@ self.addEventListener('fetch', (e) => {
         return;
     }
 
-    // Với tài nguyên hình ảnh, script CDN: Stale-While-Revalidate
-    e.respondWith(
-        caches.match(e.request).then((cached) => {
-            const networkFetch = fetch(e.request)
-                .then((networkRes) => {
-                    if (networkRes && networkRes.status === 200) {
-                        const resClone = networkRes.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(e.request, resClone));
-                    }
-                    return networkRes;
-                })
-                .catch(() => cached);
+    // CHIẾN LƯỢC 2: Cache-First đối với tài nguyên tĩnh (Hình ảnh, CSS, JS, Fonts)
+    event.respondWith(
+        caches.match(request).then((cachedRes) => {
+            if (cachedRes) {
+                // Trả về bản cache ngay, đồng thời âm thầm fetch để cập nhật bản mới phía sau
+                fetch(request)
+                    .then((networkRes) => {
+                        if (networkRes && networkRes.status === 200) {
+                            const resClone = networkRes.clone();
+                            caches.open(CACHE_NAME).then((cache) => cache.put(request, resClone));
+                        }
+                    })
+                    .catch(() => {});
+                return cachedRes;
+            }
 
-            return cached || networkFetch;
+            // Nếu chưa có trong cache thì nạp từ mạng
+            return fetch(request).then((networkRes) => {
+                if (networkRes && networkRes.status === 200) {
+                    const resClone = networkRes.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(request, resClone));
+                }
+                return networkRes;
+            });
         })
     );
 });

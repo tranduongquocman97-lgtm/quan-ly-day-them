@@ -3,73 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bộ Bóc Tách Đề Thi Siêu Cấp v2</title>
+    <title>Bộ Bóc Tách Đề Thi Siêu Cấp - SigmaMath</title>
+    
+    <link rel="icon" type="image/png" href="logo-teacher-192.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- KaTeX Hỗ Trợ Công Thức Toán Học -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .editor-box { min-height: 320px; max-height: 520px; outline: none; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .editor-box { min-height: 340px; max-height: 540px; outline: none; }
         .editor-box:empty:before { content: attr(placeholder); color: #94a3b8; font-style: italic; }
         .editor-box img { max-height: 220px; border-radius: 8px; border: 1px solid #e2e8f0; margin: 6px 0; display: inline-block; }
     </style>
 </head>
-<body class="p-4 md:p-8 text-slate-800">
+<body class="p-3 sm:p-6 md:p-8 text-slate-800">
 
-    <div class="max-w-7xl mx-auto space-y-6">
-        <div class="bg-indigo-900 text-white p-5 rounded-2xl shadow-md flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-black">BỘ BÓC TÁCH ĐỀ THI 3 PHẦN & DÁN ẢNH (BẢN CHUẨN HOÁ V2)</h1>
-                <p class="text-xs text-indigo-200 mt-1">Hỗ trợ nhận diện tự động kể cả khi không viết hoa hoặc nằm cùng dòng</p>
+    <div class="max-w-7xl mx-auto space-y-5">
+        <!-- HEADER CÔNG CỤ -->
+        <div class="bg-indigo-950 text-white p-5 sm:p-6 rounded-3xl shadow-xl border border-indigo-900/60 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="space-y-1">
+                <div class="flex items-center space-x-2.5">
+                    <img src="logo-teacher.png" alt="SigmaMath" class="w-8 h-8 rounded-xl object-cover border border-amber-400/40">
+                    <h1 class="text-base sm:text-xl font-black tracking-tight">BỘ BÓC TÁCH ĐỀ THI 3 PHẦN & DÁN ẢNH</h1>
+                </div>
+                <p class="text-xs text-indigo-300">Chuẩn hóa cấu trúc GDPT Mới: [P1] 4 lựa chọn, [P2] Đúng/Sai, [P3] Điền khuyết</p>
             </div>
-            <button onclick="insertSampleData()" class="bg-indigo-700 hover:bg-indigo-600 text-xs font-bold px-3 py-2 rounded-xl transition">
-                + Nạp Đề Mẫu Chuẩn
-            </button>
+            <div class="flex items-center space-x-2">
+                <button onclick="insertSampleData()" class="bg-indigo-800 hover:bg-indigo-700 text-xs font-bold px-3.5 py-2.5 rounded-xl transition flex items-center space-x-1.5 border border-indigo-700 shadow-sm">
+                    <i data-lucide="file-plus" class="w-4 h-4 text-amber-300"></i>
+                    <span>Nạp Đề Mẫu Chuẩn</span>
+                </button>
+                <a href="index.html" class="bg-white/10 hover:bg-white/20 text-xs font-bold px-3 py-2.5 rounded-xl transition flex items-center space-x-1 border border-white/15">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Về Quản Trị</span>
+                </a>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- CỘT NHẬP LIỆU -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 items-start">
+            <!-- CỘT NHẬP LIỆU BÊN TRÁI -->
+            <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-200 space-y-4">
                 <div class="flex justify-between items-center border-b pb-3">
-                    <h2 class="font-bold text-sm">Dán Đề Thi Từ Word Vào Đây</h2>
-                    <span class="text-[11px] bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded">Ctrl + V Dán Ảnh Trực Tiếp</span>
+                    <h2 class="font-bold text-sm text-slate-800 flex items-center space-x-1.5">
+                        <i data-lucide="edit-3" class="w-4 h-4 text-indigo-600"></i>
+                        <span>Dán Đề Thi Từ Word Vào Đây</span>
+                    </h2>
+                    <span class="text-[11px] bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-lg border border-emerald-100 flex items-center space-x-1">
+                        <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                        <span>Ctrl + V Dán Ảnh Trực Tiếp</span>
+                    </span>
                 </div>
 
                 <div id="smartEditor" contenteditable="true" 
-                     placeholder="Dán nội dung từ file Word vào đây... Bấm Windows + Shift + S chụp ảnh rồi Ctrl + V vào vị trí bất kỳ."
-                     class="editor-box w-full p-4 border-2 border-dashed border-slate-300 rounded-xl overflow-y-auto text-sm focus:border-indigo-500 bg-slate-50/50 leading-relaxed font-mono">
+                     placeholder="Dán nội dung từ file Word vào đây... Thầy có thể bấm Windows + Shift + S chụp hình vẽ rồi bấm Ctrl + V vào đúng vị trí câu hỏi."
+                     class="editor-box w-full p-4 border-2 border-dashed border-slate-300 rounded-2xl overflow-y-auto text-xs sm:text-sm focus:border-indigo-600 bg-slate-50/50 leading-relaxed font-mono outline-none transition">
                 </div>
 
-                <div class="flex gap-3">
-                    <button onclick="parseExamContent()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow text-sm">
-                        ⚡ Bóc Tách Tự Động & Sửa Lỗi Toán
+                <div class="flex gap-2.5">
+                    <button onclick="parseExamContent()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3 px-4 rounded-xl shadow-lg shadow-indigo-600/20 text-xs sm:text-sm transition flex items-center justify-center space-x-1.5">
+                        <i data-lucide="zap" class="w-4 h-4 text-amber-300"></i>
+                        <span>Bóc Tách Tự Động & Sửa Lỗi Toán</span>
                     </button>
-                    <button onclick="clearEditor()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 px-4 rounded-xl text-sm">
-                        Xóa
+                    <button onclick="clearEditor()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 px-4 rounded-xl text-xs sm:text-sm transition flex items-center justify-center space-x-1">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <span>Xóa</span>
                     </button>
                 </div>
             </div>
 
-            <!-- CỘT XEM TRƯỚC -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4 flex flex-col h-[700px]">
+            <!-- CỘT XEM TRƯỚC BÊN PHẢI -->
+            <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-200 space-y-4 flex flex-col h-[650px] sm:h-[720px]">
                 <div class="flex justify-between items-center border-b pb-3 shrink-0">
-                    <h2 class="font-bold text-sm">Bản Xem Trước Của Thí Sinh</h2>
-                    <span id="questionCounter" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">0 câu hỏi</span>
+                    <h2 class="font-bold text-sm text-slate-800 flex items-center space-x-1.5">
+                        <i data-lucide="eye" class="w-4 h-4 text-indigo-600"></i>
+                        <span>Bản Xem Trước Của Thí Sinh</span>
+                    </h2>
+                    <span id="questionCounter" class="text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-xl">0 câu hỏi</span>
                 </div>
 
-                <div id="previewContainer" class="flex-1 overflow-y-auto space-y-4 pr-1">
-                    <div class="h-full flex items-center justify-center text-slate-400 text-xs italic">
-                        Chưa có dữ liệu bóc tách.
+                <div id="previewContainer" class="flex-1 overflow-y-auto space-y-3.5 pr-1">
+                    <div class="h-full flex flex-col items-center justify-center text-slate-400 text-xs italic space-y-2">
+                        <i data-lucide="inbox" class="w-8 h-8 stroke-1 text-slate-300"></i>
+                        <span>Chưa có dữ liệu. Dán đề và bấm "Bóc Tách Tự Động" để xem kết quả.</span>
                     </div>
                 </div>
 
-                <div class="pt-3 border-t shrink-0 flex justify-between items-center">
-                    <button onclick="exportJSON()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow">
-                        Xuất Cấu Trúc JSON
-                    </button>
-                    <span id="exportStatus" class="text-xs text-slate-500 font-mono"></span>
+                <div class="pt-3 border-t shrink-0 flex flex-wrap justify-between items-center gap-2">
+                    <div class="flex items-center space-x-2">
+                        <button onclick="copyJSONToClipboard()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl shadow transition flex items-center space-x-1.5">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                            <span>Sao Chép JSON</span>
+                        </button>
+                        <button onclick="downloadJSONFile()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl shadow transition flex items-center space-x-1.5">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                            <span>Tải Tệp .json</span>
+                        </button>
+                    </div>
+                    <span id="exportStatus" class="text-xs text-emerald-600 font-bold font-mono"></span>
                 </div>
             </div>
         </div>
@@ -79,7 +117,11 @@
         let parsedQuestions = [];
         const editor = document.getElementById('smartEditor');
 
-        // BẮT SỰ KIỆN DÁN ẢNH TỪ CLIPBOARD
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+        });
+
+        // ==================== 1. BẮT SỰ KIỆN DÁN ẢNH TỪ CLIPBOARD ====================
         editor.addEventListener('paste', function (e) {
             const items = (e.clipboardData || window.clipboardData).items;
             for (let item of items) {
@@ -96,22 +138,26 @@
             }
         });
 
-        // HÀM CHUẨN HOÁ CÔNG THỨC TOÁN MATHTYPE / LATEX
+        // ==================== 2. CHUẨN HOÁ CÔNG THỨC TOÁN MATHTYPE / LATEX ====================
         function normalizeMathLatex(text) {
-            if(!text) return '';
+            if (!text) return '';
             return text
-                // Đổi \[...\] và \(...\) sang $...$ để KaTeX dễ render
+                // Đổi [...] sang $$...$$ (Display Math)
                 .replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$')
-                .replace(/\\\(([\s\S]*?)\\\)/g, '$1$$')                 // Khắc phục lỗi gõ kẹp 2 lần $$
+                // Đổi \(...\) sang $...$ (Inline Math)
+                .replace(/\\\(([\s\S]*?)\\\)/g, '$1$$')                 // Chuẩn hóa dấu $$ kép
                 .replace(/\$\$/g, '$');
         }
 
-        // THUẬT TOÁN BÓC TÁCH MỚI
+        // ==================== 3. THUẬT TOÁN BÓC TÁCH ĐỀ THI 3 PHẦN ====================
         function parseExamContent() {
             let content = editor.innerHTML;
-            if(!content.trim()) { alert("Khung soạn thảo đang trống!"); return; }
+            if (!content.trim()) { 
+                alert("Khung soạn thảo đang trống! Thầy vui lòng dán nội dung đề vào trước."); 
+                return; 
+            }
 
-            // Giữ lại ảnh, chuyển các thẻ ngắt dòng thành ký tự xuống dòng
+            // Giữ lại hình ảnh, chuyển các thẻ ngắt dòng của HTML thành ký tự xuống dòng thuần túy
             content = content.replace(/<div><br><\/div>/gi, '\n')
                              .replace(/<div>/gi, '\n')
                              .replace(/<\/div>/gi, '')
@@ -119,32 +165,32 @@
                              .replace(/<\/p>/gi, '')
                              .replace(/<br\s*[\/]?>/gi, '\n');
 
-            // Chuẩn hoá công thức
+            // Chuẩn hoá công thức Toán
             content = normalizeMathLatex(content);
 
-            // Chèn ký tự ngắt dòng trước các thẻ đánh dấu phần nếu bị dính liền
-            content = content.replace(/(\[(?:P1\vert{}P2\vert{}P3\vert{}PHẦN\s*[123I\vert{}V]+)\]|PHẦN\s+[123I|V]+[\s:.-])/gi, '\n$1\n');
+            // Sửa lỗi cú pháp Regex: sử dụng dấu | chuẩn xác thay vì \vert{}
+            content = content.replace(/(\[(?:P1\vert{}P2\vert{}P3\vert{}PHẦN\s*[123IV]+)\]|PHẦN\s+[123IV]+[\s:.-])/gi, '\n$1\n');
 
-            // Chèn ngắt dòng trước "Câu 1:", "Câu 2:" để tách độc lập
+            // Tách độc lập câu hỏi
             content = content.replace(/(Câu\s+\d+[\s:.-])/gi, '\n$1');
 
             const lines = content.split('\n').map(l => l.trim()).filter(l => l);
 
             parsedQuestions = [];
-            let currentPart = 1; // Mặc định là phần 1
+            let currentPart = 1; // Mặc định bắt đầu từ Phần I
             let currentQ = null;
 
             lines.forEach(line => {
-                // 1. Kiểm tra chuyển đổi Phần
-                const partMatch = line.match(/(?:\[(?:P1\vert{}PHẦN\s*1\vert{}PHẦN\s*I)\]|^PHẦN\s*(?:1|I)[\s:.-])/i);
+                // Nhận diện chuyển phần thi
+                const partMatch  = line.match(/(?:\[(?:P1\vert{}PHẦN\s*1\vert{}PHẦN\s*I)\]|^PHẦN\s*(?:1|I)[\s:.-])/i);
                 const part2Match = line.match(/(?:\[(?:P2\vert{}PHẦN\s*2\vert{}PHẦN\s*II)\]|^PHẦN\s*(?:2|II)[\s:.-])/i);
                 const part3Match = line.match(/(?:\[(?:P3\vert{}PHẦN\s*3\vert{}PHẦN\s*III)\]|^PHẦN\s*(?:3|III)[\s:.-])/i);
 
-                if (partMatch) { currentPart = 1; return; }
+                if (partMatch)  { currentPart = 1; return; }
                 if (part2Match) { currentPart = 2; return; }
                 if (part3Match) { currentPart = 3; return; }
 
-                // 2. Phát hiện bắt đầu một câu hỏi mới
+                // Phát hiện bắt đầu một câu hỏi mới
                 const qHeaderMatch = line.match(/^Câu\s+(\d+)[\s:.-]+([\s\S]*)$/i);
                 if (qHeaderMatch) {
                     if (currentQ) finalizeQuestion(currentQ);
@@ -157,38 +203,37 @@
                     return;
                 }
 
-                // Nếu đang trong 1 câu hỏi, dồn các dòng vào
+                // Dồn các dòng tiếp theo vào nội dung câu hiện tại
                 if (currentQ) {
                     currentQ.lines.push(line);
                 }
             });
 
-            // Đóng câu cuối cùng
+            // Đóng câu hỏi cuối cùng
             if (currentQ) finalizeQuestion(currentQ);
 
             renderPreview();
         }
 
-        // HÀM XỬ LÝ CHI TIẾT NỘI DUNG 1 CÂU HỎI
+        // ==================== 4. PHÂN TÍCH CHI TIẾT TỪNG DẠNG CÂU HỎI ====================
         function finalizeQuestion(q) {
             const fullBody = q.lines.join(' ');
             const fullText = (q.prompt + ' ' + fullBody).trim();
 
-            // Tự nhận diện thông minh lại Phần nếu câu hỏi chưa khớp
             const hasABCD = /(?:\*?[A-D]\s*[\.:\)])/g.test(fullText);
             const hasSmallABCD = /(?:\*?[a-d]\s*[\.:\)])/g.test(fullText);
             const hasAnswerKeyword = /(?:Đáp án|ĐA|KQ)[\s:.-]+/i.test(fullText);
 
+            // Tự động nhận diện lại phần nếu người ra đề quên đặt thẻ [P1], [P2], [P3]
             if (q.part === 1 && !hasABCD && hasSmallABCD) q.part = 2;
             if (q.part === 1 && !hasABCD && hasAnswerKeyword) q.part = 3;
 
             if (q.part === 1) {
-                // PHẦN 1: Bóc tách phương án A, B, C, D (Kể cả khi nằm ngang trên 1 dòng)
+                // PHẦN I: Trắc nghiệm 4 lựa chọn (A, B, C, D)
                 let prompt = q.prompt;
                 const options = [];
                 let correct = '';
 
-                // Tách nội dung câu hỏi trước lựa chọn đầu tiên
                 const splitFirstOpt = fullText.split(/(?=\*?[A-D]\s*[\.:\)])/);
                 prompt = splitFirstOpt[0].replace(/^Câu\s+\d+[\s:.-]*/i, '').trim();
 
@@ -212,7 +257,7 @@
                 });
 
             } else if (q.part === 2) {
-                // PHẦN 2: Bóc tách 4 ý a), b), c), d)
+                // PHẦN II: Đúng / Sai (4 ý a, b, c, d)
                 const splitFirstOpt = fullText.split(/(?=\*?[a-d]\s*[\.:\)])/);
                 const prompt = splitFirstOpt[0].replace(/^Câu\s+\d+[\s:.-]*/i, '').trim();
 
@@ -237,7 +282,7 @@
                 });
 
             } else if (q.part === 3) {
-                // PHẦN 3: Bóc tách đáp án điền số
+                // PHẦN III: Trả lời ngắn / Điền số
                 let correct = '';
                 const ansMatch = fullText.match(/(?:Đáp án|ĐA|KQ)[\s:.-]+([^\n]+)/i);
                 if (ansMatch) {
@@ -254,35 +299,35 @@
             }
         }
 
-        // RENDER KẾT QUẢ XEM TRƯỚC
+        // ==================== 5. RENDER BẢN XEM TRƯỚC ====================
         function renderPreview() {
             const container = document.getElementById('previewContainer');
             document.getElementById('questionCounter').innerText = `${parsedQuestions.length} câu hỏi`;
 
             if (parsedQuestions.length === 0) {
-                container.innerHTML = `<div class="p-4 bg-rose-50 text-rose-700 text-xs rounded-xl text-center">Không nhận diện được câu hỏi nào. Hãy kiểm tra chữ "Câu 1:", "Câu 2:"...</div>`;
+                container.innerHTML = `<div class="p-4 bg-rose-50 text-rose-700 text-xs rounded-2xl text-center font-bold">Không nhận diện được câu hỏi nào. Hãy kiểm tra định dạng "Câu 1:", "Câu 2:"...</div>`;
                 return;
             }
 
             let html = '';
             parsedQuestions.forEach((q, idx) => {
-                html += `<div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">`;
+                html += `<div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5 shadow-xs">`;
                 
-                // Header câu
+                // Header câu hỏi
                 html += `<div class="flex justify-between items-center text-xs">
-                            <span class="font-black text-indigo-700">CÂU ${idx + 1} (${q.part === 1 ? 'Trắc Nghiệm 4 Lựa Chọn' : (q.part === 2 ? 'Đúng / Sai' : 'Trả Lời Ngắn')})</span>
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded ${q.part === 1 ? 'bg-blue-100 text-blue-700' : (q.part === 2 ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700')}">Phần ${q.part}</span>
+                            <span class="font-black text-indigo-900">CÂU ${idx + 1} (${q.part === 1 ? 'Trắc Nghiệm 4 Lựa Chọn' : (q.part === 2 ? 'Đúng / Sai' : 'Trả Lời Ngắn')})</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${q.part === 1 ? 'bg-blue-100 text-blue-800' : (q.part === 2 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800')}">Phần ${q.part}</span>
                          </div>`;
                 
-                // Nội dung câu
-                html += `<div class="text-sm font-medium text-slate-800 leading-relaxed">${q.prompt}</div>`;
+                // Nội dung câu hỏi
+                html += `<div class="text-xs sm:text-sm font-medium text-slate-800 leading-relaxed">${q.prompt}</div>`;
 
                 // Render theo từng phần
                 if (q.part === 1) {
                     html += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">`;
                     q.options.forEach(opt => {
                         const isRight = opt.letter === q.correct;
-                        html += `<div class="p-2.5 rounded-xl border flex items-center space-x-2 text-xs ${isRight ? 'bg-emerald-50 border-emerald-300 font-bold text-emerald-800' : 'bg-white border-slate-200'}">
+                        html += `<div class="p-2.5 rounded-xl border flex items-center space-x-2 text-xs ${isRight ? 'bg-emerald-50 border-emerald-300 font-bold text-emerald-800 shadow-xs' : 'bg-white border-slate-200'}">
                                     <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 ${isRight ? 'bg-emerald-600 text-white' : 'bg-slate-100 font-bold'}">${opt.letter}</span>
                                     <span class="flex-1">${opt.content}</span>
                                     ${isRight ? '<span class="text-[9px] bg-emerald-600 text-white px-1.5 py-0.5 rounded uppercase font-black">Đáp án</span>' : ''}
@@ -294,15 +339,15 @@
                     html += `<div class="space-y-1.5 pt-1">`;
                     q.statements.forEach(st => {
                         html += `<div class="p-2.5 rounded-xl bg-white border border-slate-200 flex justify-between items-center text-xs">
-                                    <div class="flex items-center space-x-2"><b class="text-indigo-600">${st.letter})</b> <span>${st.content}</span></div>
+                                    <div class="flex items-center space-x-2"><b class="text-indigo-700">${st.letter})</b> <span>${st.content}</span></div>
                                     <span class="font-bold px-2 py-0.5 rounded text-[10px] ${st.correct === 'Đ' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">${st.correct === 'Đ' ? 'ĐÚNG' : 'SAI'}</span>
                                  </div>`;
                     });
                     html += `</div>`;
                 } 
                 else if (q.part === 3) {
-                    html += `<div class="p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl text-xs flex justify-between items-center">
-                                <span class="text-slate-500 font-medium">Đáp án cần điền:</span>
+                    html += `<div class="p-3 bg-indigo-50 border border-indigo-100 rounded-xl text-xs flex justify-between items-center">
+                                <span class="text-slate-600 font-bold">Đáp án cần điền:</span>
                                 <span class="font-black text-indigo-700 font-mono text-sm">${q.correct || 'Chưa nhận diện'}</span>
                              </div>`;
                 }
@@ -324,7 +369,7 @@
             }
         }
 
-        // NẠP ĐỀ MẪU ĐỂ TEST
+        // ==================== 6. DỮ LIỆU MẪU ĐỂ THỬ NGHIỆM ====================
         function insertSampleData() {
             editor.innerHTML = `[P1]
 Câu 1: Cho hàm số $y = f(x)$ có bảng biến thiên trên $[-1; 3]$. Tìm giá trị lớn nhất của hàm số trên $[-1; 3]$.
@@ -344,23 +389,55 @@ d) Bán kính mặt cầu ngoại tiếp bằng $\\frac{a\\sqrt{6}}{2}$.
 Câu 4: Một tổ có 6 nam và 4 nữ. Chọn ngẫu nhiên 3 học sinh. Tính xác suất để có ít nhất 1 học sinh nữ.
 Đáp án: 0.8
 
-Câu 5: Các kí hiệu nào sau đây dùng để viết đúng mệnh đề "[7] là một số tự nhiên".
-*A. $\\{7\\} \\subset \\mathbb{N}$   B. $7 \\in \\mathbb{N}$   C. $7 < \\mathbb{N}$   D. $7 \\le \\mathbb{N}$`;
+Câu 5: Trong không gian $Oxyz$, cho mặt cầu $(S): (x-1)^2 + (y+2)^2 + (z-3)^2 = 16$. Bán kính của mặt cầu $(S)$ bằng:
+Đáp án: 4`;
             parseExamContent();
         }
 
         function clearEditor() {
             editor.innerHTML = '';
             parsedQuestions = [];
-            document.getElementById('previewContainer').innerHTML = `<div class="h-full flex items-center justify-center text-slate-400 text-xs italic">Chưa có dữ liệu bóc tách.</div>`;
+            document.getElementById('previewContainer').innerHTML = `
+                <div class="h-full flex flex-col items-center justify-center text-slate-400 text-xs italic space-y-2">
+                    <i data-lucide="inbox" class="w-8 h-8 stroke-1 text-slate-300"></i>
+                    <span>Chưa có dữ liệu.</span>
+                </div>
+            `;
             document.getElementById('questionCounter').innerText = '0 câu hỏi';
             document.getElementById('exportStatus').innerText = '';
+            if (window.lucide) lucide.createIcons();
         }
 
-        function exportJSON() {
-            if(parsedQuestions.length === 0) { alert("Chưa có dữ liệu!"); return; }
-            console.log(JSON.stringify(parsedQuestions, null, 2));
-            alert(`Đã xuất thành công ${parsedQuestions.length} câu hỏi. Thầy bấm F12 -> Console để xem chi tiết.`);
+        // ==================== 7. XUẤT VÀ SAO CHÉP DỮ LIỆU JSON ====================
+        function copyJSONToClipboard() {
+            if (parsedQuestions.length === 0) { 
+                alert("Chưa có dữ liệu bóc tách để sao chép!"); 
+                return; 
+            }
+            const jsonText = JSON.stringify(parsedQuestions, null, 2);
+            navigator.clipboard.writeText(jsonText).then(() => {
+                const st = document.getElementById('exportStatus');
+                st.innerText = `✓ Đã sao chép ${parsedQuestions.length} câu vào bộ nhớ tạm!`;
+                setTimeout(() => st.innerText = '', 3000);
+            }).catch(() => {
+                alert("Không thể sao chép tự động, vui lòng thử lại!");
+            });
+        }
+
+        function downloadJSONFile() {
+            if (parsedQuestions.length === 0) { 
+                alert("Chưa có dữ liệu để tải về!"); 
+                return; 
+            }
+            const blob = new Blob([JSON.stringify(parsedQuestions, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `DeThi_BocTach_${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
     </script>
 </body>

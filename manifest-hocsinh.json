@@ -2,24 +2,71 @@
   "id": "sigmamath-student-app-2026",
   "name": "SigmaMath - Thầy Mẫn",
   "short_name": "M-SigmaMath",
+  "description": "Cổng tra cứu chuyên cần, học phí & khảo thí trực tuyến môn Toán Thầy Mẫn",
   "start_url": "./hocsinh.html",
   "scope": "./",
   "display": "standalone",
+  "display_override": [
+    "standalone",
+    "window-controls-overlay"
+  ],
   "background_color": "#0b1329",
   "theme_color": "#1e1b4b",
   "orientation": "portrait-primary",
+  "lang": "vi",
+  "categories": [
+    "education"
+  ],
   "icons": [
     {
-      "src": "logo-student.png",
+      "src": "logo-student-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "logo-student-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "logo-student.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "logo-student.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Phòng Thi Online",
+      "short_name": "Phòng Thi",
+      "description": "Vào làm bài kiểm tra và thi thử trực tuyến",
+      "url": "./exam.html",
+      "icons": [
+        {
+          "src": "logo-student-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Học Phí & VietQR",
+      "short_name": "Học Phí",
+      "description": "Kiểm tra học phí và quét mã VietQR thanh toán",
+      "url": "./hocsinh.html#tuition",
+      "icons": [
+        {
+          "src": "logo-student-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

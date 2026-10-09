@@ -46,7 +46,7 @@
     </style>
 </head>
 
-<body class="text-slate-800 flex flex-col md:flex-row min-h-screen md:h-screen md:overflow-hidden">
+<body class="text-slate-800 flex flex-col md:flex-row min-h-screen md:h-screen md:overflow-hidden select-none">
 
     <!-- MÀN HÌNH KHÓA MÃ PIN QUẢN TRỊ -->
     <div id="adminPinLockScreen" class="fixed inset-0 bg-slate-950 z-[100] flex items-center justify-center p-4">
@@ -56,7 +56,7 @@
             </div>
             <div>
                 <h1 class="text-lg font-black text-slate-800">XÁC THỰC GIÁO VIÊN</h1>
-                <p class="text-xs text-slate-500 mt-0.5">M_SigmaTeacher • Xác thực 1 lần duy nhất</p>
+                <p class="text-xs text-slate-500 mt-0.5">M_SigmaTeacher • Quản Trị Hệ Thống</p>
             </div>
             <form onsubmit="handleVerifyAdminPin(event)" class="space-y-4">
                 <div class="relative">
@@ -81,7 +81,7 @@
         </div>
     </div>
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR BÊN TRÁI -->
     <aside id="sidebar" class="w-full md:w-64 bg-slate-900 text-slate-200 flex flex-col shrink-0 transition-all duration-300 z-50 shadow-xl">
         <div class="p-3 sm:p-4 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center space-x-3 overflow-hidden">
@@ -121,7 +121,7 @@
         </div>
     </aside>
 
-    <!-- KHU VỰC NỘI DUNG CHÍNH -->
+    <!-- KHU VỰC NỘI DUNG CHÍNH (BÊN PHẢI) -->
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative">
         <header class="bg-white border-b border-slate-200 p-2.5 sm:p-3.5 flex items-center justify-between z-10 shrink-0 shadow-sm">
             <div class="flex items-center space-x-2 sm:space-x-3">
@@ -594,12 +594,12 @@
         <div id="assistantChatWindow" class="hidden w-[330px] sm:w-[380px] h-[460px] sm:h-[500px] bg-white rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden mb-3 transition-all duration-200">
             <div class="bg-indigo-950 text-white p-3.5 flex justify-between items-center shrink-0">
                 <div class="flex items-center space-x-2.5">
-                    <img src="logo-teacher.png" class="w-7 h-7 rounded-xl object-cover border border-amber-400/40">
+                    <img src="logo-teacher.png" class="w-7 h-7 rounded-xl object-cover border border-amber-400/40" alt="Avatar">
                     <div>
                         <h3 class="font-bold text-xs leading-tight">Trợ Lý M_SigmaTeacher</h3>
                         <p class="text-[10px] text-indigo-300 flex items-center space-x-1">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                            <span>Google Assistant</span>
+                            <span>Sẵn Sàng Hỗ Trợ</span>
                         </p>
                     </div>
                 </div>
@@ -610,7 +610,7 @@
                 <div class="flex items-start space-x-2">
                     <div class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0 text-[10px] font-bold">AI</div>
                     <div class="p-3 bg-white border border-slate-200 rounded-2xl rounded-tl-none shadow-sm leading-relaxed text-slate-700">
-                        Chào thầy! Em là Trợ lý M_SigmaTeacher. Em có thể giúp thầy kiểm tra ca dạy hôm nay, rà soát học phí hoặc nhắc lịch Google Calendar.
+                        Chào thầy! Em là Trợ lý M_SigmaTeacher. Em có thể giúp thầy kiểm tra ca dạy hôm nay, rà soát công nợ học phí hoặc đồng bộ Google Calendar.
                     </div>
                 </div>
             </div>
@@ -857,6 +857,8 @@
         const STORAGE_KEY = 'TUTORING_MASTER_SYSTEM_V2026';
         const ADMIN_PIN_KEY = 'MASTER_SYSTEM_ADMIN_PIN';
         const ADMIN_AUTH_TOKEN_KEY = 'MASTER_SYSTEM_ADMIN_AUTH_TOKEN';
+        const STUDENT_AUTH_KEY = 'SIGMA_STUDENT_SESSION';
+        const ACTIVE_STUDENT_SESSION_KEY = 'ACTIVE_STUDENT_SESSION';
 
         let cloudApiUrl = localStorage.getItem('API_URL') || "https://script.google.com/macros/s/AKfycbznfqhckK2L97z427a50oLuZ0W0nLbtdDcJROOv6S2sGQL3_OGbK0Fs7Hd8wOi_or5cXA/exec";
 
@@ -871,20 +873,21 @@
         let selectedAttDateToChange = null;
         let tempImportedStudents = [];
 
-        // ==================== TÍNH NĂNG GIẢ LẬP HỌC SINH TỪ TRANG GV ====================
+        // ==================== 1. TÍNH NĂNG GIẢ LẬP HỌC SINH TỪ TRANG GV ====================
         function impersonateStudent(studentId) {
             const s = appData.students.find(x => x.id === studentId);
             if (!s) {
                 alert("Không tìm thấy thông tin học sinh!");
                 return;
             }
-            const sessionData = { id: s.id };
-            localStorage.setItem('SIGMA_STUDENT_SESSION', JSON.stringify(sessionData));
+            // Đồng bộ cả 2 khóa để hoạt động với cả hocsinh.html và exam.html
+            localStorage.setItem(STUDENT_AUTH_KEY, JSON.stringify({ id: s.id }));
+            localStorage.setItem(ACTIVE_STUDENT_SESSION_KEY, s.id);
             const studentUrl = `hocsinh.html?impersonate=${s.id}`;
             window.open(studentUrl, '_blank');
         }
 
-        // ==================== 1. CHỈNH SỬA LỚP & LỊCH HỌC CỐ ĐỊNH ====================
+        // ==================== 2. CHỈNH SỬA LỚP & LỊCH HỌC CỐ ĐỊNH ====================
         function openEditClassModal(classId) {
             const c = appData.classes.find(x => x.id === classId);
             if (!c) return;
@@ -965,7 +968,7 @@
             }
         }
 
-        // ==================== 2. XUẤT DANH SÁCH RA EXCEL ====================
+        // ==================== 3. XUẤT DANH SÁCH RA EXCEL ====================
         function exportStudentsToExcel() {
             const stds = getFilteredStudents();
             if (stds.length === 0) {
@@ -1002,7 +1005,7 @@
             XLSX.writeFile(workbook, fileName);
         }
 
-        // ==================== 3. NHẬP HỌC SINH TỪ EXCEL ====================
+        // ==================== 4. NHẬP HỌC SINH TỪ EXCEL ====================
         function openImportExcelModal() {
             const sel = document.getElementById('importTargetClassSelect');
             sel.innerHTML = appData.classes.map(c => `
@@ -1122,7 +1125,7 @@
             alert(`✅ Đã nhập thành công ${tempImportedStudents.length} học sinh vào lớp ${targetClass ? targetClass.name : ''}!`);
         }
 
-        // TỰ ĐỘNG BẮT BẢN CẬP NHẬT MỚI VÀ RELOAD TRANG NGAY
+        // ==================== 5. ĐĂNG KÝ SERVICE WORKER ====================
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').then((reg) => {
                 reg.update();
@@ -1147,7 +1150,12 @@
             });
         }
 
-        // BẮT SỰ KIỆN CÀI ĐẶT APP CHO GIÁO VIÊN
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            teacherDeferredPrompt = e;
+        });
+
+        // KHỞI ĐỘNG HỆ THỐNG
         window.addEventListener('DOMContentLoaded', () => {
             try {
                 checkAdminSession();
@@ -1173,7 +1181,7 @@
 
                 if (cloudApiUrl) loadDataFromCloud();
             } catch (err) {
-                console.error("Lỗi khởi tạo khi F5:", err);
+                console.error("Lỗi khởi tạo:", err);
             }
         });
 
@@ -1213,7 +1221,7 @@
                 teacherDeferredPrompt.prompt();
                 teacherDeferredPrompt.userChoice.then(() => { teacherDeferredPrompt = null; });
             } else {
-                alert("Nếu dùng iPhone: Bấm nút Chia sẻ ➔ Chọn 'Thêm vào Màn hình chính'.\nNếu dùng Android: Bấm menu 3 chấm của Chrome ➔ Chọn 'Cài đặt ứng dụng'.");
+                alert("Hướng dẫn cài đặt App:\n• Trên iPhone/iPad: Bấm nút Chia sẻ (Share 📤) ➔ Chọn 'Thêm vào Màn hình chính'.\n• Trên Android/PC: Bấm menu 3 chấm ở góc trên trình duyệt ➔ Chọn 'Cài đặt ứng dụng' (hoặc 'Cài đặt M_SigmaTeacher').");
             }
         }
 
@@ -1462,7 +1470,7 @@
                     body: JSON.stringify({ action: 'backupNow' })
                 });
                 const result = await res.json();
-                alert(result.message);
+                alert(result.message || 'Đã tạo bản sao lưu dữ liệu!');
                 updateSyncStatus('success', 'Đã sao lưu');
             } catch(err) {
                 alert('Đã gửi yêu cầu sao lưu sang Google Drive!');
@@ -2061,7 +2069,6 @@
                         <td class="p-2.5 sm:p-3 font-mono">${formatDateVN(s.joinDate)}</td>
                         <td class="p-2.5 sm:p-3 font-bold ${fee===0?'text-blue-600':'text-emerald-600'}">${fee===0?'Miễn phí':fee.toLocaleString()+'đ'}</td>
                         <td class="p-2.5 sm:p-3 text-center space-x-1">
-                            <!-- NÚT GIẢ LẬP HỌC SINH -->
                             <button onclick="impersonateStudent('${s.id}')" class="text-teal-600 hover:bg-teal-50 p-1.5 rounded-lg transition" title="Xem Cổng Học Sinh (Giả lập em ${s.name})">
                                 <i data-lucide="eye" class="w-3.5 h-3.5 inline"></i>
                             </button>
@@ -2682,6 +2689,7 @@
             });
         }
 
+        // ==================== 6. BỘ BÓC TÁCH ĐỀ THI CHUẨN HOÁ ====================
         function parseAdminExamDirect() {
             const ed = document.getElementById('directEditorArea');
             let content = ed.innerHTML;
@@ -2697,7 +2705,8 @@
                              .replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$')
                              .replace(/\$\$/g, '$');
 
-            content = content.replace(/(\[(?:P1|P2|P3|PHẦN\s*[123I|V]+)\]|PHẦN\s+[123I|V]+[\s:.-])/gi, '\n$1\n');
+            // Khắc phục Regex lỗi escape chuỗi
+            content = content.replace(/(\[(?:P1|P2|P3|PHẦN\s*[123IV]+)\]|PHẦN\s+[123IV]+[\s:.-])/gi, '\n$1\n');
             content = content.replace(/(Câu\s+\d+[\s:.-])/gi, '\n$1');
 
             const lines = content.split('\n').map(l => l.trim()).filter(l => l);

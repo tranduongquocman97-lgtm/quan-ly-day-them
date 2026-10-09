@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Cổng Học Sinh - M_SigmaMath</title>
+    <title>Cổng Học Sinh - SigmaMath</title>
     
     <!-- KHỚP CHÍNH XÁC VỚI MANIFEST HỌC SINH -->
     <link rel="manifest" href="manifest-hocsinh.json">
@@ -11,7 +11,8 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="icon" type="image/png" id="appFavicon" href="logo-student.png">
+    <meta name="apple-mobile-web-app-title" content="M-SigmaMath">
+    <link rel="icon" type="image/png" id="appFavicon" href="logo-student-192.png">
     <link rel="apple-touch-icon" href="logo-student.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -50,7 +51,7 @@
             </div>
             <form onsubmit="handleStudentLogin(event)" class="space-y-3.5 text-left text-xs">
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Tài khoản (Username / Mã HS):</label>
+                    <label class="block font-bold text-slate-700 mb-1">Tài khoản (Username / Mã HS / SĐT):</label>
                     <input type="text" id="loginUsername" required placeholder="VD: 10001 hoặc nguyenvana.10n1" class="w-full p-3 border-2 border-indigo-100 rounded-xl outline-none focus:border-indigo-600 bg-slate-50 font-bold transition">
                 </div>
                 <div>
@@ -150,7 +151,7 @@
         <!-- TOP BAR ĐIỆN THOẠI -->
         <div class="md:hidden bg-indigo-950 text-white px-4 py-3 flex justify-between items-center z-10 shrink-0 shadow-md">
             <div class="flex items-center space-x-2.5">
-                <img src="logo-student.png" class="w-7 h-7 rounded-lg object-contain bg-white/10 p-0.5">
+                <img src="logo-student.png" class="w-7 h-7 rounded-lg object-contain bg-white/10 p-0.5" alt="Logo">
                 <div>
                     <div class="font-black text-xs leading-tight" id="mobileHeaderStudentName">Học Sinh</div>
                     <div class="text-[10px] text-indigo-300 font-mono" id="mobileHeaderStudentClass">---</div>
@@ -277,7 +278,7 @@
                 </div>
             </div>
 
-            <!-- TAB 2: HỌC PHÍ & VIETQR (BỔ SUNG KHỐI NỘP HỌC PHÍ TRỰC QUAN TRÊN ĐẦU BẢNG) -->
+            <!-- TAB 2: HỌC PHÍ & VIETQR -->
             <div id="tab-tuition" class="student-tab-content hidden space-y-4">
                 
                 <!-- KHỐI QUÉT MÃ NỘP HỌC PHÍ NHANH VIETQR AGRIBANK -->
@@ -398,7 +399,7 @@
                     <div class="bg-white/90 backdrop-blur-md p-5 rounded-3xl border border-slate-200 shadow-sm space-y-4 flex flex-col min-h-[360px]">
                         <div class="border-b pb-3 flex justify-between items-center">
                             <h3 class="font-black text-sm text-slate-800">Đánh Giá Năng Lực Trắc Nghiệm GDPT Mới</h3>
-                            <span class="text-xs text-indigo-700 bg-indigo-50 font-bold px-2.5 py-0.5 rounded-lg border border-indigo-100" id="badgeSchoolYear">Năm học 2026-2027</span>
+                            <span class="text-xs text-indigo-700 bg-indigo-50 font-bold px-2.5 py-0.5 rounded-lg border border-indigo-100" id="badgeSchoolYear">Chương Trình GDPT Mới</span>
                         </div>
                         <div id="perfCompetencyContainer" class="flex-1 flex flex-col justify-center space-y-4">
                             <div class="text-center text-slate-400 text-xs italic">Chưa có bài thi nào được nộp.</div>
@@ -525,7 +526,7 @@
         </nav>
     </div>
 
-    <!-- MODAL CHỌN APP NGÂN HÀNG ĐỂ MỞ THANH TOÁN (SỬA TRIỆT ĐỂ LỖI 404 VÀ MISSING APP) -->
+    <!-- MODAL CHỌN APP NGÂN HÀNG ĐỂ MỞ THANH TOÁN (CÓ FALLBACK AN TOÀN) -->
     <div id="modalBankPicker" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[80] flex items-center justify-center hidden p-4" onclick="closeBankPickerModal()">
         <div class="bg-white p-5 sm:p-6 rounded-3xl max-w-sm w-full space-y-4 shadow-2xl" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b pb-2">
@@ -586,7 +587,7 @@
                 </button>
             </div>
 
-            <!-- Tùy chọn sao chép thủ công -->
+            <!-- Tùy chọn quét trực tiếp -->
             <div class="border-t pt-2 space-y-1.5 text-center">
                 <button onclick="closeBankPickerModal(); openQrLightbox();" class="text-xs text-indigo-600 font-bold hover:underline">
                     Hoặc quét mã QR trực tiếp ➔
@@ -618,7 +619,7 @@
         </div>
     </div>
 
-    <!-- PHÒNG THI ONLINE (CÓ NÚT THOÁT RA) -->
+    <!-- PHÒNG THI ONLINE TÍCH HỢP -->
     <div id="examTakingRoom" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-50 flex flex-col hidden overflow-hidden">
         <header class="bg-white p-3 sm:p-4 border-b flex justify-between items-center shrink-0">
             <div class="flex items-center space-x-2">
@@ -662,13 +663,14 @@
 
     <!-- MODAL PHÓNG TO HÌNH ẢNH TOÁN (LIGHTBOX) -->
     <div id="imageLightboxModal" class="fixed inset-0 bg-slate-950/90 z-[70] flex items-center justify-center hidden p-4" onclick="this.classList.add('hidden')">
-        <img id="lightboxImg" src="" class="max-w-full max-h-full rounded-2xl shadow-2xl border border-white/20">
+        <img id="lightboxImg" src="" class="max-w-full max-h-full rounded-2xl shadow-2xl border border-white/20" alt="Phóng to hình ảnh">
     </div>
 
     <!-- SCRIPT CHÍNH CỦA CỔNG HỌC SINH -->
     <script>
         const STORAGE_KEY = 'TUTORING_MASTER_SYSTEM_V2026';
         const STUDENT_AUTH_KEY = 'SIGMA_STUDENT_SESSION';
+        const ACTIVE_STUDENT_SESSION_KEY = 'ACTIVE_STUDENT_SESSION';
 
         let cloudApiUrl = localStorage.getItem('API_URL') || "https://script.google.com/macros/s/AKfycbznfqhckK2L97z427a50oLuZ0W0nLbtdDcJROOv6S2sGQL3_OGbK0Fs7Hd8wOi_or5cXA/exec";
 
@@ -695,13 +697,13 @@
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js', { scope: './', updateViaCache: 'none' })
                     .then((reg) => {
-                        reg.update(); // Bắt buộc kiểm tra bản mới trên server
+                        reg.update();
                         reg.onupdatefound = () => {
                             const installingWorker = reg.installing;
                             if (installingWorker) {
                                 installingWorker.onstatechange = () => {
                                     if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                        window.location.reload(); // Tự động reload khi có bản mới
+                                        window.location.reload();
                                     }
                                 };
                             }
@@ -719,7 +721,7 @@
             });
         }
 
-        // ==================== 2. TỰ ĐỘNG BẬT CÀI ĐẶT TRÊN ANDROID (PROMPT) ====================
+        // ==================== 2. HỖ TRỢ CÀI ĐẶT PWA ====================
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             studentDeferredPrompt = e;
@@ -731,19 +733,15 @@
 
         function triggerStudentPWAInstall() {
             if (studentDeferredPrompt) {
-                // Tự động mở hộp thoại cài đặt của hệ điều hành Android
                 studentDeferredPrompt.prompt();
                 studentDeferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('Học sinh đã chọn cài đặt ứng dụng');
-                    }
                     studentDeferredPrompt = null;
                 });
             } else {
                 if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
                     alert("Ứng dụng SigmaMath đã được cài đặt trên thiết bị của em rồi nhé!");
                 } else {
-                    alert("Hướng dẫn cài đặt:\n• Trên Android: Bấm menu 3 chấm (⋮) ở góc trên bên phải Chrome ➔ Chọn 'Cài đặt ứng dụng' (hoặc 'Thêm vào màn hình chính').\n• Trên iPhone: Bấm nút Chia sẻ (Share 📤) ➔ Chọn 'Thêm vào Màn hình chính'.");
+                    alert("Hướng dẫn cài đặt:\n• Trên Android: Bấm menu 3 chấm (⋮) ở góc trên bên phải trình duyệt ➔ Chọn 'Cài đặt ứng dụng' (hoặc 'Thêm vào màn hình chính').\n• Trên iPhone/iPad: Bấm nút Chia sẻ (Share 📤) ➔ Chọn 'Thêm vào Màn hình chính' (Add to Home Screen).");
                 }
             }
         }
@@ -755,7 +753,7 @@
             alert("Chúc mừng em đã cài đặt thành công App SigmaMath!");
         });
 
-        // ==================== CÔNG CỤ XỬ LÝ NGÀY THÁNG DD-MM-YYYY ====================
+        // ==================== 3. CÔNG CỤ XỬ LÝ NGÀY THÁNG ====================
         function normalizeCloudDate(d) {
             if (!d) return '';
             d = String(d).trim();
@@ -803,7 +801,7 @@
             return 'CHÀO BUỔI TỐI!';
         }
 
-        // ==================== KHỞI ĐỘNG HỆ THỐNG ====================
+        // ==================== 4. KHỞI ĐỘNG HỆ THỐNG ====================
         window.addEventListener('DOMContentLoaded', () => {
             loadFromStorage();
             checkUrlImpersonation();
@@ -820,9 +818,14 @@
                 const s = (appData.students || []).find(x => x.id === impId || x.code === impId);
                 if (s) {
                     currentStudent = s;
-                    localStorage.setItem(STUDENT_AUTH_KEY, JSON.stringify({ id: s.id }));
+                    saveStudentSession(s.id);
                 }
             }
+        }
+
+        function saveStudentSession(studentId) {
+            localStorage.setItem(STUDENT_AUTH_KEY, JSON.stringify({ id: studentId }));
+            localStorage.setItem(ACTIVE_STUDENT_SESSION_KEY, studentId);
         }
 
         function loadFromStorage() {
@@ -853,13 +856,18 @@
         }
 
         function checkStudentSession() {
-            const savedSession = localStorage.getItem(STUDENT_AUTH_KEY);
+            const savedSession = localStorage.getItem(STUDENT_AUTH_KEY) || localStorage.getItem(ACTIVE_STUDENT_SESSION_KEY);
             if (savedSession) {
                 try {
-                    const parsed = JSON.parse(savedSession);
-                    const s = (appData.students || []).find(x => x.id === parsed.id);
+                    let studentId = savedSession;
+                    if (savedSession.startsWith('{')) {
+                        const parsed = JSON.parse(savedSession);
+                        studentId = parsed.id;
+                    }
+                    const s = (appData.students || []).find(x => x.id === studentId);
                     if (s) {
                         currentStudent = s;
+                        saveStudentSession(s.id);
                         document.getElementById('loginScreen').classList.add('hidden');
                         if (currentStudent.mustChangePassword) {
                             document.getElementById('modalForceChangePassword').classList.remove('hidden');
@@ -894,7 +902,7 @@
 
             if (s && String(s.password).trim() === p) {
                 currentStudent = s;
-                localStorage.setItem(STUDENT_AUTH_KEY, JSON.stringify({ id: s.id }));
+                saveStudentSession(s.id);
                 document.getElementById('loginScreen').classList.add('hidden');
                 err.classList.add('hidden');
                 if (currentStudent.mustChangePassword) {
@@ -938,6 +946,7 @@
         function handleStudentLogout() {
             if (confirm("Em có chắc chắn muốn đăng xuất khỏi cổng học sinh?")) {
                 localStorage.removeItem(STUDENT_AUTH_KEY);
+                localStorage.removeItem(ACTIVE_STUDENT_SESSION_KEY);
                 currentStudent = null;
                 document.getElementById('loginScreen').classList.remove('hidden');
             }
@@ -1021,7 +1030,7 @@
             return dates.sort((a, b) => compareDateDDMMYYYY(a, b));
         }
 
-        // ==================== RENDER TOÀN BỘ GIAO DIỆN HỌC SINH ====================
+        // ==================== 5. RENDER TOÀN BỘ GIAO DIỆN HỌC SINH ====================
         function renderStudentPortal() {
             if (!currentStudent) return;
             const targetClass = (appData.classes || []).find(c => c.id === currentStudent.classId);
@@ -1119,7 +1128,7 @@
             if (window.lucide) lucide.createIcons();
         }
 
-        // ==================== TÍNH TOÁN CÔNG NỢ & NẠP QR CHO CẢ 2 VỊ TRÍ ====================
+        // ==================== 6. TÍNH TOÁN CÔNG NỢ & NẠP QR ====================
         function renderTuitionAndQR(targetClass, className, allDates, activeCycleIndex) {
             const effFee = (currentStudent.customFee !== null && currentStudent.customFee !== undefined) 
                            ? parseFloat(currentStudent.customFee) 
@@ -1173,7 +1182,6 @@
             }
             document.getElementById('studentTuitionTableBody').innerHTML = rowsHtml;
 
-            // Cập nhật thẻ trạng thái nợ
             const summaryBadge = document.getElementById('tuitionBalanceSummary');
             if (totalDebtToPay > 0) {
                 document.getElementById('statTuitionStatus').innerText = `Còn nợ tiền`;
@@ -1199,7 +1207,6 @@
             currentQrContent = qrDesc;
             currentQrUrl = `https://img.vietqr.io/image/${AGRIBANK_BIN}-${AGRIBANK_STK}-compact2.png?amount=${totalDebtToPay}&addInfo=${encodeURIComponent(qrDesc)}&accountName=${encodeURIComponent(AGRIBANK_NAME)}`;
 
-            // ĐỒNG BỘ MÃ QR VÀ THÔNG TIN SANG CẢ 2 NƠI (TAB TỔNG QUAN & TAB HỌC PHÍ)
             const tabQrImg = document.getElementById('tabTuitionQrImg');
             if (tabQrImg) tabQrImg.src = currentQrUrl;
             const tabAmtText = document.getElementById('tabTuitionAmountText');
@@ -1208,13 +1215,12 @@
             if (tabContentText) tabContentText.innerText = qrDesc;
         }
 
-        // ==================== CÁC HÀM THANH TOÁN THÔNG MINH (TRÁNH LỖI 404 & MISSING APP) ====================
+        // ==================== 7. CỔNG THANH TOÁN VIETQR AN TOÀN ====================
         function openBankAppToPay() {
             if (currentQrAmount <= 0) {
                 alert("Em đã hoàn thành học phí, không có công nợ cần thanh toán!");
                 return;
             }
-            // Mở modal chọn ngân hàng để đảm bảo có tham số app đích xác
             document.getElementById('pickerAmountDisplay').innerText = currentQrAmount.toLocaleString() + ' đ';
             document.getElementById('modalBankPicker').classList.remove('hidden');
         }
@@ -1224,15 +1230,19 @@
         }
 
         function launchBankApp(appCode, appName) {
-            // 1. Sao chép nội dung & STK vào Clipboard
             copyToClipboard(currentQrContent, `Đã sao chép nội dung chuyển khoản! Đang mở ứng dụng ${appName}...`);
-
-            // 2. Chuyển hướng tới cổng thanh toán VietQR chính thức với tham số app
             const directPayUrl = `https://dl.vietqr.io/pay?bank=${AGRIBANK_BIN}&acc=${AGRIBANK_STK}&amount=${currentQrAmount}&des=${encodeURIComponent(currentQrContent)}&app=${appCode}`;
             
+            // Cơ chế Fallback an toàn nếu trình duyệt máy tính hoặc thiết bị không mở được App
+            const startTime = Date.now();
             setTimeout(() => {
-                window.location.href = directPayUrl;
-            }, 500);
+                if (Date.now() - startTime < 3000) {
+                    closeBankPickerModal();
+                    openQrLightbox();
+                }
+            }, 1800);
+
+            window.location.href = directPayUrl;
         }
 
         function openQrLightbox() {
@@ -1343,7 +1353,7 @@
             document.getElementById('studentCyclesAccordion').innerHTML = accHtml || '<div class="text-xs text-slate-400 italic">Chưa có dữ liệu</div>';
         }
 
-        // ==================== TIẾN ĐỘ & NĂNG LỰC ====================
+        // ==================== 8. TIẾN ĐỘ & NĂNG LỰC ====================
         function renderPerformanceTab() {
             const studentExams = (appData.examResults || []).filter(r => String(r.studentId) === String(currentStudent.id));
             const countBadge = document.getElementById('perfExamCountBadge');
@@ -1438,7 +1448,7 @@
                 <div class="space-y-1.5">
                     <div class="flex justify-between text-xs font-bold">
                         <span class="text-slate-700">Phần II: Câu hỏi Đúng / Sai</span>
-                        <span class="text-emerald-600 font-mono">${p2Rate}% (${p2Points.toFixed(1)}/${p2Max} điểm)</span>
+                        <span class="text-emerald-600 font-mono">${p2Rate}% (${p2Points.toFixed(1)}/${p2Max.toFixed(1)} điểm)</span>
                     </div>
                     <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                         <div class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: ${p2Rate}%"></div>
@@ -1457,7 +1467,7 @@
             `;
         }
 
-        // ==================== TÀI LIỆU ====================
+        // ==================== 9. TÀI LIỆU ====================
         function renderDocumentsTab() {
             const allDocs = (appData.documents || []).filter(d => d.classId === currentStudent.classId);
             const container = document.getElementById('studentDocumentsContainer');
@@ -1496,13 +1506,13 @@
             if (window.lucide) lucide.createIcons();
         }
 
-        // ==================== KHẢO THÍ TRỰC TUYẾN ====================
+        // ==================== 10. KHẢO THÍ TRỰC TUYẾN ====================
         function renderExamsTab() {
             const exams = (appData.exams || []).filter(e => e.classId === currentStudent.classId);
             const container = document.getElementById('studentExamsListContainer');
 
             if (exams.length === 0) {
-                container.innerHTML = `<div class="col-span-2 p-6 text-center text-slate-400 text-xs italic">Chưa có bài thi nào được giao.</div>`;
+                container.innerHTML = `<div class="col-span-2 p-6 text-center text-slate-400 text-xs italic">Chưa có bài thi nào được giao cho lớp của em.</div>`;
                 return;
             }
 
@@ -1525,9 +1535,15 @@
                                 Xem Lại Bài Làm & Lời Giải
                             </button>
                         ` : `
-                            <button onclick="startTakingExam('${e.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition text-center block">
-                                Vào Làm Bài Thi Ngay
-                            </button>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="startTakingExam('${e.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition text-center">
+                                    Làm Bài Tại Đây
+                                </button>
+                                <a href="exam.html" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-xl text-xs shadow-sm transition text-center flex items-center justify-center space-x-1">
+                                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                                    <span>Phòng Thi Riêng</span>
+                                </a>
+                            </div>
                         `}
                     </div>
                 `;
@@ -1574,7 +1590,10 @@
 
             if (window.renderMathInElement) {
                 renderMathInElement(document.getElementById('examQuestionsRenderArea'), {
-                    delimiters: [{left: '$', right: '$', display: false}],
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
                     throwOnError: false
                 });
             }
@@ -1648,6 +1667,7 @@
             }
         }
 
+        // ==================== 11. CHẤM ĐIỂM CHUẨN MA TRẬN GDPT MỚI ====================
         async function submitExamNow() {
             if (!activeExam) return;
             clearInterval(examTimerInterval);
@@ -1655,29 +1675,43 @@
             let totalScore = 0;
             const questions = activeExam.questions || [];
 
+            const p1List = questions.filter(q => q.part === 1);
+            const p2List = questions.filter(q => q.part === 2);
+            const p3List = questions.filter(q => q.part === 3);
+
+            let p1ScorePerQ = p1List.length > 0 ? (p2List.length === 0 && p3List.length === 0 ? 10.0 / p1List.length : 3.0 / p1List.length) : 0;
+            let p2ScorePerQ = p2List.length > 0 ? (p1List.length === 0 && p3List.length === 0 ? 10.0 / p2List.length : 4.0 / p2List.length) : 0;
+            let p3ScorePerQ = p3List.length > 0 ? (p1List.length === 0 && p2List.length === 0 ? 10.0 / p3List.length : 3.0 / p3List.length) : 0;
+
+            if (p1List.length > 0 && p2List.length > 0 && p3List.length > 0) {
+                p1ScorePerQ = 3.0 / p1List.length;
+                p2ScorePerQ = 4.0 / p2List.length;
+                p3ScorePerQ = 3.0 / p3List.length;
+            }
+
             questions.forEach(q => {
                 const userAns = studentAnswers[q.id];
                 if (q.part === 1) {
                     if (userAns && String(userAns).toUpperCase() === String(q.correct).toUpperCase()) {
-                        totalScore += (10 / questions.length);
+                        totalScore += p1ScorePerQ;
                     }
                 } else if (q.part === 2) {
                     let correctCount = 0;
                     (q.statements || []).forEach(st => {
                         if (userAns && userAns[st.letter] === st.correct) correctCount++;
                     });
-                    if (correctCount === 1) totalScore += 0.1;
-                    else if (correctCount === 2) totalScore += 0.25;
-                    else if (correctCount === 3) totalScore += 0.5;
-                    else if (correctCount === 4) totalScore += 1.0;
+                    if (correctCount === 1) totalScore += (p2ScorePerQ * 0.1);
+                    else if (correctCount === 2) totalScore += (p2ScorePerQ * 0.25);
+                    else if (correctCount === 3) totalScore += (p2ScorePerQ * 0.5);
+                    else if (correctCount === 4) totalScore += p2ScorePerQ;
                 } else if (q.part === 3) {
                     if (userAns && String(userAns).trim().toLowerCase() === String(q.correct).trim().toLowerCase()) {
-                        totalScore += (10 / questions.length);
+                        totalScore += p3ScorePerQ;
                     }
                 }
             });
 
-            totalScore = Math.min(10, Math.round(totalScore * 10) / 10);
+            totalScore = Math.min(10, Math.max(0, Math.round(totalScore * 10) / 10));
 
             const resultItem = {
                 id: 'res_' + Date.now(),
@@ -1697,7 +1731,11 @@
                     await fetch(cloudApiUrl, {
                         method: 'POST',
                         headers: { "Content-Type": "text/plain;charset=utf-8" },
-                        body: JSON.stringify({ action: 'submitExamResult', payload: resultItem })
+                        body: JSON.stringify({ 
+                            action: 'submitExamResult', 
+                            payload: resultItem,
+                            examResult: resultItem 
+                        })
                     });
                 } catch(err){}
             }
@@ -1706,10 +1744,10 @@
             document.getElementById('examTakingRoom').classList.add('hidden');
             activeExam = null;
             renderStudentPortal();
-            alert(`Nộp bài thành công!\nĐiểm số: ${totalScore.toFixed(1)} đ.`);
+            alert(`Nộp bài thành công!\nĐiểm số của em: ${totalScore.toFixed(1)} đ.`);
         }
 
-        // ==================== XEM LẠI BÀI THI & ĐÁP ÁN (REVIEW) ====================
+        // ==================== 12. XEM LẠI BÀI THI & ĐÁP ÁN (REVIEW) ====================
         function openReviewExamResult(examId) {
             const ex = (appData.exams || []).find(e => e.id === examId);
             const res = (appData.examResults || []).find(r => r.examId === examId && r.studentId === currentStudent.id);
@@ -1783,7 +1821,13 @@
 
             document.getElementById('modalReviewExamResult').classList.remove('hidden');
             if (window.renderMathInElement) {
-                renderMathInElement(area, { delimiters: [{left: '$', right: '$', display: false}], throwOnError: false });
+                renderMathInElement(area, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
             }
         }
 

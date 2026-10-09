@@ -20,9 +20,9 @@
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
         body { 
-            font-family: 'Inter', sans-serif; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
             background-color: #f8fafc;
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -55,7 +55,7 @@
     <header class="bg-indigo-950 text-white shadow-md sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between">
             <div class="flex items-center space-x-2.5 sm:space-x-3">
-                <img src="logo-student.png" alt="SigmaMath" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl object-cover border border-indigo-700 shadow-inner">
+                <img src="logo-student.png" alt="SigmaMath" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl object-contain bg-white/10 p-0.5 border border-indigo-700 shadow-inner">
                 <div>
                     <h1 class="font-bold text-xs sm:text-sm leading-tight" id="examHeaderTitle">SigmaMath - Phòng Khảo Thí</h1>
                     <p class="text-[10px] text-indigo-300" id="studentExamInfo">Đang tải...</p>
@@ -133,7 +133,7 @@
 
                 <!-- Nút nộp bài cuối trang -->
                 <div class="p-4 bg-white rounded-3xl border shadow-sm flex items-center justify-between sticky bottom-3 z-20">
-                    <span class="text-xs text-slate-500 hidden sm:inline">Kiểm tra lại toàn bộ trước khi nộp bài.</span>
+                    <span class="text-xs text-slate-500 hidden sm:inline">Kiểm tra lại toàn bộ bài làm trước khi bấm nộp.</span>
                     <button type="button" onclick="confirmSubmitExam()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs px-8 py-3 rounded-2xl shadow transition flex items-center justify-center space-x-2">
                         <i data-lucide="send" class="w-4 h-4"></i>
                         <span>NỘP BÀI THI</span>
@@ -221,7 +221,7 @@
             <div>
                 <h3 class="font-black text-rose-600 text-base">CẢNH BÁO RỜI PHÒNG THI!</h3>
                 <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-                    Hệ thống ghi nhận bạn đã chuyển tab hoặc rời ứng dụng.<br>
+                    Hệ thống ghi nhận em đã chuyển tab hoặc rời ứng dụng.<br>
                     Hành vi này đã được lưu vào hệ thống giám sát của Thầy!
                 </p>
             </div>
@@ -229,7 +229,7 @@
                 Số lần vi phạm: 1 lần
             </div>
             <button onclick="dismissCheatAlert()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl shadow text-xs">
-                Tôi Đã Hiểu Và Quay Lại Làm Bài
+                Em Đã Hiểu Và Quay Lại Làm Bài
             </button>
         </div>
     </div>
@@ -243,9 +243,11 @@
     </div>
 
     <script>
-        const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbznfqhckK2L97z427a50oLuZ0W0nLbtdDcJROOv6S2sGQL3_OGbK0Fs7Hd8wOi_or5cXA/exec";
-        const SESSION_KEY = 'ACTIVE_STUDENT_SESSION';
-        const CACHE_DATA_KEY = 'STUDENT_PORTAL_DATA_CACHE';
+        // Lấy API Cloud linh hoạt: Ưu tiên URL đã lưu tại localStorage của hệ thống
+        const CLOUD_API_URL = localStorage.getItem('API_URL') || "https://script.google.com/macros/s/AKfycbznfqhckK2L97z427a50oLuZ0W0nLbtdDcJROOv6S2sGQL3_OGbK0Fs7Hd8wOi_or5cXA/exec";
+        const STUDENT_AUTH_KEY = 'SIGMA_STUDENT_SESSION';
+        const ACTIVE_STUDENT_SESSION_KEY = 'ACTIVE_STUDENT_SESSION';
+        const CACHE_DATA_KEY = 'TUTORING_MASTER_SYSTEM_V2026';
 
         let appData = { classes: [], students: [], exams: [], examResults: [] };
         let currentStudent = null;
@@ -285,9 +287,9 @@
             setupAntiCheatGuards();
         });
 
-        // ==================== PHẦN 2: CƠ CHẾ CHỐNG GIAN LẬN ĐA TẦNG ====================
+        // ==================== 1. CƠ CHẾ CHỐNG GIAN LẬN ĐA TẦNG ====================
         function setupAntiCheatGuards() {
-            // 1. Chặn menu ngữ cảnh (chuột phải)
+            // Chặn chuột phải khi làm bài
             document.addEventListener('contextmenu', (e) => {
                 if (activeExam) {
                     e.preventDefault();
@@ -295,19 +297,17 @@
                 }
             });
 
-            // 2. Chặn các phím tắt sao chép, mở DevTools, chụp ảnh
+            // Chặn phím tắt mở DevTools, sao chép
             document.addEventListener('keydown', (e) => {
                 if (!activeExam) return;
-                // Chặn F12
                 if (e.key === 'F12') { e.preventDefault(); return false; }
-                // Chặn Ctrl+C, Ctrl+V, Ctrl+U, Ctrl+S, Ctrl+P
                 if (e.ctrlKey && ['c', 'v', 'u', 's', 'p', 'C', 'V', 'U', 'S', 'P'].includes(e.key)) {
                     e.preventDefault();
                     return false;
                 }
             });
 
-            // 3. Radar giám sát chuyển tab (visibilitychange & blur)
+            // Radar giám sát chuyển tab
             document.addEventListener('visibilitychange', () => {
                 if (activeExam && document.hidden) {
                     triggerCheatViolation();
@@ -323,9 +323,8 @@
 
         function triggerCheatViolation() {
             tabSwitchCount++;
-            saveExamDraftLocally(); // Lưu ngay lập tức
+            saveExamDraftLocally();
             
-            // Cập nhật badge cảnh báo trên Header
             const cheatBadge = document.getElementById('cheatWarningBadge');
             const cheatText = document.getElementById('cheatWarningText');
             if (cheatBadge && cheatText) {
@@ -333,7 +332,6 @@
                 cheatText.innerText = `Vi phạm: ${tabSwitchCount}`;
             }
 
-            // Hiện modal cảnh báo nhắc nhở
             const modal = document.getElementById('modalCheatAlert');
             const modalCount = document.getElementById('modalCheatCountText');
             if (modal && modalCount) {
@@ -344,7 +342,6 @@
 
         function dismissCheatAlert() {
             document.getElementById('modalCheatAlert').classList.add('hidden');
-            // Cố gắng yêu cầu mở lại Fullscreen nếu trình duyệt cho phép
             requestFullScreenMode();
         }
 
@@ -357,7 +354,7 @@
             } catch(e){}
         }
 
-        // ==================== PHẦN 3: BỘ ĐỆM TỰ ĐỘNG LƯU NHÁP CHỐNG MẤT BÀI ====================
+        // ==================== 2. TỰ ĐỘNG LƯU NHÁP CHỐNG MẤT BÀI ====================
         function getDraftStorageKey() {
             if (!activeExam || !currentStudent) return null;
             return `EXAM_DRAFT_${currentStudent.id}_${activeExam.id}`;
@@ -395,12 +392,10 @@
                 flaggedQuestions = draft.flaggedQuestions || {};
                 tabSwitchCount = draft.tabSwitchCount || 0;
 
-                // Khôi phục đồng hồ nếu thời gian còn hợp lệ
                 if (draft.remainingSeconds && draft.remainingSeconds > 0) {
                     remainingSeconds = draft.remainingSeconds;
                 }
 
-                // Cập nhật lại UI câu hỏi theo đáp án cũ
                 restoreAnswersToUI();
                 updatePaletteStatus();
 
@@ -449,7 +444,7 @@
             if (key) localStorage.removeItem(key);
         }
 
-        // ==================== TẢI DỮ LIỆU & BẮT ĐẦU THI ====================
+        // ==================== 3. TẢI DỮ LIỆU & XÁC THỰC ====================
         async function loadCloudData() {
             try {
                 const res = await fetch(CLOUD_API_URL);
@@ -459,7 +454,7 @@
                 if (j.Exams) appData.exams = j.Exams.slice(1).map(r => ({
                     id: String(r[0]||''), title: String(r[1]||''), classId: String(r[2]||''),
                     duration: parseInt(r[3])||45, questions: JSON.parse(r[5]||'[]'),
-                    matrix: JSON.parse(r[6]||'{}'), status: String(r[7]||'OPEN')
+                    solutionUrl: String(r[4]||''), status: String(r[7]||'OPEN')
                 }));
                 if (j.ExamResults) appData.examResults = j.ExamResults.slice(1).map(r => ({ id: String(r[0]||''), examId: String(r[1]||''), studentId: String(r[2]||''), score: parseFloat(r[3]||0) }));
 
@@ -469,32 +464,47 @@
         }
 
         function checkAuthAndInit() {
-            const savedId = localStorage.getItem(SESSION_KEY);
-            if (!savedId) {
+            let studentId = null;
+            // Đọc tương thích cả cấu trúc Object JSON lẫn chuỗi ID thuần túy
+            const sessionObj = localStorage.getItem(STUDENT_AUTH_KEY);
+            if (sessionObj) {
+                try {
+                    const parsed = JSON.parse(sessionObj);
+                    studentId = parsed.id || parsed;
+                } catch(e) {
+                    studentId = sessionObj;
+                }
+            }
+            if (!studentId) {
+                studentId = localStorage.getItem(ACTIVE_STUDENT_SESSION_KEY);
+            }
+
+            if (!studentId) {
                 alert("Vui lòng đăng nhập tại Cổng Học Sinh trước!");
                 location.href = "hocsinh.html";
                 return;
             }
-            currentStudent = appData.students.find(s => s.id === savedId);
+
+            currentStudent = (appData.students || []).find(s => s.id === studentId || s.code === studentId);
             if (!currentStudent) return;
 
-            const c = appData.classes.find(x => x.id === currentStudent.classId);
+            const c = (appData.classes || []).find(x => x.id === currentStudent.classId);
             document.getElementById('studentExamInfo').innerText = `${currentStudent.name} (${currentStudent.code}) • Lớp ${c ? c.name : '---'}`;
             renderAvailableExams();
         }
 
         function renderAvailableExams() {
             const container = document.getElementById('examCardsList');
-            const myExams = appData.exams.filter(e => e.classId === currentStudent.classId);
+            const myExams = (appData.exams || []).filter(e => e.classId === currentStudent.classId);
             document.getElementById('examCountBadge').innerText = `${myExams.length} đề`;
 
             if (myExams.length === 0) {
-                container.innerHTML = '<div class="p-6 text-center text-xs text-slate-400 italic">Hiện tại chưa có đề thi nào mở cho lớp của bạn.</div>';
+                container.innerHTML = '<div class="p-6 text-center text-xs text-slate-400 italic">Hiện tại chưa có đề thi nào mở cho lớp của em.</div>';
                 return;
             }
 
             container.innerHTML = myExams.map(ex => {
-                const res = appData.examResults.find(r => r.examId === ex.id && r.studentId === currentStudent.id);
+                const res = (appData.examResults || []).find(r => r.examId === ex.id && r.studentId === currentStudent.id);
                 const isDone = !!res;
 
                 return `
@@ -526,7 +536,7 @@
         }
 
         function startTakingExam(examId) {
-            activeExam = appData.exams.find(e => e.id === examId);
+            activeExam = (appData.exams || []).find(e => e.id === examId);
             if (!activeExam) return;
 
             studentAnswers = {};
@@ -541,17 +551,16 @@
             renderQuestions(activeExam.questions || []);
             renderQuestionPalette(activeExam.questions || []);
 
-            // Thử khôi phục bài nháp nếu trước đó bị rớt mạng hoặc tắt trang
             const restored = restoreExamDraftLocally();
             if (!restored) {
-                remainingSeconds = activeExam.duration * 60;
+                remainingSeconds = (activeExam.duration || 45) * 60;
             }
 
             requestFullScreenMode();
             startTimer(remainingSeconds);
         }
 
-        // ==================== RENDER CÂU HỎI & BẢNG PALETTE ====================
+        // ==================== 4. RENDER CÂU HỎI & PALETTE ====================
         function renderQuestions(questions) {
             const container = document.getElementById('questionsListContainer');
             container.innerHTML = questions.map((q, idx) => {
@@ -579,11 +588,11 @@
                                     <span class="font-semibold text-slate-800"><b class="text-indigo-900">${st.letter})</b>${st.content}</span>
                                     <div class="flex items-center space-x-4 shrink-0 font-bold bg-white px-3 py-1 rounded-lg border">
                                         <label class="flex items-center space-x-1 cursor-pointer text-emerald-700">
-                                            <input type="radio" name="ans_q_${idx}_${sIdx}" value="Đ" onchange="recordPart2Answer(${idx},${sIdx}, 'Đ')" class="w-4 h-4 text-emerald-600">
+                                            <input type="radio" name="ans_q_${idx}_${sIdx}" value="Đ" onchange="recordPart2Answer(${idx},'${st.letter}', 'Đ')" class="w-4 h-4 text-emerald-600">
                                             <span>Đúng</span>
                                         </label>
                                         <label class="flex items-center space-x-1 cursor-pointer text-rose-700">
-                                            <input type="radio" name="ans_q_${idx}_${sIdx}" value="S" onchange="recordPart2Answer(${idx},${sIdx}, 'S')" class="w-4 h-4 text-rose-600">
+                                            <input type="radio" name="ans_q_${idx}_${sIdx}" value="S" onchange="recordPart2Answer(${idx},'${st.letter}', 'S')" class="w-4 h-4 text-rose-600">
                                             <span>Sai</span>
                                         </label>
                                     </div>
@@ -620,7 +629,13 @@
             }).join('');
 
             if (window.renderMathInElement) {
-                renderMathInElement(container, { delimiters: [{left: '$', right: '$', display: false}], throwOnError: false });
+                renderMathInElement(container, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
             }
 
             container.querySelectorAll('.exam-question-body img').forEach(img => {
@@ -706,9 +721,9 @@
             saveExamDraftLocally();
         }
 
-        function recordPart2Answer(qIdx, sIdx, val) {
+        function recordPart2Answer(qIdx, letter, val) {
             if (!studentAnswers[qIdx]) studentAnswers[qIdx] = {};
-            studentAnswers[qIdx][sIdx] = val;
+            studentAnswers[qIdx][letter] = val;
             updatePaletteStatus();
             saveExamDraftLocally();
         }
@@ -733,7 +748,7 @@
             saveExamDraftLocally();
         }
 
-        // ==================== ĐỒNG HỒ ĐẾM NGƯỢC ====================
+        // ==================== 5. ĐỒNG HỒ ĐẾM NGƯỢC ====================
         function startTimer(seconds) {
             remainingSeconds = seconds;
             updateTimerDisplay();
@@ -741,7 +756,6 @@
             timerInterval = setInterval(() => {
                 remainingSeconds--;
                 updateTimerDisplay();
-                // Lưu nháp định kỳ mỗi 15 giây
                 if (remainingSeconds % 15 === 0) {
                     saveExamDraftLocally();
                 }
@@ -782,7 +796,7 @@
 
         function handleExitExam() {
             if (activeExam) {
-                if (confirm("Bài thi đang diễn ra! Bạn có chắc muốn tạm thoát (bài làm nháp sẽ được giữ lại trên máy)?")) {
+                if (confirm("Bài thi đang diễn ra! Em có chắc muốn tạm thoát (bài làm nháp vẫn được giữ nguyên trên thiết bị)?")) {
                     saveExamDraftLocally();
                     location.href = "hocsinh.html";
                 }
@@ -802,8 +816,8 @@
             });
 
             const msg = unanswered > 0 
-                ? `Bạn còn ${unanswered} câu chưa hoàn thành. Bạn có chắc chắn muốn nộp bài ngay bây giờ?`
-                : `Bạn đã làm xong tất cả câu hỏi. Nộp bài ngay bây giờ?`;
+                ? `Em còn ${unanswered} câu chưa hoàn thành. Em có chắc chắn muốn nộp bài ngay bây giờ?`
+                : `Em đã hoàn thành tất cả câu hỏi. Nộp bài ngay bây giờ?`;
 
             if (confirm(msg)) {
                 if (timerInterval) clearInterval(timerInterval);
@@ -811,26 +825,35 @@
             }
         }
 
-        // ==================== CHẤM ĐIỂM & NỘP BÀI LÊN CLOUD ====================
+        // ==================== 6. CHẤM ĐIỂM & NỘP BÀI LÊN CLOUD ====================
         async function executeSubmitExam() {
             let totalScore = 0;
             const questions = activeExam.questions || [];
-            const part1Count = questions.filter(q => q.part === 1).length;
-            const part2Count = questions.filter(q => q.part === 2).length;
-            const part3Count = questions.filter(q => q.part === 3).length;
 
-            const p1PerQ = part1Count > 0 ? (3.0 / part1Count) : 0;
-            const p2PerQ = part2Count > 0 ? (4.0 / part2Count) : 0;
-            const p3PerQ = part3Count > 0 ? (3.0 / part3Count) : 0;
+            const p1List = questions.filter(q => q.part === 1);
+            const p2List = questions.filter(q => q.part === 2);
+            const p3List = questions.filter(q => q.part === 3);
+
+            let p1PerQ = p1List.length > 0 ? (p2List.length === 0 && p3List.length === 0 ? 10.0 / p1List.length : 3.0 / p1List.length) : 0;
+            let p2PerQ = p2List.length > 0 ? (p1List.length === 0 && p3List.length === 0 ? 10.0 / p2List.length : 4.0 / p2List.length) : 0;
+            let p3PerQ = p3List.length > 0 ? (p1List.length === 0 && p2List.length === 0 ? 10.0 / p3List.length : 3.0 / p3List.length) : 0;
+
+            if (p1List.length > 0 && p2List.length > 0 && p3List.length > 0) {
+                p1PerQ = 3.0 / p1List.length;
+                p2PerQ = 4.0 / p2List.length;
+                p3PerQ = 3.0 / p3List.length;
+            }
 
             questions.forEach((q, idx) => {
                 const uAns = studentAnswers[idx];
                 if (q.part === 1) {
-                    if (uAns && uAns === q.correct) totalScore += p1PerQ;
+                    if (uAns && String(uAns).toUpperCase() === String(q.correct).toUpperCase()) {
+                        totalScore += p1PerQ;
+                    }
                 } else if (q.part === 2) {
                     let stCorrectCount = 0;
-                    (q.statements || []).forEach((st, sIdx) => {
-                        if (uAns && uAns[sIdx] === st.correct) stCorrectCount++;
+                    (q.statements || []).forEach(st => {
+                        if (uAns && uAns[st.letter] === st.correct) stCorrectCount++;
                     });
                     if (stCorrectCount === 1) totalScore += (p2PerQ * 0.1);
                     else if (stCorrectCount === 2) totalScore += (p2PerQ * 0.25);
@@ -843,7 +866,7 @@
                 }
             });
 
-            totalScore = Math.min(10, Math.round(totalScore * 10) / 10);
+            totalScore = Math.min(10, Math.max(0, Math.round(totalScore * 10) / 10));
 
             const resultPayload = {
                 id: 'res_' + Date.now(),
@@ -859,14 +882,18 @@
                 await fetch(CLOUD_API_URL, {
                     method: 'POST',
                     headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({ action: 'submitExam', payload: resultPayload })
+                    body: JSON.stringify({ 
+                        action: 'submitExamResult', 
+                        payload: resultPayload,
+                        examResult: resultPayload 
+                    })
                 });
             } catch(e) { console.error("Lỗi gửi điểm cloud:", e); }
 
+            if (!appData.examResults) appData.examResults = [];
             appData.examResults.push(resultPayload);
             localStorage.setItem(CACHE_DATA_KEY, JSON.stringify(appData));
 
-            // Xóa bản nháp sau khi nộp thành công
             clearExamDraftLocally();
 
             document.getElementById('screenExamTaking').classList.add('hidden');
@@ -879,15 +906,15 @@
             
             const cheatNoteEl = document.getElementById('resultCheatNote');
             if (tabSwitchCount > 0) {
-                cheatNoteEl.innerText = `Cảnh báo: Đã rời tab ${tabSwitchCount} lần!`;
+                cheatNoteEl.innerText = `Cảnh báo: Đã rời màn hình ${tabSwitchCount} lần!`;
                 cheatNoteEl.className = "text-[11px] font-bold text-rose-600";
             } else {
-                cheatNoteEl.innerText = "Làm bài nghiêm túc, không vi phạm rời tab";
+                cheatNoteEl.innerText = "Làm bài nghiêm túc, không vi phạm rời màn hình";
                 cheatNoteEl.className = "text-[11px] font-bold text-emerald-600";
             }
 
-            if (activeExam.matrix && activeExam.matrix.solutionUrl) {
-                document.getElementById('btnViewSolution').href = activeExam.matrix.solutionUrl;
+            if (activeExam.solutionUrl) {
+                document.getElementById('btnViewSolution').href = activeExam.solutionUrl;
                 document.getElementById('solutionBox').classList.remove('hidden');
             }
             if (window.lucide) lucide.createIcons();
