@@ -1,13 +1,15 @@
 {
-  "id": "/hocsinh.html",
+  "id": "sigmamath-student-app",
   "name": "SigmaMath - Thầy Mẫn",
   "short_name": "M-SigmaMath",
+  "description": "Cổng tra cứu chuyên cần, học phí và khảo thí trực tuyến",
   "start_url": "./hocsinh.html",
-  "scope": "./",
+  "scope": "./hocsinh.html",
   "display": "standalone",
   "background_color": "#0b1329",
   "theme_color": "#312e81",
-  "orientation": "any",
+  "orientation": "portrait-primary",
+  "categories": ["education"],
   "icons": [
     {
       "src": "logo-student-192.png",

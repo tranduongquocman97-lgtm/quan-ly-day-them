@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Cổng Học Sinh - M_SigmaMath</title>
     
-    <link rel="manifest" href="manifest.json">
+    <!-- LIÊN KẾT PWA RIÊNG CỦA HỌC SINH -->
+    <link rel="manifest" href="manifest-student.json">
     <meta name="theme-color" content="#1e1b4b">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,6 +17,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
+    <!-- KaTeX Hỗ Trợ Công Thức Toán Học -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
@@ -31,10 +33,12 @@
 </head>
 <body class="text-slate-800 bg-slate-50/70 min-h-screen flex flex-col md:flex-row md:h-screen md:overflow-hidden select-none relative">
 
+    <!-- HIỆU ỨNG MESH GRADIENT NỀN MỜ TẠO CHIỀU SÂU -->
     <div class="fixed top-[-10%] right-[-5%] w-[420px] h-[420px] rounded-full bg-indigo-200/35 blur-3xl pointer-events-none z-0"></div>
     <div class="fixed bottom-[-10%] left-[15%] w-[480px] h-[480px] rounded-full bg-emerald-200/25 blur-3xl pointer-events-none z-0"></div>
     <div class="fixed top-[40%] left-[-8%] w-[380px] h-[380px] rounded-full bg-purple-200/20 blur-3xl pointer-events-none z-0"></div>
 
+    <!-- MÀN HÌNH ĐĂNG NHẬP -->
     <div id="loginScreen" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white/95 backdrop-blur-xl p-6 sm:p-8 rounded-3xl shadow-2xl border border-slate-200 w-full max-w-sm text-center space-y-5">
             <div class="w-20 h-20 mx-auto rounded-3xl overflow-hidden shadow-lg border border-slate-100 flex items-center justify-center bg-indigo-950 p-2">
@@ -67,6 +71,33 @@
         </div>
     </div>
 
+    <!-- MODAL BẮT BUỘC ĐỔI MẬT KHẨU LẦN ĐẦU -->
+    <div id="modalForceChangePassword" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[60] flex items-center justify-center hidden p-4">
+        <div class="bg-white p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
+            <div class="text-center space-y-1">
+                <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl mx-auto flex items-center justify-center mb-2">
+                    <i data-lucide="shield-alert" class="w-6 h-6"></i>
+                </div>
+                <h3 class="font-black text-sm text-slate-900">ĐỔI MẬT KHẨU LẦN ĐẦU</h3>
+                <p class="text-xs text-slate-500">Vì lý do bảo mật, em vui lòng đổi mật khẩu mới trước khi vào hệ thống.</p>
+            </div>
+            <form onsubmit="handleForceChangePassword(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Mật khẩu mới (ít nhất 6 ký tự):</label>
+                    <input type="password" id="inputNewPass" required minlength="6" placeholder="Nhập mật khẩu mới..." class="w-full p-2.5 border rounded-xl font-bold outline-none focus:border-indigo-600">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Xác nhận mật khẩu mới:</label>
+                    <input type="password" id="inputConfirmPass" required minlength="6" placeholder="Nhập lại mật khẩu..." class="w-full p-2.5 border rounded-xl font-bold outline-none focus:border-indigo-600">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow transition">
+                    Xác Nhận & Lưu Mật Khẩu
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SIDEBAR DỌC TRÁI (CHO MÁY TÍNH / LAPTOP) -->
     <aside id="studentSidebar" class="w-full md:w-64 bg-white/90 backdrop-blur-md border-r border-slate-200/80 flex flex-col shrink-0 z-30 shadow-xs hidden md:flex">
         <div class="p-4 border-b border-slate-100/80 flex items-center space-x-3">
             <div class="w-11 h-11 rounded-2xl bg-indigo-950 p-1 shrink-0 overflow-hidden shadow-sm">
@@ -114,13 +145,15 @@
         </div>
     </aside>
 
+    <!-- KHU VỰC NỘI DUNG CHÍNH (BÊN PHẢI) -->
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative z-10">
+        <!-- MOBILE TOP BAR GỌN GÀNG -->
         <div class="md:hidden bg-indigo-950 text-white px-4 py-3 flex justify-between items-center z-10 shrink-0 shadow-md">
             <div class="flex items-center space-x-2.5">
                 <img src="logo-student.png" class="w-7 h-7 rounded-lg object-contain bg-white/10 p-0.5">
                 <div>
                     <div class="font-black text-xs leading-tight" id="mobileHeaderStudentName">Học Sinh</div>
-                    <div class="text-[10px] text-indigo-300 font-mono" id="mobileHeaderStudentClass">10N1</div>
+                    <div class="text-[10px] text-indigo-300 font-mono" id="mobileHeaderStudentClass">---</div>
                 </div>
             </div>
             <button onclick="switchStudentTab('settings')" class="text-xs bg-indigo-900/80 hover:bg-indigo-800 text-white px-2.5 py-1.5 rounded-xl border border-indigo-700 font-bold flex items-center space-x-1 transition">
@@ -129,15 +162,18 @@
             </button>
         </div>
 
+        <!-- MAIN SCROLLABLE -->
         <main class="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6 space-y-4 sm:space-y-5 pb-24 md:pb-6">
 
+            <!-- TAB 1: TỔNG QUAN -->
             <div id="tab-overview" class="student-tab-content space-y-4 sm:space-y-5">
+                <!-- HERO BANNER TÍM -->
                 <div class="rounded-3xl p-5 sm:p-7 text-white shadow-xl bg-gradient-to-r from-indigo-950 via-purple-950 to-indigo-900 relative overflow-hidden flex flex-col justify-between min-h-[140px] border border-white/10">
                     <div class="flex justify-between items-start z-10">
                         <div class="space-y-1">
                             <span class="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-amber-300 flex items-center space-x-1">
                                 <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                                <span>CHÀO BUỔI CHIỀU!</span>
+                                <span id="heroGreetingText">CHÀO BUỔI HỌC!</span>
                             </span>
                             <h1 class="text-xl sm:text-2xl font-black text-white" id="heroStudentName">Học Sinh</h1>
                         </div>
@@ -152,7 +188,9 @@
                     </div>
                 </div>
 
+                <!-- 4 QUICK STATS CARDS PHÂN MÀU THÔNG MINH -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                    <!-- THẺ 1: CA TIẾP THEO (XANH DƯƠNG) -->
                     <div class="bg-gradient-to-br from-blue-50/90 to-white/95 p-4 rounded-2xl border border-blue-100 shadow-sm flex flex-col justify-between space-y-2 hover:shadow-md transition">
                         <div class="flex justify-between items-center text-blue-700 text-[10px] font-bold uppercase tracking-wider">
                             <span>CA TIẾP THEO</span>
@@ -162,11 +200,12 @@
                         </div>
                         <div>
                             <div class="font-black text-xs sm:text-sm text-slate-800" id="statNextLesson">Hôm nay</div>
-                            <div class="text-[11px] font-mono text-blue-700 font-bold" id="statNextTime">19:00 - 20:30</div>
+                            <div class="text-[11px] font-mono text-blue-700 font-bold" id="statNextTime">Theo lịch cố định</div>
                         </div>
-                        <div class="text-[10px] text-slate-400">Theo lịch cố định</div>
+                        <div class="text-[10px] text-slate-400">Theo lịch của lớp</div>
                     </div>
 
+                    <!-- THẺ 2: TIẾN ĐỘ CHU KỲ (TÍM) -->
                     <div class="bg-gradient-to-br from-purple-50/90 to-white/95 p-4 rounded-2xl border border-purple-100 shadow-sm flex flex-col justify-between space-y-2 hover:shadow-md transition">
                         <div class="flex justify-between items-center text-purple-700 text-[10px] font-bold uppercase tracking-wider">
                             <span>TIẾN ĐỘ CHU KỲ</span>
@@ -175,12 +214,13 @@
                             </div>
                         </div>
                         <div>
-                            <div class="font-black text-xs sm:text-sm text-slate-800" id="statCycleProgress">Buổi 4/8</div>
-                            <div class="text-[11px] text-purple-700 font-bold" id="statCycleName">Kỳ 2</div>
+                            <div class="font-black text-xs sm:text-sm text-slate-800" id="statCycleProgress">Buổi --/8</div>
+                            <div class="text-[11px] text-purple-700 font-bold" id="statCycleName">Kỳ ---</div>
                         </div>
                         <div class="text-[10px] text-emerald-600 font-bold" id="statAttSummary">Chuyên cần: 100%</div>
                     </div>
 
+                    <!-- THẺ 3: HỌC PHÍ (XANH NGỌC) -->
                     <div class="bg-gradient-to-br from-emerald-50/90 to-white/95 p-4 rounded-2xl border border-emerald-100 shadow-sm flex flex-col justify-between space-y-2 hover:shadow-md transition">
                         <div class="flex justify-between items-center text-emerald-700 text-[10px] font-bold uppercase tracking-wider">
                             <span>HỌC PHÍ</span>
@@ -195,6 +235,7 @@
                         <button onclick="switchStudentTab('tuition')" class="text-[10px] text-emerald-700 font-bold hover:underline text-left">Chi tiết & QR ➔</button>
                     </div>
 
+                    <!-- THẺ 4: KHẢO THÍ GẦN NHẤT (VÀNG HỔ PHÁCH) -->
                     <div class="bg-gradient-to-br from-amber-50/90 to-white/95 p-4 rounded-2xl border border-amber-100 shadow-sm flex flex-col justify-between space-y-2 hover:shadow-md transition">
                         <div class="flex justify-between items-center text-amber-700 text-[10px] font-bold uppercase tracking-wider">
                             <span>KHẢO THÍ GẦN NHẤT</span>
@@ -210,17 +251,19 @@
                     </div>
                 </div>
 
+                <!-- TIẾN TRÌNH 8 BUỔI CHU KỲ HIỆN TẠI -->
                 <div class="bg-white/90 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
                     <div class="flex justify-between items-center border-b pb-2.5">
                         <h2 class="font-black text-xs sm:text-sm text-slate-800 flex items-center space-x-2">
                             <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
                             <span>Tiến Trình 8 Buổi Học Trong Chu Kỳ Hiện Tại</span>
                         </h2>
-                        <span id="currentCycleBadge" class="text-xs bg-indigo-50 text-indigo-700 font-black px-2.5 py-0.5 rounded-lg border border-indigo-100">Kỳ 2</span>
+                        <span id="currentCycleBadge" class="text-xs bg-indigo-50 text-indigo-700 font-black px-2.5 py-0.5 rounded-lg border border-indigo-100">Kỳ 1</span>
                     </div>
                     <div class="grid grid-cols-4 sm:grid-cols-8 gap-2 sm:gap-2.5" id="currentCycleBallsContainer"></div>
                 </div>
 
+                <!-- 2 CỘT: LỊCH TUẦN & NỘP HỌC PHÍ NHANH VIETQR -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div class="bg-white/90 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
                         <div class="flex justify-between items-center border-b pb-2">
@@ -233,6 +276,7 @@
                         <div id="weeklyClassScheduleList" class="space-y-2"></div>
                     </div>
 
+                    <!-- KHỐI THANH TOÁN VIETQR VỚI CHUYỂN TIỀN 1 CHẠM & PHÓNG TO QR -->
                     <div class="bg-white/90 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
                         <div class="flex justify-between items-center border-b pb-2">
                             <h3 class="font-black text-xs sm:text-sm text-slate-800 flex items-center space-x-1.5">
@@ -242,6 +286,7 @@
                             <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Agribank</span>
                         </div>
                         <div class="flex flex-col sm:flex-row items-center gap-4">
+                            <!-- Ảnh QR bấm vào để phóng to -->
                             <div class="relative group cursor-pointer shrink-0" onclick="openQrLightbox()" title="Chạm để phóng to mã QR">
                                 <div class="p-1.5 bg-slate-50 border rounded-2xl hover:border-indigo-500 transition shadow-xs">
                                     <img id="quickVietQrImg" src="" class="w-36 h-36 rounded-xl object-contain bg-white" alt="VietQR">
@@ -265,6 +310,7 @@
                             </div>
                         </div>
 
+                        <!-- CỤM NÚT THAO TÁC 1 CHẠM: MỞ APP CHUYỂN TIỀN & TẢI ẢNH QR -->
                         <div class="grid grid-cols-2 gap-2 pt-1">
                             <button onclick="openBankAppToPay()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2.5 px-3 rounded-xl text-xs shadow-md shadow-indigo-600/20 transition flex items-center justify-center space-x-1.5">
                                 <i data-lucide="smartphone" class="w-4 h-4 text-amber-300"></i>
@@ -279,6 +325,7 @@
                 </div>
             </div>
 
+            <!-- TAB 2: HỌC PHÍ & VIETQR (CÓ CỘT THỜI GIAN NỘP) -->
             <div id="tab-tuition" class="student-tab-content hidden space-y-4">
                 <div class="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                     <h2 class="font-black text-sm text-slate-800 border-b pb-2 flex justify-between items-center">
@@ -303,6 +350,7 @@
                 </div>
             </div>
 
+            <!-- TAB 3: SỔ ĐIỂM DANH 8 BUỔI -->
             <div id="tab-attendance" class="student-tab-content hidden space-y-4">
                 <div class="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                     <h2 class="font-black text-sm text-slate-800 border-b pb-2">Hồ Sơ Chuyên Cần 8 Buổi / Chu Kỳ</h2>
@@ -310,8 +358,10 @@
                 </div>
             </div>
 
+            <!-- TAB 4: TIẾN ĐỘ & NĂNG LỰC (2026-2027) -->
             <div id="tab-performance" class="student-tab-content hidden space-y-4">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <!-- KHỐI 1: BIỂU ĐỒ PHONG ĐỘ ĐIỂM SỐ -->
                     <div class="bg-white/90 backdrop-blur-md p-5 rounded-3xl border border-slate-200 shadow-sm space-y-4 flex flex-col min-h-[360px]">
                         <div class="border-b pb-3 flex justify-between items-center">
                             <h3 class="font-black text-sm text-slate-800">Biểu Đồ Phong Độ Điểm Số</h3>
@@ -322,6 +372,7 @@
                         </div>
                     </div>
 
+                    <!-- KHỐI 2: ĐÁNH GIÁ NĂNG LỰC TRẮC NGHIỆM GDPT MỚI -->
                     <div class="bg-white/90 backdrop-blur-md p-5 rounded-3xl border border-slate-200 shadow-sm space-y-4 flex flex-col min-h-[360px]">
                         <div class="border-b pb-3 flex justify-between items-center">
                             <h3 class="font-black text-sm text-slate-800">Đánh Giá Năng Lực Trắc Nghiệm GDPT Mới</h3>
@@ -334,6 +385,7 @@
                 </div>
             </div>
 
+            <!-- TAB 5: KHO CHUYÊN ĐỀ -->
             <div id="tab-documents" class="student-tab-content hidden space-y-4">
                 <div class="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                     <h2 class="font-black text-sm text-slate-800 border-b pb-2">Tài Liệu Học Tập & Bài Giảng</h2>
@@ -341,6 +393,7 @@
                 </div>
             </div>
 
+            <!-- TAB 6: KHẢO THÍ TRỰC TUYẾN -->
             <div id="tab-exams" class="student-tab-content hidden space-y-4">
                 <div class="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                     <h2 class="font-black text-sm text-slate-800 border-b pb-2">Danh Sách Bài Thi & Đề Kiểm Tra</h2>
@@ -348,6 +401,7 @@
                 </div>
             </div>
 
+            <!-- TAB 7: CÀI ĐẶT & TÀI KHOẢN -->
             <div id="tab-settings" class="student-tab-content hidden space-y-4 max-w-2xl mx-auto">
                 <div class="bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm space-y-5">
                     <div class="border-b pb-3 flex justify-between items-center">
@@ -361,6 +415,7 @@
                         </button>
                     </div>
 
+                    <!-- Thông tin cá nhân -->
                     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2 text-xs">
                         <div class="flex justify-between">
                             <span class="text-slate-500">Họ và tên:</span>
@@ -380,6 +435,7 @@
                         </div>
                     </div>
 
+                    <!-- Form Đổi Mật Khẩu -->
                     <div class="space-y-3">
                         <h3 class="font-black text-xs text-slate-800 flex items-center space-x-1.5">
                             <i data-lucide="key-round" class="w-4 h-4 text-indigo-600"></i>
@@ -406,6 +462,7 @@
                         </form>
                     </div>
 
+                    <!-- Cài App & Đăng Xuất -->
                     <div class="pt-4 border-t space-y-2">
                         <button onclick="triggerStudentPWAInstall()" id="btnSettingsInstallPWA" class="w-full bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold py-3 rounded-2xl border border-purple-200 text-xs transition flex items-center justify-center space-x-2">
                             <i data-lucide="smartphone" class="w-4 h-4"></i>
@@ -421,6 +478,7 @@
 
         </main>
 
+        <!-- THANH ĐIỀU HƯỚNG ĐÁY CỐ ĐỊNH TRÊN ĐIỆN THOẠI -->
         <nav id="mobileBottomNav" class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 py-1.5 flex justify-around items-center z-40 shadow-lg">
             <button onclick="switchStudentTab('overview')" id="mob-tab-overview" class="flex flex-col items-center p-1 text-indigo-600 font-bold text-[10px]">
                 <i data-lucide="layout-grid" class="w-5 h-5"></i>
@@ -445,6 +503,7 @@
         </nav>
     </div>
 
+    <!-- MODAL PHÓNG TO MÃ VIETQR (LIGHTBOX) -->
     <div id="qrLightboxModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[70] flex items-center justify-center hidden p-4" onclick="closeQrLightbox()">
         <div class="bg-white p-5 rounded-3xl max-w-sm w-full text-center space-y-3 shadow-2xl" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b pb-2">
@@ -467,6 +526,7 @@
         </div>
     </div>
 
+    <!-- PHÒNG THI ONLINE (CÓ NÚT THOÁT RA) -->
     <div id="examTakingRoom" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-50 flex flex-col hidden overflow-hidden">
         <header class="bg-white p-3 sm:p-4 border-b flex justify-between items-center shrink-0">
             <div class="flex items-center space-x-2">
@@ -494,6 +554,25 @@
         </div>
     </div>
 
+    <!-- MODAL XEM LẠI BÀI THI & ĐÁP ÁN (REVIEW) -->
+    <div id="modalReviewExamResult" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden space-y-4">
+            <div class="flex justify-between items-center border-b pb-3 shrink-0">
+                <div>
+                    <h3 class="font-black text-sm sm:text-base text-slate-900" id="reviewExamTitle">Xem Lại Bài Thi</h3>
+                    <div class="text-xs text-indigo-700 font-bold" id="reviewExamScoreBadge">Điểm: ---</div>
+                </div>
+                <button onclick="closeReviewExamModal()"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto space-y-4 pr-1 text-xs" id="reviewExamContentArea"></div>
+        </div>
+    </div>
+
+    <!-- MODAL PHÓNG TO HÌNH ẢNH TOÁN (LIGHTBOX) -->
+    <div id="imageLightboxModal" class="fixed inset-0 bg-slate-950/90 z-[70] flex items-center justify-center hidden p-4" onclick="this.classList.add('hidden')">
+        <img id="lightboxImg" src="" class="max-w-full max-h-full rounded-2xl shadow-2xl border border-white/20">
+    </div>
+
     <script>
         const STORAGE_KEY = 'TUTORING_MASTER_SYSTEM_V2026';
         const STUDENT_AUTH_KEY = 'SIGMA_STUDENT_SESSION';
@@ -519,6 +598,7 @@
         let currentQrAmount = 0;
         let currentQrContent = "";
 
+        // ==================== CÔNG CỤ XỬ LÝ NGÀY THÁNG DD-MM-YYYY ====================
         function normalizeCloudDate(d) {
             if (!d) return '';
             d = String(d).trim();
@@ -558,6 +638,15 @@
             return p.length === 3 ? `${p[0]}/${p[1]}` : clean;
         }
 
+        function getGreetingByTime() {
+            const h = new Date().getHours();
+            if (h >= 5 && h < 11) return 'CHÀO BUỔI SÁNG!';
+            if (h >= 11 && h < 14) return 'CHÀO BUỔI TRƯA!';
+            if (h >= 14 && h < 18) return 'CHÀO BUỔI CHIỀU!';
+            return 'CHÀO BUỔI TỐI!';
+        }
+
+        // ==================== KHỞI ĐỘNG HỆ THỐNG ====================
         window.addEventListener('DOMContentLoaded', () => {
             loadFromStorage();
             checkUrlImpersonation();
@@ -567,6 +656,7 @@
             setupAntiCheatMonitoring();
         });
 
+        // Bắt tham số giả lập từ giáo viên (?impersonate=...)
         function checkUrlImpersonation() {
             const params = new URLSearchParams(window.location.search);
             const impId = params.get('impersonate') || params.get('id');
@@ -579,6 +669,7 @@
             }
         }
 
+        // Đăng ký sự kiện PWA
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             studentDeferredPrompt = e;
@@ -591,7 +682,7 @@
                 studentDeferredPrompt.prompt();
                 studentDeferredPrompt.userChoice.then(() => { studentDeferredPrompt = null; });
             } else {
-                alert("Nếu dùng iPhone: Bấm nút Chia sẻ ➔ Chọn 'Thêm vào Màn hình chính'.\nNếu dùng Android: Bấm menu 3 chấm Chrome ➔ Chọn 'Cài đặt ứng dụng'.");
+                alert("Nếu dùng iPhone: Bấm nút 'Chia sẻ' (Share) ➔ Chọn 'Thêm vào Màn hình chính' (Add to Home Screen).\nNếu dùng Android: Bấm menu 3 chấm của Chrome ➔ Chọn 'Cài đặt ứng dụng'.");
             }
         }
 
@@ -607,7 +698,7 @@
                 const res = await fetch(cloudApiUrl);
                 const j = await res.json();
                 if (j.Classes) appData.classes = j.Classes.slice(1).map(r => ({ id: String(r[0]||''), name: String(r[1]||''), fee: parseFloat(r[2])||300000, schedules: JSON.parse(r[3]||'[]') }));
-                if (j.Students) appData.students = j.Students.slice(1).map(r => ({ id: String(r[0]||''), classId: String(r[1]||''), code: String(r[2]||''), name: String(r[3]||''), phone: String(r[4]||''), joinDate: normalizeCloudDate(r[5]||'01-08-2026'), customFee: r[6]!==''&&r[6]!==null?parseFloat(r[6]):null, username: String(r[7]||''), password: String(r[8]||'') }));
+                if (j.Students) appData.students = j.Students.slice(1).map(r => ({ id: String(r[0]||''), classId: String(r[1]||''), code: String(r[2]||''), name: String(r[3]||''), phone: String(r[4]||''), joinDate: normalizeCloudDate(r[5]||'01-08-2026'), customFee: (r[6]!==''&&r[6]!==null)?parseFloat(r[6]):null, username: String(r[7]||''), password: String(r[8]||''), mustChangePassword: r[9]===true||r[9]==='true' }));
                 if (j.Attendance) appData.attendance = j.Attendance.slice(1).map(r => ({ studentId: String(r[0]||''), classId: String(r[1]||''), date: normalizeCloudDate(r[2]||''), status: String(r[3]||''), note: String(r[4]||'') }));
                 if (j.Payments) appData.payments = j.Payments.slice(1).map(r => ({ id: String(r[0]||''), studentId: String(r[1]||''), classId: String(r[2]||''), cycleIndex: parseInt(r[3]), amount: parseFloat(r[4])||0, status: String(r[5]||''), method: String(r[6]||''), note: String(r[7]||''), date: normalizeCloudDate(r[8]||'') }));
                 if (j.Documents) appData.documents = j.Documents.slice(1).map(r => ({ id: String(r[0]||''), classId: String(r[1]||''), name: String(r[2]||''), category: String(r[3]||'Chuyên đề chung'), url: String(r[4]||'') }));
@@ -631,6 +722,9 @@
                     if (s) {
                         currentStudent = s;
                         document.getElementById('loginScreen').classList.add('hidden');
+                        if (currentStudent.mustChangePassword) {
+                            document.getElementById('modalForceChangePassword').classList.remove('hidden');
+                        }
                         renderStudentPortal();
                         return;
                     }
@@ -664,11 +758,42 @@
                 localStorage.setItem(STUDENT_AUTH_KEY, JSON.stringify({ id: s.id }));
                 document.getElementById('loginScreen').classList.add('hidden');
                 err.classList.add('hidden');
+                if (currentStudent.mustChangePassword) {
+                    document.getElementById('modalForceChangePassword').classList.remove('hidden');
+                }
                 renderStudentPortal();
             } else {
                 err.innerText = "Tài khoản hoặc mật khẩu không chính xác!";
                 err.classList.remove('hidden');
             }
+        }
+
+        async function handleForceChangePassword(e) {
+            e.preventDefault();
+            const p1 = document.getElementById('inputNewPass').value.trim();
+            const p2 = document.getElementById('inputConfirmPass').value.trim();
+
+            if (p1 !== p2) {
+                alert("Xác nhận mật khẩu mới không khớp!");
+                return;
+            }
+
+            currentStudent.password = p1;
+            currentStudent.mustChangePassword = false;
+
+            if (cloudApiUrl) {
+                try {
+                    await fetch(cloudApiUrl, {
+                        method: 'POST',
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify({ action: 'changePassword', studentId: currentStudent.id, newPassword: p1 })
+                    });
+                } catch(err){}
+            }
+
+            saveToStorage();
+            document.getElementById('modalForceChangePassword').classList.add('hidden');
+            alert("Đổi mật khẩu thành công! Em hãy ghi nhớ mật khẩu mới nhé.");
         }
 
         function handleStudentLogout() {
@@ -701,6 +826,7 @@
             }
 
             currentStudent.password = newPass;
+            currentStudent.mustChangePassword = false;
             if (cloudApiUrl) {
                 try {
                     await fetch(cloudApiUrl, {
@@ -756,6 +882,7 @@
             return dates.sort((a, b) => compareDateDDMMYYYY(a, b));
         }
 
+        // ==================== RENDER TOÀN BỘ GIAO DIỆN HỌC SINH ====================
         function renderStudentPortal() {
             if (!currentStudent) return;
             const targetClass = (appData.classes || []).find(c => c.id === currentStudent.classId);
@@ -768,6 +895,7 @@
             const mobC = document.getElementById('mobileHeaderStudentClass');
             if (mobC) mobC.innerText = `Lớp: ${className} • Mã: ${currentStudent.code}`;
 
+            document.getElementById('heroGreetingText').innerText = getGreetingByTime();
             document.getElementById('heroStudentName').innerText = currentStudent.name;
             document.getElementById('heroClassBadge').innerText = `Lớp: ${className}`;
             document.getElementById('heroCodeBadge').innerText = `Mã: ${currentStudent.code}`;
@@ -785,7 +913,7 @@
 
             const attRate = totalTaught > 0 ? Math.round((attendedCount / totalTaught) * 100) : 100;
             const activeCycleIndex = Math.max(0, Math.floor((totalTaught - 1) / 8));
-            const sessInCycle = ((totalTaught - 1) % 8) + 1;
+            const sessInCycle = totalTaught > 0 ? (((totalTaught - 1) % 8) + 1) : 0;
 
             document.getElementById('statCycleProgress').innerText = `Buổi ${sessInCycle}/8`;
             document.getElementById('statCycleName').innerText = `Kỳ ${activeCycleIndex + 1}`;
@@ -794,6 +922,7 @@
             const todayVN = normalizeCloudDate(new Date().toISOString());
             document.getElementById('statNextLesson').innerText = `Hôm nay (${formatDateShortVN(todayVN)})`;
 
+            // Lịch học tuần
             const schedules = targetClass ? (targetClass.schedules || []) : [];
             document.getElementById('weeklyClassScheduleList').innerHTML = schedules.length === 0 ? '<div class="text-xs text-slate-400 italic">Chưa có lịch cố định</div>' : schedules.map(sc => `
                 <div class="p-2.5 bg-slate-50 border rounded-xl flex justify-between items-center text-xs">
@@ -802,6 +931,7 @@
                 </div>
             `).join('');
 
+            // 8 Buổi chu kỳ hiện tại
             document.getElementById('currentCycleBadge').innerText = `Kỳ ${activeCycleIndex + 1}`;
             const currentCycleDates = allDates.slice(activeCycleIndex * 8, (activeCycleIndex + 1) * 8);
             let ballsHtml = '';
@@ -850,6 +980,7 @@
             if (window.lucide) lucide.createIcons();
         }
 
+        // ==================== HỌC PHÍ & VIETQR ====================
         function renderTuitionAndQR(targetClass, className, allDates, activeCycleIndex) {
             const effFee = (currentStudent.customFee !== null && currentStudent.customFee !== undefined) 
                            ? parseFloat(currentStudent.customFee) 
@@ -917,7 +1048,6 @@
             const cleanUser = (currentStudent.username || currentStudent.code).toUpperCase().replace(/[^A-Z0-9]/g, '');
             const qrDesc = `HP ${cleanClassName} ${cleanUser} K${activeCycleIndex + 1}`;
 
-            // Lưu biến toàn cục cho các hàm tương tác
             currentQrAmount = totalDebtToPay;
             currentQrContent = qrDesc;
             currentQrUrl = `https://img.vietqr.io/image/${AGRIBANK_BIN}-${AGRIBANK_STK}-compact2.png?amount=${totalDebtToPay}&addInfo=${encodeURIComponent(qrDesc)}&accountName=${encodeURIComponent(AGRIBANK_NAME)}`;
@@ -939,20 +1069,21 @@
             document.getElementById('qrLightboxModal').classList.add('hidden');
         }
 
+        // Mở App Ngân hàng chuyển tiền qua Universal Picker
         function openBankAppToPay() {
             if (currentQrAmount <= 0) {
                 alert("Em không có học phí nợ cần thanh toán!");
                 return;
             }
-            copyToClipboard(currentQrContent, "Đã sao chép nội dung chuyển khoản! Đang mở ứng dụng ngân hàng...");
+            copyToClipboard(currentQrContent, "Đã sao chép nội dung chuyển khoản! Đang mở cổng ứng dụng ngân hàng...");
 
-            const deeplinkUrl = `https://dl.vietqr.io/pay?bank=${AGRIBANK_BIN}&acc=${AGRIBANK_STK}&amount=${currentQrAmount}&des=${encodeURIComponent(currentQrContent)}`;
-            
+            const payUrl = `https://vietqr.co/${AGRIBANK_BIN}/${AGRIBANK_STK}/${currentQrAmount}/${encodeURIComponent(currentQrContent)}`;
             setTimeout(() => {
-                window.location.href = deeplinkUrl;
-            }, 600);
+                window.open(payUrl, '_blank');
+            }, 500);
         }
 
+        // Tải ảnh QR về máy
         async function downloadQrImage() {
             if (!currentQrUrl) return;
             try {
@@ -1050,6 +1181,7 @@
             document.getElementById('studentCyclesAccordion').innerHTML = accHtml || '<div class="text-xs text-slate-400 italic">Chưa có dữ liệu</div>';
         }
 
+        // ==================== TIẾN ĐỘ & NĂNG LỰC ====================
         function renderPerformanceTab() {
             const studentExams = (appData.examResults || []).filter(r => String(r.studentId) === String(currentStudent.id));
             const countBadge = document.getElementById('perfExamCountBadge');
@@ -1163,6 +1295,7 @@
             `;
         }
 
+        // ==================== TÀI LIỆU ====================
         function renderDocumentsTab() {
             const allDocs = (appData.documents || []).filter(d => d.classId === currentStudent.classId);
             const container = document.getElementById('studentDocumentsContainer');
@@ -1198,8 +1331,10 @@
                     </div>
                 </div>
             `).join('');
+            if (window.lucide) lucide.createIcons();
         }
 
+        // ==================== KHẢO THÍ TRỰC TUYẾN ====================
         function renderExamsTab() {
             const exams = (appData.exams || []).filter(e => e.classId === currentStudent.classId);
             const container = document.getElementById('studentExamsListContainer');
@@ -1224,8 +1359,8 @@
                             ` : ''}
                         </div>
                         ${result ? `
-                            <button disabled class="w-full bg-slate-200 text-slate-500 font-bold py-2.5 rounded-xl text-xs text-center cursor-not-allowed">
-                                Đã Nộp Bài Thi
+                            <button onclick="openReviewExamResult('${e.id}')" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-xs text-center transition">
+                                Xem Lại Bài Làm & Lời Giải
                             </button>
                         ` : `
                             <button onclick="startTakingExam('${e.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition text-center block">
@@ -1322,7 +1457,7 @@
                         </div>
                     `;
                 } else if (q.part === 3) {
-                    bodyHtml = `<div class="pt-2"><input type="text" placeholder="Nhập đáp án..." oninput="recordAnswer('${q.id}', this.value)" class="w-full p-2.5 border rounded-xl bg-white font-mono font-bold outline-none"></div>`;
+                    bodyHtml = `<div class="pt-2"><input type="text" placeholder="Nhập đáp án (VD: 3/4 hoặc 1.25)..." oninput="recordAnswer('${q.id}', this.value)" class="w-full p-2.5 border rounded-xl bg-white font-mono font-bold outline-none"></div>`;
                 }
 
                 return `
@@ -1331,7 +1466,7 @@
                             <span class="font-black text-indigo-700">Câu ${idx + 1}</span>
                             <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700">Phần ${q.part}</span>
                         </div>
-                        <div class="text-xs sm:text-sm leading-relaxed">${q.prompt}</div>
+                        <div class="text-xs sm:text-sm leading-relaxed" onclick="handleImageClick(event)">${q.prompt}</div>
                         ${bodyHtml}
                     </div>
                 `;
@@ -1342,6 +1477,13 @@
         function recordSubAnswer(qId, letter, val) {
             if (!studentAnswers[qId]) studentAnswers[qId] = {};
             studentAnswers[qId][letter] = val;
+        }
+
+        function handleImageClick(e) {
+            if (e.target.tagName === 'IMG') {
+                document.getElementById('lightboxImg').src = e.target.src;
+                document.getElementById('imageLightboxModal').classList.remove('hidden');
+            }
         }
 
         async function submitExamNow() {
@@ -1403,6 +1545,88 @@
             activeExam = null;
             renderStudentPortal();
             alert(`Nộp bài thành công!\nĐiểm số: ${totalScore.toFixed(1)} đ.`);
+        }
+
+        // ==================== XEM LẠI BÀI THI & ĐÁP ÁN (REVIEW) ====================
+        function openReviewExamResult(examId) {
+            const ex = (appData.exams || []).find(e => e.id === examId);
+            const res = (appData.examResults || []).find(r => r.examId === examId && r.studentId === currentStudent.id);
+            if (!ex || !res) return;
+
+            document.getElementById('reviewExamTitle').innerText = ex.title;
+            document.getElementById('reviewExamScoreBadge').innerText = `Điểm đạt được: ${res.score.toFixed(1)} đ (Rời màn hình: ${res.tabSwitchCount} lần)`;
+
+            const userAnswers = res.details || {};
+            const area = document.getElementById('reviewExamContentArea');
+
+            area.innerHTML = (ex.questions || []).map((q, idx) => {
+                let ansHtml = '';
+
+                if (q.part === 1) {
+                    const chosen = userAnswers[q.id];
+                    const isCorrect = String(chosen).toUpperCase() === String(q.correct).toUpperCase();
+                    ansHtml = `
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                            ${(q.options || []).map(opt => {
+                                const isThisChosen = opt.letter === chosen;
+                                const isThisCorrect = opt.letter === q.correct;
+                                let borderClass = 'border-slate-200 bg-white';
+                                if (isThisCorrect) borderClass = 'border-emerald-500 bg-emerald-50 text-emerald-800 font-bold';
+                                else if (isThisChosen && !isCorrect) borderClass = 'border-rose-400 bg-rose-50 text-rose-700 line-through';
+
+                                return `
+                                    <div class="p-2.5 rounded-xl border ${borderClass}">
+                                        <b>${opt.letter}.</b>${opt.content}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                } else if (q.part === 2) {
+                    const subAns = userAnswers[q.id] || {};
+                    ansHtml = `
+                        <div class="space-y-1.5 pt-2">
+                            ${(q.statements || []).map(st => {
+                                const userPick = subAns[st.letter];
+                                const isCorrect = userPick === st.correct;
+                                return `
+                                    <div class="p-2 border rounded-xl flex justify-between items-center ${isCorrect ? 'bg-emerald-50/50 border-emerald-200' : 'bg-rose-50/50 border-rose-200'}">
+                                        <span><b>${st.letter})</b>${st.content}</span>
+                                        <span class="font-mono text-xs">Em chọn: <b>${userPick || 'Chưa chọn'}</b> | ĐA: <b class="text-emerald-700">${st.correct}</b></span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                } else if (q.part === 3) {
+                    const userText = userAnswers[q.id] || 'Chưa trả lời';
+                    const isCorrect = String(userText).trim().toLowerCase() === String(q.correct).trim().toLowerCase();
+                    ansHtml = `
+                        <div class="pt-2 font-mono text-xs p-2.5 rounded-xl border ${isCorrect ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'}">
+                            Em trả lời: <b>${userText}</b> | Đáp án chuẩn: <b class="text-emerald-700">${q.correct}</b>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="p-4 bg-slate-50 border rounded-2xl space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-black text-indigo-700">Câu ${idx + 1} (Phần ${q.part})</span>
+                        </div>
+                        <div class="text-xs sm:text-sm leading-relaxed">${q.prompt}</div>
+                        ${ansHtml}
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('modalReviewExamResult').classList.remove('hidden');
+            if (window.renderMathInElement) {
+                renderMathInElement(area, { delimiters: [{left: '$', right: '$', display: false}], throwOnError: false });
+            }
+        }
+
+        function closeReviewExamModal() {
+            document.getElementById('modalReviewExamResult').classList.add('hidden');
         }
     </script>
 </body>
