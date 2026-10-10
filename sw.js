@@ -3,7 +3,7 @@
 // ============================================================================
 
 // Đổi chuỗi phiên bản này mỗi khi cập nhật code để thiết bị tự động làm mới
-const CACHE_VERSION = 'v2026.10.10.1';
+const CACHE_VERSION = 'v2026.10.10.2';
 const CACHE_NAME = `msigma-cache-${CACHE_VERSION}`;
 
 // Danh sách các tài nguyên tĩnh cốt lõi cần nạp sẵn vào bộ nhớ đệm

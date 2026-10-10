@@ -391,13 +391,13 @@
                 </div>
             </section>
 
-            <!-- TAB 7: HỌC PHÍ THEO KỲ -->
+            <!-- TAB 7: HỌC PHÍ THEO KỲ (ĐỒNG BỘ LŨY KẾ & SỐ DƯ) -->
             <section id="tab-tuition" class="tab-content hidden space-y-4 sm:space-y-6">
                 <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex justify-between items-center border-b pb-2">
                         <div>
-                            <h2 class="font-bold text-xs sm:text-sm text-slate-800">Theo Dõi Học Phí Theo Chu Kỳ Của Lớp</h2>
-                            <p class="text-[11px] text-slate-500">Cả lớp chạy chung nhịp kỳ. Khi chuyển nhóm, hệ thống tự động cộng dồn số buổi liên tục.</p>
+                            <h2 class="font-bold text-xs sm:text-sm text-slate-800">Theo Dõi Học Phí Theo Chu Kỳ (Tự Động Cấn Trừ Lũy Kế)</h2>
+                            <p class="text-[11px] text-slate-500">Tiền nộp thừa từ kỳ trước sẽ tự động trừ sang kỳ sau. Bấm vào từng ô để xem chi tiết hoặc thu tiền.</p>
                         </div>
                     </div>
                     <div class="overflow-x-auto border rounded-xl">
@@ -422,12 +422,12 @@
             <section id="tab-history" class="tab-content hidden space-y-4 sm:space-y-6">
                 <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex justify-between items-center border-b pb-2">
-                        <h2 class="font-bold text-xs sm:text-sm">Nhật Ký Thu Học Phí</h2>
+                        <h2 class="font-bold text-xs sm:text-sm">Nhật Ký Thu Học Phí (Hỗ trợ Nhận diện Tự Động Agribank)</h2>
                         <span id="textTotalClassRevenue" class="text-xs sm:text-sm font-black text-emerald-600 bg-emerald-50 px-2.5 sm:px-3 py-1 rounded-xl border border-emerald-100 font-mono">0 đ</span>
                     </div>
                     <div class="overflow-x-auto border rounded-xl">
                         <table class="w-full text-left text-xs whitespace-nowrap">
-                            <thead><tr class="bg-slate-100 font-bold"><th class="p-2.5 sm:p-3">Lớp</th><th class="p-2.5 sm:p-3">Ngày</th><th class="p-2.5 sm:p-3">Học Sinh</th><th class="p-2.5 sm:p-3">Kỳ Thu</th><th class="p-2.5 sm:p-3">Số Tiền</th><th class="p-2.5 sm:p-3">Hình Thức</th><th class="p-2.5 sm:p-3 text-center">Xóa</th></tr></thead>
+                            <thead><tr class="bg-slate-100 font-bold"><th class="p-2.5 sm:p-3">Lớp</th><th class="p-2.5 sm:p-3">Ngày</th><th class="p-2.5 sm:p-3">Học Sinh</th><th class="p-2.5 sm:p-3">Kỳ Thu</th><th class="p-2.5 sm:p-3">Số Tiền</th><th class="p-2.5 sm:p-3">Hình Thức & Nguồn</th><th class="p-2.5 sm:p-3 text-center">Xóa</th></tr></thead>
                             <tbody id="paymentHistoryBody" class="divide-y"></tbody>
                         </table>
                     </div>
@@ -698,7 +698,11 @@
             <form id="formPayTuition" onsubmit="handleSavePayment(event)" class="space-y-3 text-xs">
                 <input type="hidden" id="payStudentId"><input type="hidden" id="payCycleIndex">
                 <input type="text" id="payStudentInfo" readonly class="w-full p-2 border bg-slate-50 font-bold rounded-xl">
-                <div><label class="block font-bold mb-1">Số Tiền Thực Thu (VNĐ)</label><input type="number" id="payAmount" step="any" class="w-full p-2.5 border rounded-xl text-base font-black text-emerald-600 outline-none"></div>
+                <div>
+                    <label class="block font-bold mb-1">Số Tiền Thực Thu (VNĐ)</label>
+                    <input type="number" id="payAmount" step="any" class="w-full p-2.5 border rounded-xl text-base font-black text-emerald-600 outline-none">
+                    <p id="payNoteSuggestion" class="text-[11px] text-slate-500 mt-1 italic"></p>
+                </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div><label class="block font-bold mb-1">Ngày Thu (DD-MM-YYYY)</label><input type="text" id="payDate" required placeholder="DD-MM-YYYY" class="w-full p-2 border rounded-xl font-mono font-bold text-center"></div>
                     <div><label class="block font-bold mb-1">Hình Thức</label><select id="payMethod" class="w-full p-2 border rounded-xl font-bold"><option value="Chuyển khoản">Chuyển khoản</option><option value="Tiền mặt">Tiền mặt</option></select></div>
@@ -873,21 +877,20 @@
         let selectedAttDateToChange = null;
         let tempImportedStudents = [];
 
-        // ==================== 1. TÍNH NĂNG GIẢ LẬP HỌC SINH TỪ TRANG GV ====================
+        // 1. TÍNH NĂNG GIẢ LẬP HỌC SINH TỪ TRANG GV
         function impersonateStudent(studentId) {
             const s = appData.students.find(x => x.id === studentId);
             if (!s) {
                 alert("Không tìm thấy thông tin học sinh!");
                 return;
             }
-            // Đồng bộ cả 2 khóa để hoạt động với cả hocsinh.html và exam.html
             localStorage.setItem(STUDENT_AUTH_KEY, JSON.stringify({ id: s.id }));
             localStorage.setItem(ACTIVE_STUDENT_SESSION_KEY, s.id);
             const studentUrl = `hocsinh.html?impersonate=${s.id}`;
             window.open(studentUrl, '_blank');
         }
 
-        // ==================== 2. CHỈNH SỬA LỚP & LỊCH HỌC CỐ ĐỊNH ====================
+        // 2. CHỈNH SỬA LỚP & LỊCH HỌC CỐ ĐỊNH
         function openEditClassModal(classId) {
             const c = appData.classes.find(x => x.id === classId);
             if (!c) return;
@@ -968,7 +971,7 @@
             }
         }
 
-        // ==================== 3. XUẤT DANH SÁCH RA EXCEL ====================
+        // 3. XUẤT DANH SÁCH RA EXCEL
         function exportStudentsToExcel() {
             const stds = getFilteredStudents();
             if (stds.length === 0) {
@@ -1005,7 +1008,7 @@
             XLSX.writeFile(workbook, fileName);
         }
 
-        // ==================== 4. NHẬP HỌC SINH TỪ EXCEL ====================
+        // 4. NHẬP HỌC SINH TỪ EXCEL
         function openImportExcelModal() {
             const sel = document.getElementById('importTargetClassSelect');
             sel.innerHTML = appData.classes.map(c => `
@@ -1125,7 +1128,7 @@
             alert(`✅ Đã nhập thành công ${tempImportedStudents.length} học sinh vào lớp ${targetClass ? targetClass.name : ''}!`);
         }
 
-        // ==================== 5. ĐĂNG KÝ SERVICE WORKER ====================
+        // 5. ĐĂNG KÝ SERVICE WORKER
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').then((reg) => {
                 reg.update();
@@ -1555,8 +1558,20 @@
 
                 if(j.Payments) appData.payments = j.Payments.slice(1).map(r=>({id:String(r[0]||''), studentId:String(r[1]||''), classId:String(r[2]||''), cycleIndex:parseInt(r[3]), amount:parseFloat(r[4])||0, status:String(r[5]||''), method:String(r[6]||''), note:String(r[7]||''), date:normalizeCloudDate(r[8]||'')}));
                 if(j.Documents) appData.documents = j.Documents.slice(1).map(r=>({id:String(r[0]||''), classId:String(r[1]||''), name:String(r[2]||''), category:String(r[3]||'Chuyên đề chung'), url:String(r[4]||'')}));
-                if(j.Exams) appData.exams = j.Exams.slice(1).map(r=>({id:String(r[0]||''), title:String(r[1]||''), classId:String(r[2]||''), duration:parseInt(r[3])||45, questions:JSON.parse(r[5]||'[]')}));
-                if(j.ExamResults) appData.examResults = j.ExamResults.slice(1).map(r=>({id:String(r[0]||''), examId:String(r[1]||''), studentId:String(r[2]||''), score:parseFloat(r[3]||0), details:JSON.parse(r[4]||'{}'), tabSwitchCount:parseInt(r[5]||0), submittedAt:String(r[6]||'')}));
+                
+                // Đồng bộ chuẩn cấu trúc Exams
+                if(j.Exams) appData.exams = j.Exams.slice(1).map(r=>({
+                    id: String(r[0]||''),
+                    title: String(r[1]||''),
+                    classId: String(r[2]||''),
+                    duration: parseInt(r[3])||45,
+                    solutionUrl: String(r[4]||''),
+                    questions: JSON.parse(r[5]||'[]'),
+                    matrix: JSON.parse(r[6]||'{}'),
+                    status: String(r[7]||'OPEN')
+                }));
+
+                if(j.ExamResults) appData.examResults = j.ExamResults.slice(1).map(r=>({id:String(r[0]||''), examId:String(r[1]||''), studentId:String(r[2]||''), score:parseFloat(r[3]||0), details: (typeof r[4]==='string'?JSON.parse(r[4]||'{}'):(r[4]||{})), tabSwitchCount:parseInt(r[5]||0), submittedAt:String(r[6]||'')}));
                 if(j.WeeklyOverrides) appData.weeklyOverrides = j.WeeklyOverrides.slice(1).map(r=>({id:String(r[0]||''), classId:String(r[1]||''), date:normalizeCloudDate(r[2]||''), type:String(r[3]||''), startTime:String(r[4]||''), endTime:String(r[5]||''), note:String(r[6]||'')}));
                 
                 if(j.InactiveStudents) appData.inactiveStudents = j.InactiveStudents.slice(1).map(r=>({
@@ -1584,7 +1599,7 @@
                     Attendance: [['studentId','classId','date','status','note'], ...appData.attendance.map(a=>[a.studentId, a.classId||'', normalizeCloudDate(a.date), a.status, a.note||''])],
                     Payments: [['id','studentId','classId','cycleIndex','amount','status','method','note','date'], ...appData.payments.map(p=>[p.id,p.studentId,p.classId,p.cycleIndex,p.amount,p.status,p.method,p.note||'',normalizeCloudDate(p.date)])],
                     Documents: [['id','classId','name','category','url'], ...appData.documents.map(d=>[d.id,d.classId,d.name,d.category||'Chuyên đề chung',d.url])],
-                    Exams: [['id','title','classId','duration','deadline','questionsJson'], ...appData.exams.map(e=>[e.id,e.title,e.classId,e.duration||45,'',JSON.stringify(e.questions||[])])],
+                    Exams: [['id','title','classId','duration','solutionUrl','questionsJson','matrixJson','status'], ...appData.exams.map(e=>[e.id, e.title, e.classId, e.duration||45, e.solutionUrl||'', JSON.stringify(e.questions||[]), JSON.stringify(e.matrix||{}), e.status||'OPEN'])],
                     ExamResults: [['id','examId','studentId','score','detailsJson','tabSwitchCount','submittedAt'], ...appData.examResults.map(r=>[r.id,r.examId,r.studentId,r.score,JSON.stringify(r.details||{}),r.tabSwitchCount,r.submittedAt])],
                     WeeklyOverrides: [['id','classId','date','type','startTime','endTime','note'], ...(appData.weeklyOverrides||[]).map(o=>[o.id,o.classId,normalizeCloudDate(o.date),o.type,o.startTime||'',o.endTime||'',o.note||''])],
                     InactiveStudents: [['id','studentId','studentCode','studentName','classId','className','phone','joinDate','leaveDate','totalSessions','totalPaid','debtAmount','reason'], ...(appData.inactiveStudents||[]).map(x=>[x.id, x.studentId, x.studentCode, x.studentName, x.classId, x.className, x.phone||'', normalizeCloudDate(x.joinDate), normalizeCloudDate(x.leaveDate), x.totalSessions, x.totalPaid, x.debtAmount, x.reason||''])],
@@ -1645,6 +1660,87 @@
             if(window.lucide) lucide.createIcons();
         }
 
+        // THUẬT TOÁN ĐỒNG BỘ TOÀN DIỆN VỚI HOCSINH.HTML
+        function calculateStudentTuitionLedger(s) {
+            const targetClass = appData.classes.find(c => c.id === s.classId);
+            const effFee = getEffectiveStudentFee(s, targetClass);
+            const allDates = getClassSessionDates(s.classId);
+            const totalTaught = allDates.length;
+            const activeCycleIndex = Math.max(0, Math.floor((totalTaught - 1) / 8));
+
+            const skipCount = allDates.filter(d => compareDateDDMMYYYY(d, s.joinDate) < 0).length;
+            const joinCycle = Math.floor(skipCount / 8);
+
+            let carriedSurplus = 0;
+            let totalDebtToPay = 0;
+            let cyclesInfo = [];
+
+            for (let i = 0; i < 4; i++) {
+                const cyclePayments = (appData.payments || []).filter(p => p.studentId === s.id && p.classId === s.classId && p.cycleIndex === i);
+                const paidAmount = cyclePayments.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+                const isExempt = (effFee === 0) || cyclePayments.some(p => p.status === 'EXEMPT');
+
+                let baseFee = effFee;
+                let isNotJoined = (i < joinCycle);
+
+                if (isExempt) {
+                    baseFee = 0;
+                } else if (isNotJoined) {
+                    baseFee = 0;
+                } else if (i === joinCycle && skipCount > 0) {
+                    const actualSess = 8 - (skipCount % 8);
+                    baseFee = Math.round((effFee / 8) * actualSess);
+                }
+
+                let available = carriedSurplus + paidAmount;
+                let deductedFromPrev = Math.min(baseFee, carriedSurplus);
+                let cycleStatus = 'FUTURE';
+                let cycleDebt = 0;
+                let surplus = 0;
+
+                if (isNotJoined) {
+                    cycleStatus = 'NOT_JOINED';
+                    carriedSurplus = 0;
+                } else if (isExempt) {
+                    cycleStatus = 'EXEMPT';
+                    carriedSurplus = available;
+                } else {
+                    if (available >= baseFee) {
+                        surplus = available - baseFee;
+                        carriedSurplus = surplus;
+                        cycleStatus = surplus > 0 ? 'PAID_SURPLUS' : 'PAID_EXACT';
+                    } else {
+                        cycleDebt = baseFee - available;
+                        carriedSurplus = 0;
+                        if (i <= activeCycleIndex) {
+                            cycleStatus = 'OWE';
+                            totalDebtToPay += cycleDebt;
+                        } else {
+                            cycleStatus = 'FUTURE';
+                        }
+                    }
+                }
+
+                cyclesInfo.push({
+                    cycleIndex: i,
+                    baseFee: baseFee,
+                    paidAmount: paidAmount,
+                    deductedFromPrev: deductedFromPrev,
+                    cycleDebt: cycleDebt,
+                    surplus: surplus,
+                    status: cycleStatus,
+                    payments: cyclePayments
+                });
+            }
+
+            return {
+                cycles: cyclesInfo,
+                totalDebt: totalDebtToPay,
+                remainingSurplus: carriedSurplus,
+                activeCycleIndex: activeCycleIndex
+            };
+        }
+
         function renderDashboard() {
             const stds = getFilteredStudents();
             document.getElementById('dashTotalStudents').innerText = stds.length;
@@ -1691,24 +1787,21 @@
 
             let totalDueCount = 0, dueListHtml = '', paidCount = 0;
             stds.forEach(s => {
-                const classSessions = getClassSessionDates(s.classId);
-                const totalClassSess = classSessions.length;
-                const activeCycleIdx = Math.max(0, Math.floor((totalClassSess - 1) / 8));
+                const ledger = calculateStudentTuitionLedger(s);
+                const curCycleInfo = ledger.cycles[ledger.activeCycleIndex];
 
-                const req = getRequiredTuitionForCycle(s, activeCycleIdx);
-                const isPaid = (req.status === 'PAID') || (req.status === 'EXEMPT');
-
-                if(isPaid) {
+                if (ledger.totalDebt === 0) {
                     paidCount++;
                 } else {
                     totalDueCount++;
+                    const debtAmount = curCycleInfo.cycleDebt > 0 ? curCycleInfo.cycleDebt : ledger.totalDebt;
                     dueListHtml += `
                         <div class="p-2.5 sm:p-3 bg-slate-50 border rounded-xl flex justify-between items-center text-xs">
                             <div>
                                 <b class="text-slate-800">${s.name}</b> <span class="text-slate-400">(${getClassName(s.classId)})</span>
-                                <div class="text-[11px] text-amber-600 font-bold">${req.note}: ${req.amount.toLocaleString()}đ</div>
+                                <div class="text-[11px] text-rose-600 font-bold">Kỳ ${ledger.activeCycleIndex + 1}: Còn nợ ${debtAmount.toLocaleString()}đ</div>
                             </div>
-                            <button onclick="openPayModal('${s.id}', ${activeCycleIdx})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg shadow text-xs transition">Thu</button>
+                            <button onclick="openPayModal('${s.id}', ${ledger.activeCycleIndex})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg shadow text-xs transition">Thu</button>
                         </div>
                     `;
                 }
@@ -2530,64 +2623,37 @@
             container.innerHTML = html;
         }
 
-        function getRequiredTuitionForCycle(s, cycleIdx) {
-            const c = appData.classes.find(x => x.id === s.classId);
-            const effFee = getEffectiveStudentFee(s, c);
-            const isExempt = effFee === 0;
-
-            const p = appData.payments.find(x => x.studentId === s.id && x.classId === s.classId && x.cycleIndex === cycleIdx);
-            
-            if (isExempt || (p && p.status === 'EXEMPT')) return { amount: 0, status: 'EXEMPT', note: p?.note || 'Miễn phí' };
-            if (p && p.status === 'PAID') return { amount: p.amount, status: 'PAID', note: 'Đã nộp' };
-            if (p && p.amount > 0) return { amount: p.amount, status: 'PENDING', note: p.note || 'Cần thu' };
-
-            const classSessions = getClassSessionDates(s.classId);
-            const skipCount = classSessions.filter(d => compareDateDDMMYYYY(d, s.joinDate) < 0).length;
-            const joinCycle = Math.floor(skipCount / 8);
-
-            if (cycleIdx < joinCycle) return { amount: 0, status: 'NOT_JOINED', note: 'Chưa vào học' };
-
-            if (cycleIdx === joinCycle && skipCount > 0) {
-                const actualSess = 8 - (skipCount % 8);
-                const partialFee = Math.round((effFee / 8) * actualSess);
-                return { amount: partialFee, status: 'PENDING', note: `Học lẻ ${actualSess} buổi` };
-            }
-
-            return { amount: effFee, status: 'PENDING', note: 'Đủ 8 buổi' };
-        }
-
+        // BẢNG THEO DÕI HỌC PHÍ THEO KỲ TRÊN TRANG QUẢN TRỊ
         function renderTuitionTable() {
             const stds = getFilteredStudents(), tb = document.getElementById('tuitionTableBody');
             if(!tb) return;
             if(stds.length === 0) { tb.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Trống</td></tr>`; return; }
 
             tb.innerHTML = stds.map(s => {
-                const classSessions = getClassSessionDates(s.classId);
-                const totalClassSess = classSessions.length;
-                const activeCycleIdx = Math.max(0, Math.floor((totalClassSess - 1) / 8));
-
+                const ledger = calculateStudentTuitionLedger(s);
                 let cells = '';
-                for(let i=0; i<4; i++) {
-                    const req = getRequiredTuitionForCycle(s, i);
+
+                for(let i = 0; i < 4; i++) {
+                    const cInfo = ledger.cycles[i];
                     let stC = 'bg-slate-50 text-slate-400', txt = 'Chưa đến';
 
-                    if (req.status === 'EXEMPT') {
+                    if (cInfo.status === 'EXEMPT') {
                         stC = 'bg-blue-50 text-blue-700 border-blue-200 font-bold';
-                        txt = req.note;
-                    } else if (req.status === 'PAID') {
-                        stC = 'bg-emerald-50 text-emerald-700 border-emerald-200';
-                        txt = `Đã nộp: ${req.amount.toLocaleString()}đ`;
-                    } else if (req.status === 'NOT_JOINED') {
+                        txt = 'Miễn phí';
+                    } else if (cInfo.status === 'NOT_JOINED') {
                         txt = 'Chưa vào học';
-                    } else if (i < activeCycleIdx) {
+                    } else if (cInfo.status === 'PAID_SURPLUS') {
+                        stC = 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold shadow-xs';
+                        txt = `Đã nộp (Dư ${cInfo.surplus.toLocaleString()}đ)`;
+                    } else if (cInfo.status === 'PAID_EXACT') {
+                        stC = 'bg-emerald-50 text-emerald-700 border-emerald-200 font-bold';
+                        txt = `Đã nộp đủ`;
+                    } else if (cInfo.status === 'OWE') {
                         stC = 'bg-rose-50 text-rose-700 border-rose-200 font-bold';
-                        txt = `Nợ: ${req.amount.toLocaleString()}đ`;
-                    } else if (i === activeCycleIdx) {
-                        stC = 'bg-amber-50 text-amber-700 border-amber-200 font-bold';
-                        txt = `Cần nộp: ${req.amount.toLocaleString()}đ`;
+                        txt = cInfo.paidAmount > 0 ? `Còn nợ: ${cInfo.cycleDebt.toLocaleString()}đ` : `Cần thu: ${cInfo.cycleDebt.toLocaleString()}đ`;
                     }
 
-                    cells += `<td class="p-2 border-r text-center cursor-pointer" onclick="openPayModal('${s.id}', ${i})" title="Bấm để thu học phí hoặc mở QR"><div class="p-1.5 sm:p-2 rounded-xl border text-[11px] ${stC}">${txt}</div></td>`;
+                    cells += `<td class="p-2 border-r text-center cursor-pointer" onclick="openPayModal('${s.id}', ${i})" title="Bấm để thu học phí hoặc xem QR"><div class="p-1.5 sm:p-2 rounded-xl border text-[11px] ${stC}">${txt}</div></td>`;
                 }
 
                 return `<tr><td class="p-2.5 sm:p-3 sticky-col-1 border-r text-[10px] font-bold">${getClassName(s.classId)}</td><td class="p-2.5 sm:p-3 sticky-col-2 border-r font-bold">${s.name}</td>${cells}</tr>`;
@@ -2598,16 +2664,30 @@
             const s = appData.students.find(x=>x.id===sId);
             if (!s) return;
 
-            const req = getRequiredTuitionForCycle(s, cIdx);
-            const p = appData.payments.find(x=>x.studentId===sId && x.classId===s.classId && x.cycleIndex===cIdx);
+            const ledger = calculateStudentTuitionLedger(s);
+            const cInfo = ledger.cycles[cIdx];
+            const p = (cInfo.payments && cInfo.payments.length > 0) ? cInfo.payments[0] : null;
 
             document.getElementById('payStudentId').value = sId;
             document.getElementById('payCycleIndex').value = cIdx;
             document.getElementById('payStudentInfo').value = `${s.name} - Kỳ ${cIdx + 1} (${getClassName(s.classId)})`;
             
-            document.getElementById('payAmount').value = (p && p.status === 'PAID') ? p.amount : req.amount;
+            let suggestedAmount = cInfo.cycleDebt > 0 ? cInfo.cycleDebt : cInfo.baseFee;
+            if (cInfo.status === 'PAID_EXACT' || cInfo.status === 'PAID_SURPLUS') {
+                suggestedAmount = cInfo.paidAmount;
+            }
+
+            document.getElementById('payAmount').value = suggestedAmount;
             document.getElementById('payDate').value = (p && p.date) ? formatDateVN(p.date) : getTodayVNString();
             document.getElementById('payMethod').value = p && p.method ? p.method : 'Chuyển khoản';
+            
+            const noteEl = document.getElementById('payNoteSuggestion');
+            if (cInfo.deductedFromPrev > 0) {
+                noteEl.innerText = `* Đã tự động cấn trừ ${cInfo.deductedFromPrev.toLocaleString()}đ từ số dư kỳ trước.`;
+            } else {
+                noteEl.innerText = '';
+            }
+
             document.getElementById('modalPayTuition').classList.remove('hidden');
         }
         function closePayModal() { document.getElementById('modalPayTuition').classList.add('hidden'); }
@@ -2665,8 +2745,14 @@
             document.getElementById('textTotalClassRevenue').innerText = 'Doanh thu: ' + pays.reduce((s,p)=>s+p.amount,0).toLocaleString() + ' đ';
             document.getElementById('paymentHistoryBody').innerHTML = pays.length===0 ? `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Trống</td></tr>` : pays.map(p => {
                 const s = appData.students.find(x=>x.id===p.studentId) || {name: 'Đã xóa'};
-                return `<tr><td class="p-2.5 sm:p-3">${getClassName(p.classId)}</td><td class="p-2.5 sm:p-3 font-mono">${formatDateVN(p.date)}</td><td class="p-2.5 sm:p-3 font-bold">${s.name}</td><td class="p-2.5 sm:p-3">Kỳ ${p.cycleIndex+1}</td><td class="p-2.5 sm:p-3 font-bold text-emerald-600">${p.amount.toLocaleString()}đ</td><td class="p-2.5 sm:p-3">${p.method}</td><td class="p-2.5 sm:p-3 text-center"><button onclick="appData.payments=appData.payments.filter(x=>x.id!=='${p.id}');saveDataToCloud();refreshCurrentTab();" class="text-rose-500"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></td></tr>`;
+                const isAutoBank = String(p.method || '').includes('Agribank') || String(p.note || '').includes('Webhook');
+                const badgeMethod = isAutoBank 
+                    ? `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px] inline-flex items-center space-x-1"><span>⚡ Tự động Agribank</span></span>`
+                    : `<span class="text-slate-700">${p.method}</span>`;
+
+                return `<tr><td class="p-2.5 sm:p-3">${getClassName(p.classId)}</td><td class="p-2.5 sm:p-3 font-mono">${formatDateVN(p.date)}</td><td class="p-2.5 sm:p-3 font-bold">${s.name}</td><td class="p-2.5 sm:p-3">Kỳ ${p.cycleIndex+1}</td><td class="p-2.5 sm:p-3 font-bold text-emerald-600">${p.amount.toLocaleString()}đ</td><td class="p-2.5 sm:p-3">${badgeMethod}</td><td class="p-2.5 sm:p-3 text-center"><button onclick="appData.payments=appData.payments.filter(x=>x.id!=='${p.id}');saveDataToCloud();refreshCurrentTab();" class="text-rose-500"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></td></tr>`;
             }).join('');
+            if (window.lucide) lucide.createIcons();
         }
 
         function setupDirectImagePaste() {
@@ -2689,7 +2775,7 @@
             });
         }
 
-        // ==================== 6. BỘ BÓC TÁCH ĐỀ THI CHUẨN HOÁ ====================
+        // BỘ BÓC TÁCH ĐỀ THI
         function parseAdminExamDirect() {
             const ed = document.getElementById('directEditorArea');
             let content = ed.innerHTML;
@@ -2705,7 +2791,6 @@
                              .replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$')
                              .replace(/\$\$/g, '$');
 
-            // Khắc phục Regex lỗi escape chuỗi
             content = content.replace(/(\[(?:P1|P2|P3|PHẦN\s*[123IV]+)\]|PHẦN\s+[123IV]+[\s:.-])/gi, '\n$1\n');
             content = content.replace(/(Câu\s+\d+[\s:.-])/gi, '\n$1');
 
@@ -2811,6 +2896,7 @@
                 classId: currentClassId,
                 duration: duration,
                 questions: tempParsedQuestions,
+                solutionUrl: document.getElementById('directExamSolutionUrl').value.trim(),
                 status: 'OPEN'
             };
 
@@ -2836,6 +2922,28 @@
             if(window.lucide) lucide.createIcons();
         }
 
+        // HỖ TRỢ SO SÁNH ĐÁP ÁN TOÁN HỌC TRONG PHÂN TÍCH PHỔ ĐIỂM
+        function isAnswerMathEqual(ans1, ans2) {
+            if (!ans1 || !ans2) return false;
+            const s1 = String(ans1).trim().replace(',', '.').toLowerCase();
+            const s2 = String(ans2).trim().replace(',', '.').toLowerCase();
+            if (s1 === s2) return true;
+            try {
+                const evalFraction = (str) => {
+                    if (str.includes('/')) {
+                        const parts = str.split('/');
+                        if (parts.length === 2) return parseFloat(parts[0]) / parseFloat(parts[1]);
+                    }
+                    return parseFloat(str);
+                };
+                const n1 = evalFraction(s1);
+                const n2 = evalFraction(s2);
+                if (!isNaN(n1) && !isNaN(n2) && Math.abs(n1 - n2) < 0.0001) return true;
+            } catch(e) {}
+            return false;
+        }
+
+        // THỐNG KÊ PHỔ ĐIỂM & GIAN LẬN
         function renderAnalyticsReport() {
             const sel = document.getElementById('analyticsExamSelect');
             const container = document.getElementById('analyticsContent');
