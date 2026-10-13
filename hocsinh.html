@@ -269,10 +269,10 @@
                             </div>
                             <div>
                                 <h2 class="font-black text-sm sm:text-base leading-tight">Nộp Học Phí Trực Tuyến (VietQR Agribank)</h2>
-                                <p class="text-[11px] text-indigo-200">Tự động cấn trừ số dư nộp thừa từ kỳ trước hoặc dồn công nợ còn thiếu</p>
+                                <p class="text-[11px] text-indigo-200">Hệ thống tự động cấn trừ số dư nộp thừa từ kỳ trước hoặc dồn công nợ còn thiếu</p>
                             </div>
                         </div>
-                        <span class="text-xs bg-emerald-500 text-white font-black px-3 py-1 rounded-xl shadow-xs">Tự Động Gạch Nợ</span>
+                        <span class="text-xs bg-indigo-800 text-indigo-200 font-bold px-3 py-1 rounded-xl border border-white/10">Chuyển Khoản Trực Tiếp</span>
                     </div>
 
                     <div class="flex flex-col md:flex-row items-center gap-5">
@@ -571,7 +571,6 @@
         let currentQrUrl = "";
         let currentQrAmount = 0;
         let currentQrContent = "";
-        let paymentPollingInterval = null;
 
         // 1. AN TOÀN RENDER KATEX
         function renderKaTeXSafe(elem) {
@@ -748,7 +747,7 @@
                 if (j.Payments) appData.payments = j.Payments.slice(1).map(r => ({ id: String(r[0]||''), studentId: String(r[1]||''), classId: String(r[2]||''), cycleIndex: parseInt(r[3]), amount: parseFloat(r[4])||0, status: String(r[5]||''), method: String(r[6]||''), note: String(r[7]||''), date: normalizeCloudDate(r[8]||'') }));
                 if (j.Documents) appData.documents = j.Documents.slice(1).map(r => ({ id: String(r[0]||''), classId: String(r[1]||''), name: String(r[2]||''), category: String(r[3]||'Chuyên đề chung'), url: String(r[4]||'') }));
                 if (j.Exams) appData.exams = j.Exams.slice(1).map(r => ({ id: String(r[0]||''), title: String(r[1]||''), classId: String(r[2]||''), duration: parseInt(r[3])||45, questions: JSON.parse(r[5]||'[]'), status: String(r[7]||'OPEN') }));
-                if (j.ExamResults) appData.examResults = j.ExamResults.slice(1).map(r => ({ id: String(r[0]||''), examId: String(r[1]||''), studentId: String(r[2]||''), score: parseFloat(r[3]||0), details: JSON.parse(r[4]||'{}'), tabSwitchCount: parseInt(r[5]||0), submittedAt: String(r[6]||'') }));
+                if (j.ExamResults) appData.examResults = j.ExamResults.slice(1).map(r => ({ id: String(r[0]||''), examId: String(r[1]||''), studentId: String(r[2]||''), score: parseFloat(r[3]||0), details: (typeof r[4]==='string'?JSON.parse(r[4]||'{}'):(r[4]||{})), tabSwitchCount: parseInt(r[5]||0), submittedAt: String(r[6]||'') }));
                 
                 saveToStorage();
                 checkUrlImpersonation();
@@ -849,7 +848,6 @@
 
         function handleStudentLogout() {
             if (confirm("Em có chắc chắn muốn đăng xuất khỏi cổng học sinh?")) {
-                stopPaymentAutoCheck();
                 localStorage.removeItem(STUDENT_AUTH_KEY);
                 localStorage.removeItem(ACTIVE_STUDENT_SESSION_KEY);
                 currentStudent = null;
@@ -915,12 +913,6 @@
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
             if (window.lucide) lucide.createIcons();
-
-            if (tabId === 'tuition') {
-                startPaymentAutoCheck();
-            } else {
-                stopPaymentAutoCheck();
-            }
         }
 
         function getClassSessionDates(classId) {
@@ -1030,23 +1022,20 @@
             if (window.lucide) lucide.createIcons();
         }
 
-        // ====================================================================
-        // 7. THUẬT TOÁN KẾ TOÁN HỌC PHÍ LŨY KẾ CHUẨN XÁC
-        // ====================================================================
+        // 7. THUẬT TOÁN KẾ TOÁN HỌC PHÍ LŨY KẾ CHUẨN XÁC (FIFO)
         function renderTuitionAndQR(targetClass, className, allDates, activeCycleIndex) {
             const effFee = (currentStudent.customFee !== null && currentStudent.customFee !== undefined) 
                            ? parseFloat(currentStudent.customFee) 
                            : (targetClass ? targetClass.fee : 300000);
 
             let rowsHtml = '';
-            let carriedSurplus = 0; // Tiền dư thực tế chuyển sang kỳ sau
-            let totalCurrentDebt = 0; // Tổng số nợ cần nộp hiện tại
+            let carriedSurplus = 0;
+            let totalCurrentDebt = 0;
 
             const skipCount = allDates.filter(d => compareDateDDMMYYYY(d, currentStudent.joinDate) < 0).length;
             const joinCycle = Math.floor(skipCount / 8);
 
             for (let i = 0; i < 4; i++) {
-                // Lấy tất cả bản ghi đóng tiền của kỳ này
                 const cyclePayments = (appData.payments || []).filter(x => 
                     x.studentId === currentStudent.id && 
                     x.classId === currentStudent.classId && 
@@ -1057,7 +1046,6 @@
                 const payDateText = cyclePayments.length > 0 && cyclePayments[0].date ? formatDateVN(cyclePayments[0].date) : '---';
                 let noteText = cyclePayments.map(p => p.note).filter(Boolean).join('; ') || (cyclePayments[0] ? cyclePayments[0].method : '');
 
-                // 1. Tính định mức gốc của kỳ
                 let baseFee = effFee;
                 let isNotJoined = (i < joinCycle);
 
@@ -1070,7 +1058,6 @@
                     baseFee = Math.round((effFee / 8) * actualSess);
                 }
 
-                // 2. Tính nguồn tiền: (Tiền dư từ kỳ trước) + (Tiền đóng kỳ này)
                 let available = carriedSurplus + paidAmount;
                 let deductedFromPrev = Math.min(baseFee, carriedSurplus);
                 let statusBadge = '<span class="text-slate-400 font-bold">Chưa đến</span>';
@@ -1083,7 +1070,6 @@
                     carriedSurplus = available;
                 } else {
                     if (available >= baseFee) {
-                        // KỲ NÀY ĐÃ ĐỦ HOẶC DƯ TIỀN
                         carriedSurplus = available - baseFee;
 
                         if (carriedSurplus > 0) {
@@ -1096,7 +1082,6 @@
                             noteText = `Đã cấn trừ ${deductedFromPrev.toLocaleString()}đ dư từ kỳ trước`;
                         }
                     } else {
-                        // KỲ NÀY THIẾU TIỀN
                         const cycleDebt = baseFee - available;
                         carriedSurplus = 0;
 
@@ -1131,7 +1116,6 @@
 
             document.getElementById('studentTuitionTableBody').innerHTML = rowsHtml;
 
-            // Cập nhật tóm tắt công nợ và mã VietQR
             const summaryBadge = document.getElementById('tuitionBalanceSummary');
             if (totalCurrentDebt > 0) {
                 document.getElementById('statTuitionStatus').innerText = `Còn nợ tiền`;
@@ -1149,7 +1133,6 @@
                 summaryBadge.innerText = (carriedSurplus > 0) ? `Đang có dư: ${carriedSurplus.toLocaleString()} đ (được trừ kỳ sau)` : `Đã hoàn thành học phí`;
             }
 
-            // Tạo mã QR chuẩn xác với số nợ hiện thời
             const cleanClassName = className.toUpperCase().replace(/[^A-Z0-9]/g, '');
             const cleanUser = (currentStudent.username || currentStudent.code).toUpperCase().replace(/[^A-Z0-9]/g, '');
             const qrDesc = `HP ${cleanClassName} ${cleanUser} K${activeCycleIndex + 1}`;
@@ -1166,54 +1149,7 @@
             if (tabContentText) tabContentText.innerText = qrDesc;
         }
 
-        // ====================================================================
-        // 8. TỰ ĐỘNG GẠCH NỢ REAL-TIME KHI TIỀN VỀ TÀI KHOẢN
-        // ====================================================================
-        function startPaymentAutoCheck() {
-            if (paymentPollingInterval) clearInterval(paymentPollingInterval);
-            
-            paymentPollingInterval = setInterval(async () => {
-                if (!currentStudent || !cloudApiUrl || document.hidden) return;
-                
-                try {
-                    const res = await fetch(cloudApiUrl);
-                    const j = await res.json();
-                    
-                    if (j.Payments) {
-                        const previousDebt = currentQrAmount;
-                        appData.payments = j.Payments.slice(1).map(r => ({
-                            id: String(r[0]||''),
-                            studentId: String(r[1]||''),
-                            classId: String(r[2]||''),
-                            cycleIndex: parseInt(r[3]),
-                            amount: parseFloat(r[4])||0,
-                            status: String(r[5]||''),
-                            method: String(r[6]||''),
-                            note: String(r[7]||''),
-                            date: normalizeCloudDate(r[8]||'')
-                        }));
-                        saveToStorage();
-                        renderStudentPortal();
-                        
-                        if (previousDebt > 0 && currentQrAmount === 0) {
-                            stopPaymentAutoCheck();
-                            closeQrLightbox();
-                            closeBankPickerModal();
-                            alert("🎉 Tuyệt vời! Hệ thống đã ghi nhận học phí thành công từ tài khoản ngân hàng!");
-                        }
-                    }
-                } catch(e) {}
-            }, 5000);
-        }
-
-        function stopPaymentAutoCheck() {
-            if (paymentPollingInterval) {
-                clearInterval(paymentPollingInterval);
-                paymentPollingInterval = null;
-            }
-        }
-
-        // 9. CÁC THAO TÁC VIETQR & APP NGÂN HÀNG
+        // 8. CÁC THAO TÁC VIETQR & APP NGÂN HÀNG
         function openBankAppToPay() {
             if (currentQrAmount <= 0) {
                 alert("Em đã hoàn thành học phí, không có công nợ cần thanh toán!");
@@ -1247,7 +1183,6 @@
             document.getElementById('lightboxQrAmount').innerText = currentQrAmount.toLocaleString() + ' đ';
             document.getElementById('lightboxQrContent').innerText = currentQrContent;
             document.getElementById('qrLightboxModal').classList.remove('hidden');
-            startPaymentAutoCheck();
         }
 
         function closeQrLightbox() {
@@ -1351,7 +1286,7 @@
             document.getElementById('studentCyclesAccordion').innerHTML = accHtml || '<div class="text-xs text-slate-400 italic">Chưa có dữ liệu</div>';
         }
 
-        // 10. NĂNG LỰC & BIỂU ĐỒ ĐIỂM
+        // 9. NĂNG LỰC & BIỂU ĐỒ ĐIỂM
         function renderPerformanceTab() {
             const studentExams = (appData.examResults || []).filter(r => String(r.studentId) === String(currentStudent.id));
             const countBadge = document.getElementById('perfExamCountBadge');
@@ -1464,7 +1399,7 @@
             `;
         }
 
-        // 11. TÀI LIỆU
+        // 10. TÀI LIỆU
         function renderDocumentsTab() {
             const allDocs = (appData.documents || []).filter(d => d.classId === currentStudent.classId);
             const container = document.getElementById('studentDocumentsContainer');
@@ -1503,7 +1438,7 @@
             if (window.lucide) lucide.createIcons();
         }
 
-        // 12. KHẢO THÍ TRỰC TUYẾN
+        // 11. KHẢO THÍ TRỰC TUYẾN
         function renderExamsTab() {
             const exams = (appData.exams || []).filter(e => e.classId === currentStudent.classId);
             const container = document.getElementById('studentExamsListContainer');
@@ -1656,7 +1591,6 @@
             }
         }
 
-        // SO SÁNH ĐÁP ÁN TOÁN (HỖ TRỢ DẤU PHẨY, DẤU CHẤM VÀ PHÂN SỐ)
         function isAnswerMathEqual(ans1, ans2) {
             if (!ans1 || !ans2) return false;
             const s1 = String(ans1).trim().replace(',', '.').toLowerCase();
@@ -1677,9 +1611,7 @@
             return false;
         }
 
-        // ====================================================================
-        // 13. CHẤM ĐIỂM CHUẨN ĐỘNG (DYNAMIC PROPORTION CHO MỌI ĐỊNH DẠNG ĐỀ)
-        // ====================================================================
+        // 12. CHẤM ĐIỂM CHUẨN ĐỘNG THEO MA TRẬN GDPT MỚI
         async function submitExamNow() {
             if (!activeExam) return;
             clearInterval(examTimerInterval);
@@ -1776,7 +1708,7 @@
             alert(`Nộp bài thành công!\nĐiểm số của em: ${totalScore.toFixed(1)} đ.`);
         }
 
-        // 14. XEM LẠI BÀI THI & ĐÁP ÁN
+        // 13. XEM LẠI BÀI THI & ĐÁP ÁN
         function openReviewExamResult(examId) {
             const ex = (appData.exams || []).find(e => e.id === examId);
             const res = (appData.examResults || []).find(r => r.examId === examId && r.studentId === currentStudent.id);
