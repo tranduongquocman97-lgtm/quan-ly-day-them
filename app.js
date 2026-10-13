@@ -262,6 +262,13 @@ async function loadDataFromCloud() {
         const res = await fetch(cloudApiUrl); 
         const j = await res.json();
         
+        // Kiểm tra an toàn: nếu trả về lỗi hoặc thiếu bảng thì không ghi đè
+        if (j.error || !j.Students || !j.Classes) {
+            console.warn("Máy chủ trả về phản hồi không hợp lệ:", j);
+            updateSyncStatus('error', 'Lỗi phản hồi');
+            return;
+        }
+
         if(j.Classes) {
             appData.classes = j.Classes.slice(1).map(r => ({
                 id: String(r[0]||''), 
@@ -270,41 +277,63 @@ async function loadDataFromCloud() {
                 schedules: (function(){ try { return typeof r[3] === 'string' ? JSON.parse(r[3] || '[]') : (r[3] || []); } catch(e) { return []; } })()
             }));
         }
-        if(j.Students) appData.students = j.Students.slice(1).map(r=>({id:String(r[0]||''), classId:String(r[1]||''), code:String(r[2]||''), name:String(r[3]||''), phone:String(r[4]||''), joinDate:normalizeCloudDate(r[5]||'01-08-2026'), customFee:r[6]!==''&&r[6]!==null?parseFloat(r[6]):null, username:String(r[7]||''), password:String(r[8]||'')}));
-        
-        if(j.Attendance) appData.attendance = j.Attendance.slice(1).map(r => {
-            const sId = String(r[0]||'');
-            const cId = (r.length >= 5) ? String(r[1]||'') : (appData.students.find(s=>s.id===sId)?.classId || '');
-            const d = (r.length >= 5) ? normalizeCloudDate(r[2]||'') : normalizeCloudDate(r[1]||'');
-            const st = (r.length >= 5) ? String(r[3]||'') : String(r[2]||'');
-            const n = (r.length >= 5) ? String(r[4]||'') : String(r[3]||'');
-            return { studentId: sId, classId: cId, date: d, status: st, note: n };
-        });
-
-        if(j.Payments) appData.payments = j.Payments.slice(1).map(r=>({id:String(r[0]||''), studentId:String(r[1]||''), classId:String(r[2]||''), cycleIndex:parseInt(r[3]), amount:parseFloat(r[4])||0, status:String(r[5]||''), method:String(r[6]||''), note:String(r[7]||''), date:normalizeCloudDate(r[8]||'')}));
-        if(j.Documents) appData.documents = j.Documents.slice(1).map(r=>({id:String(r[0]||''), classId:String(r[1]||''), name:String(r[2]||''), category:String(r[3]||'Chuyên đề chung'), url:String(r[4]||'')}));
-        
-        if(j.Exams) appData.exams = j.Exams.slice(1).map(r=>({
-            id: String(r[0]||''),
-            title: String(r[1]||''),
-            classId: String(r[2]||''),
-            duration: parseInt(r[3])||45,
-            solutionUrl: String(r[4]||''),
-            questions: JSON.parse(r[5]||'[]'),
-            matrix: JSON.parse(r[6]||'{}'),
-            status: String(r[7]||'OPEN')
-        }));
-
-        if(j.ExamResults) appData.examResults = j.ExamResults.slice(1).map(r=>({id:String(r[0]||''), examId:String(r[1]||''), studentId:String(r[2]||''), score:parseFloat(r[3]||0), details: (typeof r[4]==='string'?JSON.parse(r[4]||'{}'):(r[4]||{})), tabSwitchCount:parseInt(r[5]||0), submittedAt:String(r[6]||'')}));
-        if(j.WeeklyOverrides) appData.weeklyOverrides = j.WeeklyOverrides.slice(1).map(r=>({id:String(r[0]||''), classId:String(r[1]||''), date:normalizeCloudDate(r[2]||''), type:String(r[3]||''), startTime:String(r[4]||''), endTime:String(r[5]||''), note:String(r[6]||'')}));
-        
-        if(j.InactiveStudents) appData.inactiveStudents = j.InactiveStudents.slice(1).map(r=>({
-            id: String(r[0]||''), studentId: String(r[1]||''), studentCode: String(r[2]||''), studentName: String(r[3]||''),
-            classId: String(r[4]||''), className: String(r[5]||''), phone: String(r[6]||''), joinDate: normalizeCloudDate(r[7]||''),
-            leaveDate: normalizeCloudDate(r[8]||''), totalSessions: parseInt(r[9]||0), totalPaid: parseFloat(r[10]||0),
-            debtAmount: parseFloat(r[11]||0), reason: String(r[12]||'')
-        }));
-
+        if(j.Students) {
+            appData.students = j.Students.slice(1).map(r=>({
+                id:String(r[0]||''), classId:String(r[1]||''), code:String(r[2]||''), 
+                name:String(r[3]||''), phone:String(r[4]||''), joinDate:normalizeCloudDate(r[5]||'01-08-2026'), 
+                customFee:r[6]!==''&&r[6]!==null?parseFloat(r[6]):null, username:String(r[7]||''), password:String(r[8]||'')
+            }));
+        }
+        if(j.Attendance) {
+            appData.attendance = j.Attendance.slice(1).map(r => ({
+                studentId: String(r[0]||''), classId: (r.length >= 5) ? String(r[1]||'') : '',
+                date: (r.length >= 5) ? normalizeCloudDate(r[2]||'') : normalizeCloudDate(r[1]||''),
+                status: (r.length >= 5) ? String(r[3]||'') : String(r[2]||''), note: (r.length >= 5) ? String(r[4]||'') : String(r[3]||'')
+            }));
+        }
+        if(j.Payments) {
+            appData.payments = j.Payments.slice(1).map(r=>({
+                id:String(r[0]||''), studentId:String(r[1]||''), classId:String(r[2]||''), 
+                cycleIndex:parseInt(r[3]), amount:parseFloat(r[4])||0, status:String(r[5]||''), 
+                method:String(r[6]||''), note:String(r[7]||''), date:normalizeCloudDate(r[8]||'')
+            }));
+        }
+        if(j.Documents) {
+            appData.documents = j.Documents.slice(1).map(r=>({
+                id:String(r[0]||''), classId:String(r[1]||''), name:String(r[2]||''), 
+                category:String(r[3]||'Chuyên đề chung'), url:String(r[4]||'')
+            }));
+        }
+        if(j.Exams) {
+            appData.exams = j.Exams.slice(1).map(r=>({
+                id: String(r[0]||''), title: String(r[1]||''), classId: String(r[2]||''),
+                duration: parseInt(r[3])||45, solutionUrl: String(r[4]||''),
+                questions: (function(){ try { return JSON.parse(r[5]||'[]'); } catch(e){ return []; } })(),
+                matrix: (function(){ try { return JSON.parse(r[6]||'{}'); } catch(e){ return {}; } })(),
+                status: String(r[7]||'OPEN')
+            }));
+        }
+        if(j.ExamResults) {
+            appData.examResults = j.ExamResults.slice(1).map(r=>({
+                id:String(r[0]||''), examId:String(r[1]||''), studentId:String(r[2]||''), 
+                score:parseFloat(r[3]||0), details:(typeof r[4]==='string'?JSON.parse(r[4]||'{}'):(r[4]||{})), 
+                tabSwitchCount:parseInt(r[5]||0), submittedAt:String(r[6]||'')
+            }));
+        }
+        if(j.WeeklyOverrides) {
+            appData.weeklyOverrides = j.WeeklyOverrides.slice(1).map(r=>({
+                id:String(r[0]||''), classId:String(r[1]||''), date:normalizeCloudDate(r[2]||''), 
+                type:String(r[3]||''), startTime:String(r[4]||''), endTime:String(r[5]||''), note:String(r[6]||'')
+            }));
+        }
+        if(j.InactiveStudents) {
+            appData.inactiveStudents = j.InactiveStudents.slice(1).map(r=>({
+                id: String(r[0]||''), studentId: String(r[1]||''), studentCode: String(r[2]||''), 
+                studentName: String(r[3]||''), classId: String(r[4]||''), className: String(r[5]||''), 
+                phone: String(r[6]||''), joinDate: normalizeCloudDate(r[7]||''), leaveDate: normalizeCloudDate(r[8]||''), 
+                totalSessions: parseInt(r[9]||0), totalPaid: parseFloat(r[10]||0), debtAmount: parseFloat(r[11]||0), reason: String(r[12]||'')
+            }));
+        }
         if(j.AppConfig) {
             appData.appConfig = j.AppConfig.slice(1).map(r=>({ key: String(r[0]||''), value: String(r[1]||'') }));
             loadBrandingToSettings();
@@ -315,13 +344,12 @@ async function loadDataFromCloud() {
         refreshCurrentTab(); 
         updateSyncStatus('success', 'Đã đồng bộ');
     } catch(e) { 
-        console.warn("Không thể tải từ Cloud, tiếp tục dùng dữ liệu offline cache:", e);
+        console.warn("Lỗi kết nối Cloud, đang dùng dữ liệu lưu trữ trên máy:", e);
         updateSyncStatus('error', 'Lỗi kết nối'); 
         renderGlobalClassSelect(); 
         refreshCurrentTab(); 
     }
 }
-
 async function saveDataToCloud() {
     saveToStorage(); 
     if(!cloudApiUrl) return; 
@@ -465,6 +493,111 @@ function refreshCurrentTab() {
     if(window.lucide) lucide.createIcons();
 }
 
+function renderDashboard() {
+    try {
+        const stds = getFilteredStudents();
+        const totalEl = document.getElementById('dashTotalStudents');
+        if (totalEl) totalEl.innerText = stds.length;
+
+        const todayStr = getTodayVNString();
+        const daysMap = ['Chủ Nhật','Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7'];
+        const dayOfWeek = daysMap[new Date().getDay()];
+        const todayDateEl = document.getElementById('dashTodayDateStr');
+        if (todayDateEl) todayDateEl.innerText = `${dayOfWeek}, ${todayStr}`;
+
+        // Quét lịch dạy hôm nay với bộ giải mã lịch an toàn
+        let todayLessons = [];
+        const classes = (appData.classes || []).filter(c => currentClassId === 'ALL' || c.id === currentClassId);
+        
+        classes.forEach(c => {
+            const ov = (appData.weeklyOverrides || []).find(o => o.classId === c.id && o.date === todayStr);
+            if (!ov || ov.type !== 'CANCEL') {
+                const schs = getSafeClassSchedules(c);
+                schs.filter(sc => sc && sc.day === dayOfWeek).forEach(sc => {
+                    const classSessions = getClassSessionDates(c.id);
+                    const totalSess = classSessions.length;
+                    const curCycle = Math.floor(totalSess / 8) + 1;
+                    const sessInCycle = (totalSess % 8) + 1;
+                    todayLessons.push({ class: c, schedule: sc, totalSess, curCycle, sessInCycle });
+                });
+            }
+        });
+
+        todayLessons.sort((a, b) => (a.schedule.startTime || '').localeCompare(b.schedule.startTime || ''));
+        const lessonCountEl = document.getElementById('dashTodayLessonsCount');
+        if (lessonCountEl) lessonCountEl.innerText = `${todayLessons.length} Ca`;
+
+        const lessonContainer = document.getElementById('dashTodayLessonsContainer');
+        if (lessonContainer) {
+            if (todayLessons.length === 0) {
+                lessonContainer.innerHTML = `<div class="col-span-3 p-4 bg-slate-50 border rounded-xl text-center text-xs text-slate-400 italic">Hôm nay không có ca dạy nào theo lịch.</div>`;
+            } else {
+                lessonContainer.innerHTML = todayLessons.map(l => `
+                    <div class="p-3.5 sm:p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-black text-sm text-indigo-900">${l.class.name}</span>
+                            <span class="text-xs font-mono font-bold text-emerald-600 bg-white px-2 py-0.5 rounded-md border">${l.schedule.startTime} - ${l.schedule.endTime}</span>
+                        </div>
+                        <div class="text-xs font-semibold text-slate-600">Tiến độ: <b class="text-indigo-700">Buổi ${l.sessInCycle}/8 (Kỳ ${l.curCycle})</b></div>
+                        <button onclick="currentClassId='${l.class.id}';renderGlobalClassSelect();switchTab('attendance-session')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2 rounded-xl transition shadow">Điểm Danh Ngay</button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Quét học phí và công nợ an toàn
+        let totalDueCount = 0, dueListHtml = '', paidCount = 0;
+        stds.forEach(s => {
+            try {
+                const ledger = calculateStudentTuitionLedger(s);
+                const curCycleInfo = ledger.cycles[ledger.activeCycleIndex] || {};
+
+                if (ledger.totalDebt === 0) {
+                    paidCount++;
+                } else {
+                    totalDueCount++;
+                    const debtAmount = curCycleInfo.cycleDebt > 0 ? curCycleInfo.cycleDebt : ledger.totalDebt;
+                    dueListHtml += `
+                        <div class="p-2.5 sm:p-3 bg-slate-50 border rounded-xl flex justify-between items-center text-xs">
+                            <div>
+                                <b class="text-slate-800">${s.name}</b> <span class="text-slate-400">(${getClassName(s.classId)})</span>
+                                <div class="text-[11px] text-rose-600 font-bold">Kỳ ${ledger.activeCycleIndex + 1}: Còn nợ ${debtAmount.toLocaleString()}đ</div>
+                            </div>
+                            <button onclick="openPayModal('${s.id}', ${ledger.activeCycleIndex})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg shadow text-xs transition">Thu</button>
+                        </div>
+                    `;
+                }
+            } catch(e) {
+                console.error("Lỗi tính nợ học sinh:", s.name, e);
+            }
+        });
+
+        const dueBadge = document.getElementById('dashDueCountBadge');
+        if (dueBadge) dueBadge.innerText = `${totalDueCount} HS`;
+        const dueContainer = document.getElementById('dashDueListContainer');
+        if (dueContainer) {
+            dueContainer.innerHTML = dueListHtml || `<div class="p-4 text-center text-emerald-600 font-bold text-xs bg-emerald-50 rounded-xl">Tất cả học sinh đã hoàn thành học phí!</div>`;
+        }
+        
+        const rate = stds.length > 0 ? Math.round((paidCount / stds.length) * 100) : 0;
+        const rateEl = document.getElementById('dashTuitionRate');
+        if (rateEl) rateEl.innerText = `${rate}%`;
+
+        // Tính điểm trung bình gần nhất
+        const results = appData.examResults || [];
+        const avgScoreEl = document.getElementById('dashAvgScore');
+        if (avgScoreEl) {
+            if (results.length > 0) {
+                const sum = results.reduce((acc, r) => acc + (parseFloat(r.score) || 0), 0);
+                avgScoreEl.innerText = (sum / results.length).toFixed(1);
+            } else {
+                avgScoreEl.innerText = '--';
+            }
+        }
+    } catch (err) {
+        console.error("Lỗi renderDashboard:", err);
+    }
+}
 // ============================================================================
 // 4. QUẢN LÝ LỚP & HỌC SINH (renderClassesAndStudents & deleteClass)
 // ============================================================================
