@@ -1,8 +1,9 @@
 // ============================================================================
 // HỆ THỐNG QUẢN LÝ M_SIGMATEACHER - CORE LOGIC HOÀN CHỈNH (APP.JS)
-// Đã chuẩn hóa: renderDashboard toàn cục, bọc an toàn renderTuitionTable,
-//               tự động bù điểm danh, bộ chọn ngày thông minh, lịch 2 tầng,
-//               rà soát trùng lặp, bóc tách đề thi KaTeX & phòng thi GDPT mới.
+// Đầy đủ 100%: renderDashboard + Radar Khảo Thí, Tìm kiếm học sinh tức thì,
+//              Chuyển đổi hai chiều lịch HTML5 date (toIsoDate/fromIsoDate),
+//              Tự động bù điểm danh, FIFO học phí lũy kế, Rà soát trùng lặp,
+//              Lịch dạy 2 tầng, Bóc tách KaTeX 3 phần & Khảo thí GDPT mới.
 // ============================================================================
 
 const STORAGE_KEY = 'TUTORING_MASTER_SYSTEM_V2026';
@@ -39,7 +40,7 @@ let selectedAttDateToChange = null;
 let tempImportedStudents = [];
 
 // ============================================================================
-// 1. TIỆN ÍCH DỮ LIỆU & NGÀY THÁNG
+// 1. TIỆN ÍCH DỮ LIỆU & BỘ CHUYỂN ĐỔI NGÀY THÁNG (ISO <-> DD-MM-YYYY)
 // ============================================================================
 function getTodayVNString() {
     const v = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
@@ -65,6 +66,27 @@ function normalizeCloudDate(d) {
         }
     }
     return d;
+}
+
+// Chuyển chuỗi DD-MM-YYYY thành YYYY-MM-DD an toàn cho input date
+function toIsoDate(ddmmyyyy) {
+    if (!ddmmyyyy) return '';
+    const clean = normalizeCloudDate(ddmmyyyy);
+    const p = clean.split('-');
+    if (p.length === 3 && p[0].length === 2 && p[2].length === 4) {
+        return `${p[2]}-${p[1]}-${p[0]}`;
+    }
+    return '';
+}
+
+// Chuyển chuỗi YYYY-MM-DD từ input date thành chuẩn hệ thống DD-MM-YYYY
+function fromIsoDate(yyyymmdd) {
+    if (!yyyymmdd) return '';
+    const p = String(yyyymmdd).trim().split('-');
+    if (p.length === 3 && p[0].length === 4) {
+        return `${p[2]}-${p[1]}-${p[0]}`;
+    }
+    return normalizeCloudDate(yyyymmdd);
 }
 
 function parseDateDDMMYYYY(str) {
@@ -204,6 +226,20 @@ function getSafeClassSchedules(c) {
     return [];
 }
 
+// BỘ LỌC TÌM KIẾM HỌC SINH TỨC THÌ
+function filterStudentTable(keyword) {
+    const term = (keyword || '').toLowerCase().trim();
+    const rows = document.querySelectorAll('#studentTableBody tr');
+    rows.forEach(r => {
+        const text = r.innerText.toLowerCase();
+        if (!term || text.includes(term)) {
+            r.classList.remove('hidden');
+        } else {
+            r.classList.add('hidden');
+        }
+    });
+}
+
 // ============================================================================
 // 2. KHỞI TẠO HỆ THỐNG & ĐỒNG BỘ
 // ============================================================================
@@ -213,10 +249,10 @@ window.addEventListener('DOMContentLoaded', () => {
         loadFromStorage();
         
         const datePicker = document.getElementById('sessionDatePicker');
-        if (datePicker) datePicker.value = getTodayVNString();
+        if (datePicker) datePicker.value = toIsoDate(getTodayVNString());
         
         const joinInput = document.getElementById('inputStudentJoinDate');
-        if (joinInput) joinInput.value = getTodayVNString();
+        if (joinInput) joinInput.value = toIsoDate(getTodayVNString());
         
         const apiInput = document.getElementById('inputApiUrl');
         if (apiInput) apiInput.value = cloudApiUrl || '';
@@ -225,13 +261,11 @@ window.addEventListener('DOMContentLoaded', () => {
         previewFullClassName();
         renderGlobalClassSelect();
 
-        // Ưu tiên nạp và vẽ giao diện ngay từ bộ nhớ máy (localStorage)
         switchTab('dashboard');
 
         setupDirectImagePaste();
         if (window.lucide) lucide.createIcons();
 
-        // Tải ngầm từ Apps Script
         if (cloudApiUrl) loadDataFromCloud();
     } catch (err) {
         console.error("Lỗi khởi tạo:", err);
@@ -562,8 +596,56 @@ function calculateStudentTuitionLedger(s) {
 }
 
 // ============================================================================
-// 5. DASHBOARD (TOÀN CỤC & BỌC BẢO VỆ CHỐNG LỖI)
+// 5. DASHBOARD & RADAR KHẢO THÍ GIAN LẬN
 // ============================================================================
+function renderExamRadar() {
+    const radarContainer = document.getElementById('dashExamRadarContainer');
+    if (!radarContainer) return;
+
+    const results = (appData.examResults || []).filter(r => {
+        if (currentClassId === 'ALL') return true;
+        const s = (appData.students || []).find(st => st.id === r.studentId);
+        return s && s.classId === currentClassId;
+    });
+
+    if (results.length === 0) {
+        radarContainer.innerHTML = `<div class="p-4 text-center text-slate-400 text-xs italic bg-slate-50 rounded-xl">Chưa có bài thi nào được nộp.</div>`;
+        return;
+    }
+
+    const suspicious = results.filter(r => (parseInt(r.tabSwitchCount) || 0) > 0);
+    suspicious.sort((a, b) => (b.tabSwitchCount || 0) - (a.tabSwitchCount || 0));
+
+    let html = '';
+    if (suspicious.length === 0) {
+        html = `
+            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center space-x-2 text-xs text-emerald-800">
+                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+                <span>Tất cả bài thi đều an toàn, không phát hiện hành vi rời màn hình!</span>
+            </div>
+        `;
+    } else {
+        html = suspicious.slice(0, 5).map(r => {
+            const s = (appData.students || []).find(st => st.id === r.studentId) || { name: 'Đã xóa', code: '---' };
+            const ex = (appData.exams || []).find(e => e.id === r.examId) || { title: 'Đề thi' };
+            return `
+                <div class="p-2.5 bg-rose-50 border border-rose-200 rounded-xl flex justify-between items-center text-xs">
+                    <div>
+                        <b class="text-rose-950">${s.name}</b> <span class="text-slate-500">(${s.code})</span>
+                        <div class="text-[11px] text-rose-700">${ex.title} • Điểm: <b>${r.score}</b></div>
+                    </div>
+                    <span class="bg-rose-200 text-rose-900 font-bold px-2 py-0.5 rounded text-[10px]">
+                        Rời ${r.tabSwitchCount} lần
+                    </span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    radarContainer.innerHTML = html;
+    if (window.lucide) lucide.createIcons();
+}
+
 function renderDashboard() {
     try {
         const stds = getFilteredStudents();
@@ -663,6 +745,9 @@ function renderDashboard() {
                 avgScoreEl.innerText = '--';
             }
         }
+
+        // 4. Render Radar Khảo Thí & Gian Lận
+        renderExamRadar();
     } catch (err) {
         console.error("Lỗi renderDashboard:", err);
     }
@@ -731,6 +816,10 @@ function renderClassesAndStudents() {
             return '';
         }
     }).join('');
+
+    // Nếu đang có từ khóa tìm kiếm thì áp dụng lọc ngay
+    const searchVal = document.getElementById('searchStudentInput')?.value;
+    if (searchVal) filterStudentTable(searchVal);
 
     if (window.lucide) lucide.createIcons();
 }
@@ -885,6 +974,8 @@ function populateClassSelectModal() {
 function openAddStudentModal() {
     populateClassSelectModal();
     onStudentClassModalChange();
+    const joinInput = document.getElementById('inputStudentJoinDate');
+    if (joinInput && !joinInput.value) joinInput.value = toIsoDate(getTodayVNString());
     document.getElementById('modalAddStudent').classList.remove('hidden');
 }
 
@@ -927,7 +1018,9 @@ function handleAddStudent(e) {
     const c = (appData.classes || []).find(x => x.id === cId);
     const name = document.getElementById('inputStudentName').value.trim();
     const phone = document.getElementById('inputStudentPhone').value.trim();
-    const joinDate = normalizeCloudDate(document.getElementById('inputStudentJoinDate').value.trim());
+    
+    const rawJoin = document.getElementById('inputStudentJoinDate').value;
+    const joinDate = fromIsoDate(rawJoin) || getTodayVNString();
 
     const cleanName = name.toLowerCase().replace(/\s+/g, ' ');
     const duplicates = (appData.students || []).filter(s => s.name.toLowerCase().replace(/\s+/g, ' ') === cleanName);
@@ -1000,7 +1093,7 @@ function openEditStudentModal(id) {
     document.getElementById('editStudentName').value = s.name;
     document.getElementById('editStudentUsername').value = s.username || '';
     document.getElementById('editStudentPhone').value = s.phone || '';
-    document.getElementById('editStudentJoinDate').value = normalizeCloudDate(s.joinDate) || getTodayVNString();
+    document.getElementById('editStudentJoinDate').value = toIsoDate(s.joinDate || getTodayVNString());
     document.getElementById('editStudentCustomFee').value = s.customFee !== null ? s.customFee : '';
 
     document.getElementById('modalEditStudent').classList.remove('hidden');
@@ -1014,7 +1107,7 @@ function onEditClassChange() {
     const newClassId = document.getElementById('editStudentClassId').value;
     
     if (newClassId !== origClassId) {
-        document.getElementById('editStudentJoinDate').value = getTodayVNString();
+        document.getElementById('editStudentJoinDate').value = toIsoDate(getTodayVNString());
         document.getElementById('editStudentCode').value = generateNextStudentCode(newClassId);
 
         const transferInfo = calculateTransferTuition(studentId, origClassId, newClassId);
@@ -1043,7 +1136,9 @@ function handleSaveEditStudent(e) {
     s.code = document.getElementById('editStudentCode').value.trim();
     s.name = document.getElementById('editStudentName').value.trim();
     s.phone = document.getElementById('editStudentPhone').value.trim();
-    s.joinDate = normalizeCloudDate(document.getElementById('editStudentJoinDate').value.trim());
+    
+    const rawJoin = document.getElementById('editStudentJoinDate').value;
+    s.joinDate = fromIsoDate(rawJoin) || getTodayVNString();
     
     const c = (appData.classes || []).find(x => x.id === s.classId);
     s.username = generateUsername(s.name, c ? c.name : '');
@@ -1125,7 +1220,7 @@ function openLeaveStudentModal(id) {
 
     document.getElementById('leaveStudentId').value = s.id;
     document.getElementById('leaveStudentInfo').value = `${s.name} (${s.code}) - Lớp ${c ? c.name : ''}`;
-    document.getElementById('leaveDateInput').value = getTodayVNString();
+    document.getElementById('leaveDateInput').value = toIsoDate(getTodayVNString());
     document.getElementById('leaveTotalSessionsText').innerText = `${attendedCount} buổi`;
     document.getElementById('leaveTotalPaidText').innerText = `${paidTotal.toLocaleString()} đ`;
     document.getElementById('leaveDebtInput').value = debt;
@@ -1143,7 +1238,8 @@ function handleConfirmStudentLeave(e) {
     if(!s) return;
     const c = (appData.classes || []).find(x => x.id === s.classId);
 
-    const leaveDate = normalizeCloudDate(document.getElementById('leaveDateInput').value.trim());
+    const rawLeave = document.getElementById('leaveDateInput').value;
+    const leaveDate = fromIsoDate(rawLeave) || getTodayVNString();
     const debt = parseFloat(document.getElementById('leaveDebtInput').value) || 0;
     const reason = document.getElementById('leaveReasonInput').value.trim();
 
@@ -1335,19 +1431,10 @@ async function resolveDuplicateDelete(studentId, name, className) {
 }
 
 // ============================================================================
-// 8. ĐIỂM DANH BUỔI HỌC & SỔ LƯU TRỮ 8 BUỔI
+// 8. ĐIỂM DANH BUỔI HỌC (LỊCH ĐỒ HỌA TRỰC QUAN DATE PICKER)
 // ============================================================================
-function onNativeDatePicked(isoDateStr) {
-    if (!isoDateStr) return;
-    const parts = isoDateStr.split('-');
-    if (parts.length === 3) {
-        const ddmmyyyy = `${parts[2]}-${parts[1]}-${parts[0]}`;
-        const input = document.getElementById('sessionDatePicker');
-        if (input) {
-            input.value = ddmmyyyy;
-            loadSessionAttendance();
-        }
-    }
+function onSessionDateChanged(isoDateValue) {
+    loadSessionAttendance();
 }
 
 function renderQuickDateSuggestions() {
@@ -1375,17 +1462,20 @@ function renderQuickDateSuggestions() {
     container.innerHTML = html;
 }
 
-function setAttendanceDateQuick(dateStr) {
+function setAttendanceDateQuick(ddmmyyyy) {
     const input = document.getElementById('sessionDatePicker');
     if (input) {
-        input.value = dateStr;
+        input.value = toIsoDate(ddmmyyyy);
         loadSessionAttendance();
     }
 }
 
 function loadSessionAttendance() {
     renderQuickDateSuggestions();
-    const d = normalizeCloudDate(document.getElementById('sessionDatePicker').value.trim());
+    const input = document.getElementById('sessionDatePicker');
+    if (!input) return;
+
+    const d = fromIsoDate(input.value) || getTodayVNString();
     const stds = getFilteredStudents();
     const tbody = document.getElementById('sessionAttendanceBody');
     if (!tbody) return;
@@ -1400,25 +1490,27 @@ function loadSessionAttendance() {
 }
 
 function saveSessionAttendance() {
-    const d = normalizeCloudDate(document.getElementById('sessionDatePicker').value.trim());
-    if(!d) { alert("Vui lòng nhập ngày điểm danh hợp lệ!"); return; }
+    const input = document.getElementById('sessionDatePicker');
+    const d = fromIsoDate(input ? input.value : '') || getTodayVNString();
+    if(!d) { alert("Vui lòng chọn ngày điểm danh hợp lệ!"); return; }
 
     document.querySelectorAll('.att-status').forEach(el => {
         const sId = el.getAttribute('data-student-id');
         const cId = el.getAttribute('data-class-id');
         const status = el.value;
-        const note = document.querySelector(`.att-note[data-student-id="${sId}"]`).value;
+        const note = document.querySelector(`.att-note[data-student-id="${sId}"]`)?.value || '';
         
         appData.attendance = (appData.attendance || []).filter(a => !(a.studentId === sId && normalizeCloudDate(a.date) === d));
         appData.attendance.push({ studentId: sId, classId: cId, date: d, status: status, note: note });
     });
     saveDataToCloud(); 
-    alert('Đã lưu điểm danh!'); 
+    alert('Đã lưu điểm danh thành công!'); 
     refreshCurrentTab();
 }
 
 function deleteSessionAttendanceDay() {
-    const d = normalizeCloudDate(document.getElementById('sessionDatePicker').value.trim());
+    const input = document.getElementById('sessionDatePicker');
+    const d = fromIsoDate(input ? input.value : '') || getTodayVNString();
     if (!d) return;
 
     const count = (appData.attendance || []).filter(a => (currentClassId === 'ALL' || a.classId === currentClassId) && normalizeCloudDate(a.date) === d).length;
@@ -1436,7 +1528,7 @@ function deleteSessionAttendanceDay() {
 function openEditAttendanceDateModal(dateStr) {
     selectedAttDateToChange = normalizeCloudDate(dateStr);
     document.getElementById('editCurrentAttDateText').value = selectedAttDateToChange;
-    document.getElementById('editNewAttDateInput').value = selectedAttDateToChange;
+    document.getElementById('editNewAttDateInput').value = toIsoDate(selectedAttDateToChange);
     document.getElementById('modalEditAttendanceDate').classList.remove('hidden');
 }
 
@@ -1446,8 +1538,9 @@ function closeEditAttendanceDateModal() {
 }
 
 function handleApplyChangeAttendanceDate() {
-    const newDate = normalizeCloudDate(document.getElementById('editNewAttDateInput').value.trim());
-    if (!newDate) { alert("Vui lòng nhập ngày mới hợp lệ!"); return; }
+    const rawNew = document.getElementById('editNewAttDateInput').value;
+    const newDate = fromIsoDate(rawNew);
+    if (!newDate) { alert("Vui lòng chọn ngày mới hợp lệ!"); return; }
     if (newDate === selectedAttDateToChange) { alert("Ngày mới trùng với ngày hiện tại!"); return; }
 
     let modifiedCount = 0;
@@ -1461,7 +1554,7 @@ function handleApplyChangeAttendanceDate() {
     saveDataToCloud();
     closeEditAttendanceDateModal();
     refreshCurrentTab();
-    alert(`Đã đổi ngày thành công!`);
+    alert(`Đã chuyển đổi thành công sang ngày ${newDate}!`);
 }
 
 function handleDeleteEntireAttendanceDay() {
@@ -1547,7 +1640,7 @@ function renderAttendanceMatrix() {
 }
 
 // ============================================================================
-// 9. HỌC PHÍ THEO KỲ & NHẬT KÝ THU TIỀN (AN TOÀN TUYỆT ĐỐI)
+// 9. HỌC PHÍ THEO KỲ & NHẬT KÝ THU TIỀN
 // ============================================================================
 function renderTuitionTable() {
     const stds = getFilteredStudents();
@@ -1585,8 +1678,7 @@ function renderTuitionTable() {
 
             return `<tr><td class="p-2.5 sm:p-3 sticky-col-1 border-r text-[10px] font-bold">${getClassName(s.classId)}</td><td class="p-2.5 sm:p-3 sticky-col-2 border-r font-bold">${s.name}</td>${cells}</tr>`;
         } catch(err) {
-            console.error("Lỗi dòng renderTuitionTable:", s.name, err);
-            return `<tr><td class="p-2.5 border-r">${getClassName(s.classId)}</td><td class="p-2.5 border-r">${s.name}</td><td colspan="4" class="p-2.5 text-center text-slate-400 italic">Lỗi tính toán</td></tr>`;
+            return `<tr><td class="p-2.5 border-r">${getClassName(s.classId)}</td><td class="p-2.5 border-r">${s.name}</td><td colspan="4" class="p-2.5 text-center text-slate-400 italic">Lỗi hiển thị</td></tr>`;
         }
     }).join('');
 }
@@ -1609,7 +1701,9 @@ function openPayModal(sId, cIdx) {
     }
 
     document.getElementById('payAmount').value = suggestedAmount;
-    document.getElementById('payDate').value = (p && p.date) ? formatDateVN(p.date) : getTodayVNString();
+    
+    const rawPayDate = (p && p.date) ? formatDateVN(p.date) : getTodayVNString();
+    document.getElementById('payDate').value = toIsoDate(rawPayDate);
     document.getElementById('payMethod').value = p && p.method ? p.method : 'Chuyển khoản';
     
     const noteEl = document.getElementById('payNoteSuggestion');
@@ -1652,7 +1746,9 @@ function handleSavePayment(e) {
     const sId = document.getElementById('payStudentId').value;
     const cIdx = parseInt(document.getElementById('payCycleIndex').value);
     const amt = parseFloat(document.getElementById('payAmount').value) || 0;
-    const d = normalizeCloudDate(document.getElementById('payDate').value.trim());
+    
+    const rawPayDate = document.getElementById('payDate').value;
+    const d = fromIsoDate(rawPayDate) || getTodayVNString();
     const m = document.getElementById('payMethod').value;
     const s = (appData.students || []).find(x => x.id === sId);
 
@@ -1875,7 +1971,7 @@ function openOverrideModal(cId, cName, date, st, et) {
     document.getElementById('overrideClassId').value = cId;
     document.getElementById('overrideOriginalDate').value = date;
     document.getElementById('overrideClassInfo').value = `${cName} (${formatDateVN(date)} | ${st} - ${et})`;
-    document.getElementById('overrideNewDate').value = date;
+    document.getElementById('overrideNewDate').value = toIsoDate(date);
     document.getElementById('overrideNewStart').value = st;
     document.getElementById('overrideNewEnd').value = et;
     toggleOverrideInputs();
@@ -1896,7 +1992,9 @@ async function handleSaveOverride(e) {
     const cId = document.getElementById('overrideClassId').value;
     const origDate = document.getElementById('overrideOriginalDate').value;
     const type = document.getElementById('overrideType').value;
-    const newDate = normalizeCloudDate(document.getElementById('overrideNewDate').value.trim());
+    
+    const rawNewDate = document.getElementById('overrideNewDate').value;
+    const newDate = fromIsoDate(rawNewDate) || origDate;
     const newSt = document.getElementById('overrideNewStart').value;
     const newEt = document.getElementById('overrideNewEnd').value;
     const note = document.getElementById('overrideNote').value.trim();
@@ -1919,7 +2017,7 @@ async function handleSaveOverride(e) {
 function openExtraLessonModal() {
     const sel = document.getElementById('extraLessonClassId');
     sel.innerHTML = (appData.classes || []).map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-    document.getElementById('extraLessonDate').value = getTodayVNString();
+    document.getElementById('extraLessonDate').value = toIsoDate(getTodayVNString());
     document.getElementById('modalExtraLesson').classList.remove('hidden');
 }
 
@@ -1928,7 +2026,8 @@ function closeExtraModal() { document.getElementById('modalExtraLesson').classLi
 async function handleSaveExtraLesson(e) {
     e.preventDefault();
     const cId = document.getElementById('extraLessonClassId').value;
-    const d = normalizeCloudDate(document.getElementById('extraLessonDate').value.trim());
+    const rawDate = document.getElementById('extraLessonDate').value;
+    const d = fromIsoDate(rawDate) || getTodayVNString();
     const st = document.getElementById('extraLessonStart').value;
     const et = document.getElementById('extraLessonEnd').value;
     const note = document.getElementById('extraLessonNote').value.trim();
@@ -2081,7 +2180,9 @@ function renderAdminPreview() {
     if (!prev) return;
     prev.innerHTML = html;
     if (window.renderMathInElement) {
-        renderMathInElement(prev, { delimiters: [{left: '$', right: '$', display: false}], throwOnError: false });
+        try {
+            renderMathInElement(prev, { delimiters: [{left: '$', right: '$', display: false}], throwOnError: false });
+        } catch(e) {}
     }
 }
 
@@ -2106,14 +2207,35 @@ async function saveDirectExamToCloud() {
     refreshCurrentTab();
 }
 
+function toggleExamStatus(examId) {
+    const ex = (appData.exams || []).find(e => e.id === examId);
+    if (!ex) return;
+    ex.status = ex.status === 'CLOSED' ? 'OPEN' : 'CLOSED';
+    saveDataToCloud();
+    renderQBankTab();
+}
+
 function renderQBankTab() {
     const container = document.getElementById('examListContainer');
     if (!container) return;
     const list = currentClassId === 'ALL' ? (appData.exams || []) : (appData.exams || []).filter(e => e.classId === currentClassId);
     container.innerHTML = list.length === 0 ? '<div class="text-xs text-slate-400 italic">Trống</div>' : list.map(e => `
         <div class="p-2.5 bg-slate-50 border rounded-xl flex justify-between items-center text-xs">
-            <div><b>${e.title}</b> (${getClassName(e.classId)})<br><span class="text-[10px] text-indigo-600 font-bold">${e.questions ? e.questions.length : 0} câu • ${e.duration}p</span></div>
-            <button onclick="appData.exams=appData.exams.filter(x=>x.id!=='${e.id}');saveDataToCloud();refreshCurrentTab();" class="text-rose-500 hover:bg-rose-100 p-1 rounded"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+            <div>
+                <b>${e.title}</b> (${getClassName(e.classId)})<br>
+                <span class="text-[10px] text-indigo-600 font-bold">${e.questions ? e.questions.length : 0} câu • ${e.duration}p</span>
+                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ml-1 ${e.status==='CLOSED'?'bg-rose-100 text-rose-700':'bg-emerald-100 text-emerald-700'}">
+                    ${e.status==='CLOSED'?'Đã Đóng':'Đang Mở'}
+                </span>
+            </div>
+            <div class="flex items-center space-x-1">
+                <button onclick="toggleExamStatus('${e.id}')" class="text-xs px-2 py-1 rounded-lg border font-bold ${e.status==='CLOSED'?'bg-emerald-50 text-emerald-700 border-emerald-200':'bg-amber-50 text-amber-700 border-amber-200'}">
+                    ${e.status==='CLOSED'?'Mở':'Khóa'}
+                </button>
+                <button onclick="appData.exams=appData.exams.filter(x=>x.id!=='${e.id}');saveDataToCloud();refreshCurrentTab();" class="text-rose-500 hover:bg-rose-100 p-1 rounded">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
         </div>
     `).join('');
     if(window.lucide) lucide.createIcons();

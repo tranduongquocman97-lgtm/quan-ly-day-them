@@ -84,7 +84,7 @@
     <!-- SIDEBAR BÊN TRÁI -->
     <aside id="sidebar" class="w-full md:w-64 bg-slate-900 text-slate-200 flex flex-col shrink-0 transition-all duration-300 z-50 shadow-xl">
         <div class="p-3 sm:p-4 border-b border-slate-800 flex items-center justify-between">
-            <div class="flex items-center space-x-3 overflow-hidden">
+            <div class="flex items-center space-x-3 overflow-hidden cursor-pointer" onclick="switchTab('dashboard')">
                 <img src="logo-teacher.png" alt="M_SigmaTeacher" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl object-cover border border-amber-400/40 shadow-sm shrink-0">
                 <div class="sidebar-text whitespace-nowrap">
                     <h1 class="font-bold text-xs sm:text-sm tracking-wide text-white leading-tight">M_SigmaTeacher</h1>
@@ -127,6 +127,10 @@
             <div class="flex items-center space-x-2 sm:space-x-3">
                 <button onclick="toggleSidebar()" class="text-slate-600 hover:text-indigo-600 transition p-1.5 sm:p-2 rounded-xl bg-slate-100 hover:bg-indigo-50"><i data-lucide="menu" class="w-5 h-5"></i></button>
                 <select id="globalClassSelect" onchange="onGlobalClassChange()" class="bg-slate-50 border border-slate-300 font-bold text-indigo-700 text-xs sm:text-sm rounded-xl p-1.5 sm:p-2 outline-none focus:ring-2 focus:ring-indigo-100"></select>
+                <!-- NÚT ĐỒNG BỘ NHANH TRÊN HEADER CHO CẢ MOBILE VÀ PC -->
+                <button onclick="manualSync()" class="p-1.5 sm:p-2 rounded-xl bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 transition" title="Đồng bộ dữ liệu tức thì">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
             </div>
             <div class="flex items-center space-x-1.5 sm:space-x-2 text-xs font-semibold">
                 <button onclick="triggerTeacherPWAInstall()" class="bg-purple-50 hover:bg-purple-100 text-purple-700 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl border border-purple-200 flex items-center space-x-1 transition" title="Cài App Giáo Viên">
@@ -237,15 +241,15 @@
                         <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
                             <h2 class="font-bold text-slate-800 text-xs sm:text-sm flex items-center space-x-2"><i data-lucide="users" class="w-4 h-4 text-indigo-600"></i><span>Danh Sách Học Sinh</span></h2>
                             <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                                <button onclick="openDuplicateAuditModal()" class="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition flex items-center space-x-1" title="Quét toàn bộ học sinh trùng tên / SĐT trong toàn hệ thống">
+                                <button onclick="openDuplicateAuditModal()" class="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition flex items-center space-x-1" title="Quét toàn bộ học sinh trùng tên trong toàn hệ thống">
                                     <i data-lucide="scan-search" class="w-3.5 h-3.5 text-amber-600"></i>
                                     <span>Rà Soát Trùng Lặp</span>
                                 </button>
-                                <button onclick="exportStudentsToExcel()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition flex items-center space-x-1" title="Xuất danh sách học sinh ra file Excel">
+                                <button onclick="exportStudentsToExcel()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition flex items-center space-x-1">
                                     <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-emerald-600"></i>
                                     <span>Xuất Excel</span>
                                 </button>
-                                <button onclick="openImportExcelModal()" class="bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition flex items-center space-x-1" title="Nhập danh sách học sinh từ file Excel">
+                                <button onclick="openImportExcelModal()" class="bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl transition flex items-center space-x-1">
                                     <i data-lucide="file-up" class="w-3.5 h-3.5 text-blue-600"></i>
                                     <span>Nhập Excel</span>
                                 </button>
@@ -259,6 +263,17 @@
                                 </button>
                             </div>
                         </div>
+
+                        <!-- THANH TÌM KIẾM HỌC SINH NHANH -->
+                        <div class="relative">
+                            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                            <input type="text" 
+                                   id="searchStudentInput" 
+                                   oninput="filterStudentTable(this.value)" 
+                                   placeholder="Tìm kiếm học sinh theo tên, mã HS hoặc số điện thoại..." 
+                                   class="w-full pl-9 pr-4 py-2 border rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-600 outline-none transition">
+                        </div>
+
                         <div class="overflow-x-auto rounded-xl border">
                             <table class="w-full text-left text-xs whitespace-nowrap">
                                 <thead>
@@ -286,7 +301,7 @@
                         <div>
                             <h2 class="font-bold text-xs sm:text-sm text-rose-900 flex items-center space-x-2">
                                 <i data-lucide="archive" class="w-4 h-4 text-rose-600"></i>
-                                <span>Hồ Sơ Học Sinh Đã Nghỉ Học & Công Nợ Chốt</span>
+                                <span>Hồ Sơ Học Sinh ĐÃ NGHỈ HỌC & CÔNG NỢ CHỐT</span>
                             </h2>
                             <p class="text-[11px] text-slate-500">Lưu trữ đối soát số buổi thực học, số tiền đã đóng và số tiền nợ lại khi nghỉ học.</p>
                         </div>
@@ -352,30 +367,25 @@
                 </div>
             </section>
 
-            <!-- TAB 5: ĐIỂM DANH BUỔI (GỢI Ý NGÀY & DATE PICKER ĐỒ HỌA) -->
+            <!-- TAB 5: ĐIỂM DANH BUỔI (LỊCH ĐỒ HỌA TRỰC QUAN HTML5 DATE) -->
             <section id="tab-attendance-session" class="tab-content hidden space-y-4 sm:space-y-6">
                 <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border space-y-4">
                     <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
                         <div>
                             <h2 class="font-bold text-xs sm:text-sm text-slate-800">Điểm Danh Buổi Học</h2>
-                            <p class="text-[11px] text-slate-500">Chọn ngày theo lịch gợi ý hoặc bấm vào ô ngày để chọn lịch trực quan.</p>
+                            <p class="text-[11px] text-slate-500">Chọn ngày theo gợi ý nhanh hoặc chạm trực tiếp vào ô lịch bên cạnh để chọn ngày đồ họa.</p>
                         </div>
                         <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
                             <!-- Nút gợi ý ngày 1 chạm -->
                             <div id="quickAttendanceDateSuggestions" class="flex items-center space-x-1"></div>
 
-                            <!-- Ô chọn ngày kết hợp Native Date Picker -->
-                            <div class="relative flex items-center">
-                                <input type="text" 
-                                       id="sessionDatePicker" 
-                                       placeholder="DD-MM-YYYY" 
-                                       onchange="loadSessionAttendance()" 
-                                       class="bg-slate-50 border p-1.5 sm:p-2 rounded-xl text-xs font-bold text-indigo-700 outline-none w-28 sm:w-32 font-mono text-center shadow-xs">
+                            <!-- Ô chọn lịch trực quan đồ họa -->
+                            <div class="flex items-center space-x-1.5 bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-1.5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-200">
+                                <i data-lucide="calendar" class="w-4 h-4 text-indigo-600 shrink-0"></i>
                                 <input type="date" 
-                                       id="nativeHtmlDatePicker" 
-                                       onchange="onNativeDatePicked(this.value)" 
-                                       class="absolute opacity-0 inset-0 cursor-pointer w-full h-full"
-                                       title="Bấm để mở lịch chọn đồ họa">
+                                       id="sessionDatePicker" 
+                                       onchange="onSessionDateChanged(this.value)" 
+                                       class="bg-transparent text-xs font-bold text-indigo-900 outline-none cursor-pointer font-mono">
                             </div>
 
                             <button type="button" 
@@ -394,8 +404,8 @@
                         </table>
                     </div>
                     <div class="flex flex-col sm:flex-row justify-between items-center gap-2 pt-2">
-                        <span class="text-[11px] text-slate-400 italic text-center sm:text-left">* Nhập ngày chuẩn DD-MM-YYYY hoặc chọn từ lịch. Nếu lưu nhầm ngày, chọn ngày đó và bấm "Xóa Buổi Này".</span>
-                        <button onclick="saveSessionAttendance()" class="bg-emerald-600 text-white font-bold text-xs px-5 sm:px-6 py-2.5 rounded-xl shadow w-full sm:w-auto">Lưu Điểm Danh</button>
+                        <span class="text-[11px] text-slate-400 italic text-center sm:text-left">* Chạm vào ô ngày để mở lịch tháng. Nếu lỡ lưu nhầm ngày, chọn ngày đó và bấm "Xóa Buổi Này".</span>
+                        <button onclick="saveSessionAttendance()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 sm:px-6 py-2.5 rounded-xl shadow w-full sm:w-auto transition">Lưu Điểm Danh</button>
                     </div>
                 </div>
             </section>
@@ -406,7 +416,7 @@
                     <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
                         <div>
                             <h2 class="font-bold text-xs sm:text-sm text-slate-800">Sổ Lưu Trữ Lịch Sử Điểm Danh (8 Buổi / Chu Kỳ)</h2>
-                            <p class="text-[11px] text-slate-500">Khóa lịch sử theo lớp: Nhóm 1 và Nhóm 2 hoàn toàn độc lập. <b>Bấm vào ngày ở cột để sửa ngày nhầm.</b></p>
+                            <p class="text-[11px] text-slate-500">Khóa lịch sử theo lớp độc lập. <b>Bấm vào ngày ở cột để sửa ngày nhầm qua lịch đồ họa.</b></p>
                         </div>
                         <div class="flex items-center space-x-2">
                             <button onclick="expandAllCycles(true)" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-2.5 sm:px-3 py-1.5 rounded-xl transition">Mở Tất Cả</button>
@@ -478,8 +488,8 @@
                             <div id="directEditorArea" contenteditable="true" placeholder="Dán đề vào đây..." class="direct-editor w-full p-3 border-2 border-dashed border-slate-300 rounded-xl min-h-[220px] max-h-[340px] overflow-y-auto text-xs font-mono bg-slate-50 outline-none leading-relaxed"></div>
                         </div>
                         <div class="flex gap-2">
-                            <button type="button" onclick="parseAdminExamDirect()" class="flex-1 bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs transition">⚡ 1. Bóc Tách</button>
-                            <button type="button" onclick="saveDirectExamToCloud()" class="flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">💾 2. Giao Đề</button>
+                            <button type="button" onclick="parseAdminExamDirect()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-xs transition">⚡ 1. Bóc Tách</button>
+                            <button type="button" onclick="saveDirectExamToCloud()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">💾 2. Giao Đề</button>
                         </div>
                         <div class="pt-3 border-t"><h3 class="font-bold text-xs uppercase mb-2 text-slate-500">Đề Thi Đang Mở</h3><div id="examListContainer" class="space-y-2 max-h-36 overflow-y-auto pr-1"></div></div>
                     </div>
@@ -587,7 +597,7 @@
         </main>
     </div>
 
-    <!-- MODAL: ĐỔI NGÀY ĐIỂM DANH HOẶC XÓA BUỔI -->
+    <!-- MODAL: ĐỔI NGÀY ĐIỂM DANH HOẶC XÓA BUỔI (LỊCH ĐỒ HỌA CHUẨN) -->
     <div id="modalEditAttendanceDate" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
             <div class="flex justify-between items-center border-b pb-2">
@@ -600,8 +610,11 @@
                     <input type="text" id="editCurrentAttDateText" readonly class="w-full p-2.5 bg-slate-100 border rounded-xl font-bold font-mono text-slate-700 text-center">
                 </div>
                 <div>
-                    <label class="block font-bold text-indigo-700 mb-1">Đổi sang ngày đúng (DD-MM-YYYY):</label>
-                    <input type="text" id="editNewAttDateInput" placeholder="VD: 07-10-2026" class="w-full p-2.5 border rounded-xl font-bold font-mono outline-none focus:border-indigo-600 text-center">
+                    <label class="block font-bold text-indigo-700 mb-1">Đổi sang ngày đúng (Chọn lịch):</label>
+                    <div class="flex items-center space-x-2 border border-indigo-200 rounded-xl px-3 py-2 bg-slate-50 focus-within:border-indigo-600">
+                        <i data-lucide="calendar" class="w-4 h-4 text-indigo-600 shrink-0"></i>
+                        <input type="date" id="editNewAttDateInput" required class="w-full bg-transparent font-bold font-mono outline-none cursor-pointer">
+                    </div>
                 </div>
                 <div class="pt-2 space-y-2">
                     <button type="button" onclick="handleApplyChangeAttendanceDate()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow transition">
@@ -652,15 +665,21 @@
         </button>
     </div>
 
-    <!-- MODAL: THÊM HỌC SINH MỚI -->
+    <!-- MODAL: THÊM HỌC SINH MỚI (LỊCH ĐỒ HỌA CHUẨN) -->
     <div id="modalAddStudent" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-md space-y-4">
             <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm">Thêm Học Sinh Mới</h3><button onclick="closeAddStudentModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
             <form id="formAddStudent" onsubmit="handleAddStudent(event)" class="space-y-3 text-xs">
-                <div><label class="block font-bold mb-1">Lớp (*)</label><select id="inputStudentClassId" onchange="onStudentClassModalChange()" class="w-full p-2.5 border rounded-xl font-bold"></select></div>
+                <div><label class="block font-bold mb-1">Lớp (*)</label><select id="inputStudentClassId" onchange="onStudentClassModalChange()" class="w-full p-2.5 border rounded-xl font-bold bg-slate-50 outline-none"></select></div>
                 <div class="grid grid-cols-2 gap-2">
                     <div><label class="block font-bold mb-1">Mã HS (*)</label><input type="text" id="inputStudentCode" required class="w-full p-2.5 border rounded-xl font-mono font-bold bg-slate-50"></div>
-                    <div><label class="block font-bold mb-1">Ngày Vào Học (DD-MM-YYYY) (*)</label><input type="text" id="inputStudentJoinDate" required placeholder="DD-MM-YYYY" class="w-full p-2.5 border rounded-xl font-bold font-mono text-center"></div>
+                    <div>
+                        <label class="block font-bold mb-1">Ngày Vào Học (*)</label>
+                        <div class="flex items-center space-x-1.5 border border-indigo-200 rounded-xl px-2.5 py-1.5 bg-slate-50 focus-within:border-indigo-600">
+                            <i data-lucide="calendar" class="w-4 h-4 text-indigo-600 shrink-0"></i>
+                            <input type="date" id="inputStudentJoinDate" required class="w-full bg-transparent font-bold font-mono outline-none cursor-pointer">
+                        </div>
+                    </div>
                 </div>
                 <div><label class="block font-bold mb-1">Họ Và Tên (*)</label><input type="text" id="inputStudentName" placeholder="VD: Bùi Nguyễn Trường Thịnh" required oninput="previewGeneratedUsername()" class="w-full p-2.5 border rounded-xl font-bold"></div>
                 <div><label class="block font-bold mb-1">Số Điện Thoại</label><input type="text" id="inputStudentPhone" placeholder="SĐT phụ huynh / học sinh" class="w-full p-2.5 border rounded-xl"></div>
@@ -669,12 +688,12 @@
                     <div class="text-xs font-mono font-bold text-indigo-900">Username: <span id="previewUsername">---</span></div>
                     <div class="text-xs font-mono text-slate-600">Mật khẩu mặc định: <span class="font-bold text-indigo-700">Theo SĐT hoặc 123456</span></div>
                 </div>
-                <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl shadow">Lưu Học Sinh</button>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow transition">Lưu Học Sinh</button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: SỬA HỌC SINH & CHUYỂN LỚP -->
+    <!-- MODAL: SỬA HỌC SINH & CHUYỂN LỚP (LỊCH ĐỒ HỌA CHUẨN) -->
     <div id="modalEditStudent" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-md space-y-4">
             <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm text-indigo-900">Sửa Thông Tin & Chuyển Lớp</h3><button onclick="closeEditStudentModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
@@ -683,41 +702,53 @@
                 <input type="hidden" id="editOriginalClassId">
                 <div>
                     <label class="block font-bold text-indigo-700 mb-1">Lớp (Chọn để chuyển lớp):</label>
-                    <select id="editStudentClassId" onchange="onEditClassChange()" class="w-full p-2.5 border rounded-xl font-bold bg-indigo-50/50"></select>
+                    <select id="editStudentClassId" onchange="onEditClassChange()" class="w-full p-2.5 border rounded-xl font-bold bg-indigo-50/50 outline-none"></select>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div><label class="block font-bold mb-1">Mã HS</label><input type="text" id="editStudentCode" required class="w-full p-2.5 border rounded-xl font-mono font-bold"></div>
-                    <div><label class="block font-bold mb-1">Ngày Vào Lớp Mới</label><input type="text" id="editStudentJoinDate" required placeholder="DD-MM-YYYY" class="w-full p-2.5 border rounded-xl font-bold font-mono text-center"></div>
+                    <div>
+                        <label class="block font-bold mb-1">Ngày Vào Lớp Mới</label>
+                        <div class="flex items-center space-x-1.5 border border-indigo-200 rounded-xl px-2.5 py-1.5 bg-slate-50 focus-within:border-indigo-600">
+                            <i data-lucide="calendar" class="w-4 h-4 text-indigo-600 shrink-0"></i>
+                            <input type="date" id="editStudentJoinDate" required class="w-full bg-transparent font-bold font-mono outline-none cursor-pointer">
+                        </div>
+                    </div>
                 </div>
                 <div><label class="block font-bold mb-1">Họ Và Tên</label><input type="text" id="editStudentName" required class="w-full p-2.5 border rounded-xl font-bold"></div>
                 <div><label class="block font-bold mb-1">Tài Khoản (Username)</label><input type="text" id="editStudentUsername" readonly class="w-full p-2.5 border rounded-xl font-mono font-bold bg-slate-100 text-slate-500"></div>
                 <div><label class="block font-bold mb-1">Số Điện Thoại</label><input type="text" id="editStudentPhone" class="w-full p-2.5 border rounded-xl"></div>
                 <div><label class="block font-bold mb-1">Học Phí Riêng (Điền 0 nếu miễn phí):</label><input type="number" id="editStudentCustomFee" placeholder="VD: 0 hoặc 300000" class="w-full p-2.5 border rounded-xl"></div>
-                <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl shadow">Cập Nhật Thông Tin</button>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow transition">Cập Nhật Thông Tin</button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: BÁO NGHỈ HỌC & CHỐT NỢ -->
+    <!-- MODAL: BÁO NGHỈ HỌC & CHỐT NỢ (LỊCH ĐỒ HỌA CHUẨN) -->
     <div id="modalLeaveStudent" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
             <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm text-rose-800">Báo Nghỉ Học & Chốt NỢ</h3><button onclick="closeLeaveModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
             <form onsubmit="handleConfirmStudentLeave(event)" class="space-y-3 text-xs">
                 <input type="hidden" id="leaveStudentId">
                 <div><label class="block font-bold mb-1 text-slate-700">Học sinh:</label><input type="text" id="leaveStudentInfo" readonly class="w-full p-2.5 bg-slate-50 border rounded-xl font-bold"></div>
-                <div><label class="block font-bold mb-1 text-slate-700">Ngày nghỉ chính thức (DD-MM-YYYY):</label><input type="text" id="leaveDateInput" required placeholder="DD-MM-YYYY" class="w-full p-2.5 border rounded-xl font-bold font-mono text-center"></div>
+                <div>
+                    <label class="block font-bold mb-1 text-slate-700">Ngày nghỉ chính thức:</label>
+                    <div class="flex items-center space-x-1.5 border border-rose-200 rounded-xl px-2.5 py-1.5 bg-slate-50 focus-within:border-rose-600">
+                        <i data-lucide="calendar" class="w-4 h-4 text-rose-600 shrink-0"></i>
+                        <input type="date" id="leaveDateInput" required class="w-full bg-transparent font-bold font-mono outline-none cursor-pointer">
+                    </div>
+                </div>
                 <div class="p-3 bg-rose-50 border border-rose-200 rounded-2xl space-y-1.5">
                     <div class="flex justify-between"><span>Số buổi đã học:</span><b id="leaveTotalSessionsText" class="text-indigo-900">0 buổi</b></div>
                     <div class="flex justify-between"><span>Tổng đã nộp:</span><b id="leaveTotalPaidText" class="text-emerald-700">0 đ</b></div>
                     <div class="flex justify-between border-t border-rose-200 pt-1"><span class="font-bold text-rose-800">Số tiền nợ chốt:</span><input type="number" id="leaveDebtInput" class="w-28 p-1 border rounded-lg text-right font-black text-rose-700 bg-white" required></div>
                 </div>
                 <div><label class="block font-bold mb-1 text-slate-700">Lý do:</label><input type="text" id="leaveReasonInput" placeholder="Lý do nghỉ..." required class="w-full p-2.5 border rounded-xl"></div>
-                <button type="submit" class="w-full bg-rose-600 text-white font-bold py-3 rounded-xl shadow">Lưu Vào Sổ Nghỉ Học & Xóa Khỏi Lớp</button>
+                <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl shadow transition">Lưu Vào Sổ Nghỉ Học & Xóa Khỏi Lớp</button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: THU HỌC PHÍ NHANH & XEM VIETQR -->
+    <!-- MODAL: THU HỌC PHÍ NHANH & XEM VIETQR (LỊCH ĐỒ HỌA CHUẨN) -->
     <div id="modalPayTuition" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
             <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm text-emerald-700">Thu Học Phí</h3><button onclick="closePayModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
@@ -730,15 +761,27 @@
                     <p id="payNoteSuggestion" class="text-[11px] text-slate-500 mt-1 italic"></p>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <div><label class="block font-bold mb-1">Ngày Thu (DD-MM-YYYY)</label><input type="text" id="payDate" required placeholder="DD-MM-YYYY" class="w-full p-2 border rounded-xl font-mono font-bold text-center"></div>
-                    <div><label class="block font-bold mb-1">Hình Thức</label><select id="payMethod" class="w-full p-2 border rounded-xl font-bold"><option value="Chuyển khoản">Chuyển khoản</option><option value="Tiền mặt">Tiền mặt</option></select></div>
+                    <div>
+                        <label class="block font-bold mb-1">Ngày Thu</label>
+                        <div class="flex items-center space-x-1.5 border border-emerald-200 rounded-xl px-2 py-1.5 bg-slate-50 focus-within:border-emerald-600">
+                            <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                            <input type="date" id="payDate" required class="w-full bg-transparent font-bold font-mono outline-none cursor-pointer">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1">Hình Thức</label>
+                        <select id="payMethod" class="w-full p-2 border rounded-xl font-bold bg-white outline-none">
+                            <option value="Chuyển khoản">Chuyển khoản</option>
+                            <option value="Tiền mặt">Tiền mặt</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="flex gap-2 pt-1">
-                    <button type="button" onclick="showAdminVietQR()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-xl shadow flex items-center justify-center space-x-1">
+                    <button type="button" onclick="showAdminVietQR()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-xl shadow flex items-center justify-center space-x-1 transition">
                         <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
                         <span>Mở QR Quét</span>
                     </button>
-                    <button type="submit" class="flex-1 bg-emerald-600 text-white font-bold py-2.5 rounded-xl shadow">Đã Thu Xong</button>
+                    <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition">Đã Thu Xong</button>
                 </div>
             </form>
         </div>
@@ -758,7 +801,7 @@
         </div>
     </div>
 
-    <!-- MODAL: ĐIỀU CHỈNH CA HỌC TUẦN NÀY -->
+    <!-- MODAL: ĐIỀU CHỈNH CA HỌC TUẦN NÀY (LỊCH ĐỒ HỌA CHUẨN) -->
     <div id="modalOverrideLesson" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
             <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm text-slate-800">Điều Chỉnh Ca Tuần Này</h3><button onclick="closeOverrideModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
@@ -773,31 +816,43 @@
                     </select>
                 </div>
                 <div id="rescheduleFields" class="hidden space-y-2 p-3 bg-amber-50 border border-amber-200 rounded-xl">
-                    <div><label class="block font-bold mb-1">Ngày Mới (DD-MM-YYYY)</label><input type="text" id="overrideNewDate" placeholder="DD-MM-YYYY" class="w-full p-2 border rounded-lg font-bold font-mono text-center"></div>
+                    <div>
+                        <label class="block font-bold mb-1">Ngày Mới (Chọn lịch)</label>
+                        <div class="flex items-center space-x-1.5 border border-amber-300 rounded-xl px-2.5 py-1.5 bg-white">
+                            <i data-lucide="calendar" class="w-4 h-4 text-amber-600 shrink-0"></i>
+                            <input type="date" id="overrideNewDate" class="w-full bg-transparent font-bold font-mono outline-none cursor-pointer">
+                        </div>
+                    </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div><label class="block font-bold mb-1">Giờ Bắt Đầu</label><input type="time" id="overrideNewStart" class="w-full p-2 border rounded-lg font-bold"></div>
                         <div><label class="block font-bold mb-1">Giờ Kết Thúc</label><input type="time" id="overrideNewEnd" class="w-full p-2 border rounded-lg font-bold"></div>
                     </div>
                 </div>
                 <div><label class="block font-bold mb-1">Ghi Chú</label><input type="text" id="overrideNote" placeholder="Lý do..." class="w-full p-2.5 border rounded-xl"></div>
-                <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2.5 rounded-xl shadow">Xác Nhận & Cập Nhật Lịch</button>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow transition">Xác Nhận & Cập Nhật Lịch</button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: THÊM CA TĂNG CƯỜNG -->
+    <!-- MODAL: THÊM CA TĂNG CƯỜNG (LỊCH ĐỒ HỌA CHUẨN) -->
     <div id="modalExtraLesson" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
             <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm text-purple-900">+ Thêm Ca Tăng Cường</h3><button onclick="closeExtraModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
             <form onsubmit="handleSaveExtraLesson(event)" class="space-y-3 text-xs">
-                <div><label class="block font-bold mb-1">Lớp</label><select id="extraLessonClassId" class="w-full p-2.5 border rounded-xl font-bold"></select></div>
-                <div><label class="block font-bold mb-1">Ngày Học (DD-MM-YYYY)</label><input type="text" id="extraLessonDate" placeholder="DD-MM-YYYY" required class="w-full p-2.5 border rounded-xl font-bold font-mono text-center"></div>
+                <div><label class="block font-bold mb-1">Lớp</label><select id="extraLessonClassId" class="w-full p-2.5 border rounded-xl font-bold bg-slate-50 outline-none"></select></div>
+                <div>
+                    <label class="block font-bold mb-1">Ngày Học (Chọn lịch)</label>
+                    <div class="flex items-center space-x-1.5 border border-purple-200 rounded-xl px-2.5 py-1.5 bg-slate-50 focus-within:border-purple-600">
+                        <i data-lucide="calendar" class="w-4 h-4 text-purple-600 shrink-0"></i>
+                        <input type="date" id="extraLessonDate" required class="w-full bg-transparent font-bold font-mono outline-none cursor-pointer">
+                    </div>
+                </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <div><label class="block font-bold mb-1">Giờ Bắt Đầu</label><input type="time" id="extraLessonStart" value="18:00" required class="w-full p-2 border rounded-xl font-bold"></div>
-                    <div><label class="block font-bold mb-1">Giờ Kết Thúc</label><input type="time" id="extraLessonEnd" value="19:30" required class="w-full p-2 border rounded-xl font-bold"></div>
+                    <div><label class="block font-bold mb-1">Giờ Bắt Đầu</label><input type="time" id="extraLessonStart" value="18:00" required class="w-full p-2 border rounded-lg font-bold"></div>
+                    <div><label class="block font-bold mb-1">Giờ Kết Thúc</label><input type="time" id="extraLessonEnd" value="19:30" required class="w-full p-2 border rounded-lg font-bold"></div>
                 </div>
                 <div><label class="block font-bold mb-1">Nội Dung</label><input type="text" id="extraLessonNote" placeholder="VD: Phụ đạo ôn tập..." class="w-full p-2.5 border rounded-xl"></div>
-                <button type="submit" class="w-full bg-purple-600 text-white font-bold py-2.5 rounded-xl shadow">Thêm Ca & Cập Nhật Lịch</button>
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl shadow transition">Thêm Ca & Cập Nhật Lịch</button>
             </form>
         </div>
     </div>
@@ -896,9 +951,7 @@
                 <button onclick="closeDuplicateAuditModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
 
-            <div id="duplicateAuditContentArea" class="flex-1 overflow-y-auto space-y-4 pr-1 text-xs">
-                <!-- Nội dung các nhóm trùng sẽ render tại đây -->
-            </div>
+            <div id="duplicateAuditContentArea" class="flex-1 overflow-y-auto space-y-4 pr-1 text-xs"></div>
 
             <div class="pt-2 border-t flex justify-end shrink-0">
                 <button onclick="closeDuplicateAuditModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs">Đóng Cửa Sổ</button>
