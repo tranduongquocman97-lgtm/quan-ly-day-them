@@ -693,21 +693,45 @@
         </div>
     </div>
 
-    <!-- MODAL: SỬA HỌC SINH & CHUYỂN LỚP (LỊCH ĐỒ HỌA CHUẨN) -->
+    <!-- MODAL: SỬA HỌC SINH & CHUYỂN LỚP HỒI TỐ (LÙI NGÀY) -->
     <div id="modalEditStudent" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-md space-y-4">
-            <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm text-indigo-900">Sửa Thông Tin & Chuyển Lớp</h3><button onclick="closeEditStudentModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+            <div class="flex justify-between border-b pb-2">
+                <h3 class="font-bold text-sm text-indigo-900">Sửa Thông Tin & Chuyển Lớp</h3>
+                <button onclick="closeEditStudentModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
             <form id="formEditStudent" onsubmit="handleSaveEditStudent(event)" class="space-y-3 text-xs">
                 <input type="hidden" id="editStudentId">
                 <input type="hidden" id="editOriginalClassId">
                 <div>
-                    <label class="block font-bold text-indigo-700 mb-1">Lớp (Chọn để chuyển lớp):</label>
-                    <select id="editStudentClassId" onchange="onEditClassChange()" class="w-full p-2.5 border rounded-xl font-bold bg-indigo-50/50 outline-none"></select>
+                    <label class="block font-bold text-indigo-700 mb-1">Lớp Học (Chọn lớp khác để chuyển nhóm):</label>
+                    <select id="editStudentClassId" onchange="onEditClassChange()" class="w-full p-2.5 border rounded-xl font-bold bg-indigo-50/50 outline-none focus:border-indigo-600"></select>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div><label class="block font-bold mb-1">Mã HS</label><input type="text" id="editStudentCode" required class="w-full p-2.5 border rounded-xl font-mono font-bold"></div>
+
+                <!-- KHU VỰC THIẾT LẬP CHUYỂN LỚP HỒI TỐ (HIỆN KHI CHỌN LỚP MỚI) -->
+                <div id="transferSettingsArea" class="hidden p-3 bg-amber-50 border border-amber-200 rounded-2xl space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="font-black text-amber-900 text-xs">⚡ Thiết lập chuyển nhóm:</span>
+                        <span class="text-[10px] text-amber-700 font-semibold">Chủ động lùi ngày</span>
+                    </div>
                     <div>
-                        <label class="block font-bold mb-1">Ngày Vào Lớp Mới</label>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Ngày bắt đầu học thực tế tại lớp mới:</label>
+                        <div class="flex items-center space-x-1.5 border border-amber-300 rounded-xl px-2.5 py-1.5 bg-white">
+                            <i data-lucide="calendar" class="w-4 h-4 text-amber-600 shrink-0"></i>
+                            <input type="date" id="editTransferActualDate" onchange="recalculateRetroactiveTransfer()" class="w-full bg-transparent font-bold font-mono outline-none cursor-pointer">
+                        </div>
+                        <p class="text-[10px] text-amber-800 mt-1 italic">* Chọn ngày em ấy đã bắt đầu ngồi học ở lớp mới để hệ thống bù điểm danh và tính học phí chính xác.</p>
+                    </div>
+                    <div id="transferCalculationPreview" class="p-2.5 bg-white rounded-xl border border-amber-200 text-[11px] space-y-1 font-semibold text-slate-700"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold mb-1">Mã HS</label>
+                        <input type="text" id="editStudentCode" required class="w-full p-2.5 border rounded-xl font-mono font-bold bg-slate-50">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1">Ngày Vào Học Ban Đầu</label>
                         <div class="flex items-center space-x-1.5 border border-indigo-200 rounded-xl px-2.5 py-1.5 bg-slate-50 focus-within:border-indigo-600">
                             <i data-lucide="calendar" class="w-4 h-4 text-indigo-600 shrink-0"></i>
                             <input type="date" id="editStudentJoinDate" required class="w-full bg-transparent font-bold font-mono outline-none cursor-pointer">
@@ -717,8 +741,8 @@
                 <div><label class="block font-bold mb-1">Họ Và Tên</label><input type="text" id="editStudentName" required class="w-full p-2.5 border rounded-xl font-bold"></div>
                 <div><label class="block font-bold mb-1">Tài Khoản (Username)</label><input type="text" id="editStudentUsername" readonly class="w-full p-2.5 border rounded-xl font-mono font-bold bg-slate-100 text-slate-500"></div>
                 <div><label class="block font-bold mb-1">Số Điện Thoại</label><input type="text" id="editStudentPhone" class="w-full p-2.5 border rounded-xl"></div>
-                <div><label class="block font-bold mb-1">Học Phí Riêng (Điền 0 nếu miễn phí):</label><input type="number" id="editStudentCustomFee" placeholder="VD: 0 hoặc 300000" class="w-full p-2.5 border rounded-xl"></div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow transition">Cập Nhật Thông Tin</button>
+                <div><label class="block font-bold mb-1">Học Phí Riêng (Điền 0 nếu miễn phí):</label><input type="number" id="editStudentCustomFee" placeholder="Để trống nếu theo học phí chuẩn của lớp" class="w-full p-2.5 border rounded-xl"></div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow transition">Lưu Thay Đổi</button>
             </form>
         </div>
     </div>
@@ -748,28 +772,33 @@
         </div>
     </div>
 
-    <!-- MODAL: THU HỌC PHÍ NHANH & XEM VIETQR (LỊCH ĐỒ HỌA CHUẨN) -->
+    <!-- MODAL: THU HỌC PHÍ & QUẢN LÝ PHIẾU THU 2 TRẠNG THÁI -->
     <div id="modalPayTuition" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-sm space-y-4">
-            <div class="flex justify-between border-b pb-2"><h3 class="font-bold text-sm text-emerald-700">Thu Học Phí</h3><button onclick="closePayModal()"><i data-lucide="x" class="w-4 h-4"></i></button></div>
-            <form id="formPayTuition" onsubmit="handleSavePayment(event)" class="space-y-3 text-xs">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 id="payModalTitle" class="font-bold text-sm text-emerald-700">Thu Học Phí</h3>
+                <button onclick="closePayModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+
+            <!-- CHẾ ĐỘ 1: CHƯA THU (THU MỚI) -->
+            <form id="formPayTuitionNew" onsubmit="handleSavePayment(event)" class="space-y-3 text-xs">
                 <input type="hidden" id="payStudentId"><input type="hidden" id="payCycleIndex">
-                <input type="text" id="payStudentInfo" readonly class="w-full p-2 border bg-slate-50 font-bold rounded-xl">
+                <input type="text" id="payStudentInfo" readonly class="w-full p-2.5 border bg-slate-50 font-bold rounded-xl text-slate-800">
                 <div>
-                    <label class="block font-bold mb-1">Số Tiền Thực Thu (VNĐ)</label>
-                    <input type="number" id="payAmount" step="any" class="w-full p-2.5 border rounded-xl text-base font-black text-emerald-600 outline-none">
+                    <label class="block font-bold mb-1 text-slate-700">Số Tiền Thực Thu (VNĐ)</label>
+                    <input type="number" id="payAmount" step="any" required class="w-full p-2.5 border rounded-xl text-base font-black text-emerald-600 outline-none focus:border-emerald-600">
                     <p id="payNoteSuggestion" class="text-[11px] text-slate-500 mt-1 italic"></p>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block font-bold mb-1">Ngày Thu</label>
+                        <label class="block font-bold mb-1 text-slate-700">Ngày Thu</label>
                         <div class="flex items-center space-x-1.5 border border-emerald-200 rounded-xl px-2 py-1.5 bg-slate-50 focus-within:border-emerald-600">
                             <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
                             <input type="date" id="payDate" required class="w-full bg-transparent font-bold font-mono outline-none cursor-pointer">
                         </div>
                     </div>
                     <div>
-                        <label class="block font-bold mb-1">Hình Thức</label>
+                        <label class="block font-bold mb-1 text-slate-700">Hình Thức</label>
                         <select id="payMethod" class="w-full p-2 border rounded-xl font-bold bg-white outline-none">
                             <option value="Chuyển khoản">Chuyển khoản</option>
                             <option value="Tiền mặt">Tiền mặt</option>
@@ -779,11 +808,65 @@
                 <div class="flex gap-2 pt-1">
                     <button type="button" onclick="showAdminVietQR()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-xl shadow flex items-center justify-center space-x-1 transition">
                         <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
-                        <span>Mở QR Quét</span>
+                        <span>Mở QR</span>
                     </button>
-                    <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition">Đã Thu Xong</button>
+                    <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition">
+                        Đã Thu Xong
+                    </button>
                 </div>
             </form>
+
+            <!-- CHẾ ĐỘ 2: ĐÃ THU (QUẢN LÝ / SỬA / HỦY / CHUYỂN HỌC SINH) -->
+            <div id="sectionPaidPaymentManager" class="space-y-3 text-xs hidden">
+                <input type="hidden" id="editPaymentId">
+                <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl space-y-1">
+                    <div class="flex justify-between items-center">
+                        <span class="text-emerald-900 font-bold">Trạng thái:</span>
+                        <span class="bg-emerald-200 text-emerald-900 font-black px-2 py-0.5 rounded text-[10px]">ĐÃ THU</span>
+                    </div>
+                    <div class="text-slate-600" id="paidPaymentStudentText">---</div>
+                </div>
+
+                <div>
+                    <label class="block font-bold mb-1 text-slate-700">Số Tiền Đã Thu (VNĐ):</label>
+                    <input type="number" id="editPaidAmount" step="any" class="w-full p-2.5 border rounded-xl font-black text-emerald-600 outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold mb-1 text-slate-700">Ngày Thu:</label>
+                        <input type="date" id="editPaidDate" class="w-full p-2 border rounded-xl font-mono font-bold">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1 text-slate-700">Hình Thức:</label>
+                        <select id="editPaidMethod" class="w-full p-2 border rounded-xl font-bold">
+                            <option value="Chuyển khoản">Chuyển khoản</option>
+                            <option value="Tiền mặt">Tiền mặt</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Chuyển phiếu thu sang học sinh khác nếu ấn nhầm -->
+                <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5">
+                    <label class="block text-[11px] font-bold text-slate-700">Ấn nhầm? Chuyển phiếu này sang HS khác:</label>
+                    <div class="flex space-x-1.5">
+                        <select id="selectTransferPaymentTarget" class="flex-1 p-1.5 border rounded-lg text-xs bg-white font-bold"></select>
+                        <button type="button" onclick="handleTransferPaymentToAnotherStudent()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-2.5 py-1.5 rounded-lg text-xs transition">
+                            Chuyển
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pt-2 space-y-2">
+                    <button type="button" onclick="handleUpdatePaidPayment()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition">
+                        Cập Nhật Phiếu Thu
+                    </button>
+                    <button type="button" onclick="handleCancelPayment()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold py-2 rounded-xl transition flex items-center justify-center space-x-1">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        <span>Hủy Thu (Hoàn Tác Về Chưa Nộp)</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -959,7 +1042,13 @@
         </div>
     </div>
 
-    <!-- NẠP TOÀN BỘ LOGIC HỆ THỐNG QUA APP.JS -->
-    <script src="app.js"></script>
+    <!-- NẠP HỆ THỐNG MODULE THEO THỨ TỰ PHỤ THUỘC (DEPENDENCY PIPELINE) -->
+    <script src="js/core.js"></script>
+    <script src="js/sync.js"></script>
+    <script src="js/students.js"></script>
+    <script src="js/attendance-schedule.js"></script>
+    <script src="js/tuition.js"></script>
+    <script src="js/qbank.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>

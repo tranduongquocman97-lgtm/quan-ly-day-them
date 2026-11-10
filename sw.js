@@ -1,9 +1,4 @@
-// ============================================================================
-// SERVICE WORKER - M_SIGMATEACHER & M_SIGMATH
-// Hỗ trợ hoạt động Offline, tự động tải ngầm và cập nhật tức thì.
-// ============================================================================
-
-const CACHE_VERSION = 'v2026.10.13.2';
+const CACHE_VERSION = 'v2026.11.03.modular_1';
 const CACHE_NAME = `sigmath-cache-${CACHE_VERSION}`;
 
 const ASSETS_TO_CACHE = [
@@ -11,31 +6,40 @@ const ASSETS_TO_CACHE = [
   './index.html',
   './hocsinh.html',
   './exam.html',
-  './app.js',
+  './js/core.js',
+  './js/sync.js',
+  './js/students.js',
+  './js/attendance-schedule.js',
+  './js/tuition.js',
+  './js/qbank.js',
+  './js/main.js',
   './manifest.json',
   './manifest-hocsinh.json',
   './logo-teacher.png',
   './logo-teacher-192.png',
+  './logo-teacher-512.png',
   './logo-student.png',
-  './logo-student-192.png'
+  './logo-student-192.png',
+  './logo-student-512.png'
 ];
 
+// Cài đặt và nạp tài nguyên vào cache
 self.addEventListener('install', (event) => {
-  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE);
-    })
+    }).then(() => self.skipWaiting())
   );
 });
 
+// Kích hoạt phiên bản mới và dọn dẹp các bản cache cũ
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
           }
         })
       );
@@ -43,29 +47,33 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Phản hồi yêu cầu mạng: ưu tiên mạng, lỗi mạng mới dùng cache (Network First)
 self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
+  if (event.request.method !== 'GET') return;
 
-  // Không can thiệp các request API Google Apps Script hoặc phương thức không phải GET
-  if (event.request.method !== 'GET' || url.hostname.includes('script.google.com') || url.hostname.includes('script.googleusercontent.com')) {
-    event.respondWith(fetch(event.request));
+  // Bỏ qua các yêu cầu gọi trực tiếp lên Google Apps Script API
+  if (event.request.url.includes('script.google.com') || event.request.url.includes('script.googleusercontent.com')) {
     return;
   }
 
-  // Chiến lược Stale-While-Revalidate chuẩn xác: Trả cache ngay, cập nhật ngầm an toàn với clone()
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      const fetchPromise = fetch(event.request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);
           });
         }
         return networkResponse;
-      }).catch(() => cachedResponse);
-
-      return cachedResponse || fetchPromise;
-    })
+      })
+      .catch(() => {
+        return caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) return cachedResponse;
+          if (event.request.headers.get('accept')?.includes('text/html')) {
+            return caches.match('./index.html');
+          }
+        });
+      })
   );
 });
