@@ -109,10 +109,7 @@
 
         <!-- MÀN HÌNH 2: GIAO DIỆN LÀM BÀI 2 CỘT (CÂU HỎI + PALETTE) -->
         <section id="screenExamTaking" class="hidden grid grid-cols-1 lg:grid-cols-4 gap-4 items-start">
-            
-            <!-- CỘT TRÁI: KHU VỰC CÂU HỎI (3 PHẦN GDPT MỚI) -->
             <div class="lg:col-span-3 space-y-4">
-                <!-- Thanh trạng thái an toàn & khôi phục bài -->
                 <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap justify-between items-center gap-2 text-xs">
                     <div class="flex items-center space-x-2">
                         <span class="font-bold text-slate-600">Tiến độ làm bài:</span>
@@ -131,7 +128,6 @@
 
                 <div id="questionsListContainer" class="space-y-4"></div>
 
-                <!-- Nút nộp bài cuối trang -->
                 <div class="p-4 bg-white rounded-3xl border shadow-sm flex items-center justify-between sticky bottom-3 z-20">
                     <span class="text-xs text-slate-500 hidden sm:inline">Kiểm tra lại toàn bộ bài làm trước khi bấm nộp.</span>
                     <button type="button" onclick="confirmSubmitExam()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs px-8 py-3 rounded-2xl shadow transition flex items-center justify-center space-x-2">
@@ -151,7 +147,6 @@
                     <span class="text-[10px] font-mono text-slate-400" id="palettePercent">0%</span>
                 </div>
 
-                <!-- Palette Phần I -->
                 <div class="space-y-1.5" id="palettePart1Box">
                     <div class="text-[11px] font-bold text-indigo-900 flex justify-between">
                         <span>Phần I: 4 Lựa Chọn</span>
@@ -160,7 +155,6 @@
                     <div class="grid grid-cols-5 gap-1.5" id="palettePart1Grid"></div>
                 </div>
 
-                <!-- Palette Phần II -->
                 <div class="space-y-1.5 border-t pt-2" id="palettePart2Box">
                     <div class="text-[11px] font-bold text-amber-900 flex justify-between">
                         <span>Phần II: Đúng / Sai</span>
@@ -169,7 +163,6 @@
                     <div class="grid grid-cols-5 gap-1.5" id="palettePart2Grid"></div>
                 </div>
 
-                <!-- Palette Phần III -->
                 <div class="space-y-1.5 border-t pt-2" id="palettePart3Box">
                     <div class="text-[11px] font-bold text-purple-900 flex justify-between">
                         <span>Phần III: Trả Lời Ngắn</span>
@@ -234,7 +227,7 @@
         </div>
     </div>
 
-    <!-- MODAL PHÓNG TO ẢNH HÌNH HỌC (LIGHTBOX) -->
+    <!-- MODAL PHÓNG TO ẢNH HÌNH HỌC -->
     <div id="modalImageZoom" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4" onclick="closeImageZoom()">
         <div class="max-w-3xl max-h-[90vh] bg-white p-2 rounded-2xl shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
             <div class="flex justify-end p-1"><button onclick="closeImageZoom()" class="p-1 text-slate-500 hover:text-black"><i data-lucide="x" class="w-5 h-5"></i></button></div>
@@ -243,7 +236,6 @@
     </div>
 
     <script>
-        // Lấy API Cloud linh hoạt: Ưu tiên URL đã lưu tại localStorage của hệ thống
         const CLOUD_API_URL = localStorage.getItem('API_URL') || "https://script.google.com/macros/s/AKfycbznfqhckK2L97z427a50oLuZ0W0nLbtdDcJROOv6S2sGQL3_OGbK0Fs7Hd8wOi_or5cXA/exec";
         const STUDENT_AUTH_KEY = 'SIGMA_STUDENT_SESSION';
         const ACTIVE_STUDENT_SESSION_KEY = 'ACTIVE_STUDENT_SESSION';
@@ -258,20 +250,8 @@
         let flaggedQuestions = {};
         let tabSwitchCount = 0;
 
-        // TỰ ĐỘNG CẬP NHẬT SERVICE WORKER
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').then((reg) => {
-                reg.onupdatefound = () => {
-                    const installingWorker = reg.installing;
-                    if (installingWorker) {
-                        installingWorker.onstatechange = () => {
-                            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                window.location.reload();
-                            }
-                        };
-                    }
-                };
-            }).catch(err => console.log('SW Fail', err));
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Fail', err));
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -287,51 +267,28 @@
             setupAntiCheatGuards();
         });
 
-        // ==================== 1. CƠ CHẾ CHỐNG GIAN LẬN ĐA TẦNG ====================
         function setupAntiCheatGuards() {
-            // Chặn chuột phải khi làm bài
-            document.addEventListener('contextmenu', (e) => {
-                if (activeExam) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
-
-            // Chặn phím tắt mở DevTools, sao chép
+            document.addEventListener('contextmenu', (e) => { if (activeExam) { e.preventDefault(); return false; } });
             document.addEventListener('keydown', (e) => {
                 if (!activeExam) return;
-                if (e.key === 'F12') { e.preventDefault(); return false; }
-                if (e.ctrlKey && ['c', 'v', 'u', 's', 'p', 'C', 'V', 'U', 'S', 'P'].includes(e.key)) {
+                if (e.key === 'F12' || (e.ctrlKey && ['c','v','u','s','p','C','V','U','S','P'].includes(e.key))) {
                     e.preventDefault();
                     return false;
                 }
             });
-
-            // Radar giám sát chuyển tab
-            document.addEventListener('visibilitychange', () => {
-                if (activeExam && document.hidden) {
-                    triggerCheatViolation();
-                }
-            });
-
-            window.addEventListener('blur', () => {
-                if (activeExam) {
-                    triggerCheatViolation();
-                }
-            });
+            document.addEventListener('visibilitychange', () => { if (activeExam && document.hidden) triggerCheatViolation(); });
+            window.addEventListener('blur', () => { if (activeExam) triggerCheatViolation(); });
         }
 
         function triggerCheatViolation() {
             tabSwitchCount++;
             saveExamDraftLocally();
-            
             const cheatBadge = document.getElementById('cheatWarningBadge');
             const cheatText = document.getElementById('cheatWarningText');
             if (cheatBadge && cheatText) {
                 cheatBadge.classList.remove('hidden');
                 cheatText.innerText = `Vi phạm: ${tabSwitchCount}`;
             }
-
             const modal = document.getElementById('modalCheatAlert');
             const modalCount = document.getElementById('modalCheatCountText');
             if (modal && modalCount) {
@@ -348,32 +305,22 @@
         function requestFullScreenMode() {
             try {
                 const elem = document.documentElement;
-                if (elem.requestFullscreen) { elem.requestFullscreen(); }
-                else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
-                else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
+                if (elem.requestFullscreen) elem.requestFullscreen();
+                else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
             } catch(e){}
         }
 
-        // ==================== 2. TỰ ĐỘNG LƯU NHÁP CHỐNG MẤT BÀI ====================
         function getDraftStorageKey() {
-            if (!activeExam || !currentStudent) return null;
-            return `EXAM_DRAFT_${currentStudent.id}_${activeExam.id}`;
+            return (activeExam && currentStudent) ? `EXAM_DRAFT_${currentStudent.id}_${activeExam.id}` : null;
         }
 
         function saveExamDraftLocally() {
             const key = getDraftStorageKey();
             if (!key) return;
-
-            const draftPayload = {
-                studentAnswers: studentAnswers,
-                flaggedQuestions: flaggedQuestions,
-                remainingSeconds: remainingSeconds,
-                tabSwitchCount: tabSwitchCount,
-                lastSavedAt: Date.now()
-            };
-
             try {
-                localStorage.setItem(key, JSON.stringify(draftPayload));
+                localStorage.setItem(key, JSON.stringify({
+                    studentAnswers, flaggedQuestions, remainingSeconds, tabSwitchCount, lastSavedAt: Date.now()
+                }));
                 const stText = document.getElementById('autoSaveStatusText');
                 if (stText) stText.innerText = "Đã lưu nháp tự động (" + new Date().toLocaleTimeString('vi-VN') + ")";
             } catch(e){}
@@ -382,7 +329,6 @@
         function restoreExamDraftLocally() {
             const key = getDraftStorageKey();
             if (!key) return false;
-
             const saved = localStorage.getItem(key);
             if (!saved) return false;
 
@@ -391,23 +337,14 @@
                 studentAnswers = draft.studentAnswers || {};
                 flaggedQuestions = draft.flaggedQuestions || {};
                 tabSwitchCount = draft.tabSwitchCount || 0;
-
-                if (draft.remainingSeconds && draft.remainingSeconds > 0) {
-                    remainingSeconds = draft.remainingSeconds;
-                }
+                if (draft.remainingSeconds && draft.remainingSeconds > 0) remainingSeconds = draft.remainingSeconds;
 
                 restoreAnswersToUI();
                 updatePaletteStatus();
-
                 if (tabSwitchCount > 0) {
-                    const cheatBadge = document.getElementById('cheatWarningBadge');
-                    const cheatText = document.getElementById('cheatWarningText');
-                    if (cheatBadge && cheatText) {
-                        cheatBadge.classList.remove('hidden');
-                        cheatText.innerText = `Vi phạm: ${tabSwitchCount}`;
-                    }
+                    document.getElementById('cheatWarningBadge')?.classList.remove('hidden');
+                    document.getElementById('cheatWarningText').innerText = `Vi phạm: ${tabSwitchCount}`;
                 }
-
                 return true;
             } catch(e) { return false; }
         }
@@ -415,17 +352,20 @@
         function restoreAnswersToUI() {
             if (!activeExam || !activeExam.questions) return;
             activeExam.questions.forEach((q, idx) => {
-                const ans = studentAnswers[idx];
+                const qKey = q.id || String(idx);
+                const ans = studentAnswers[qKey];
                 if (!ans) return;
 
                 if (q.part === 1) {
                     const radio = document.querySelector(`input[name="ans_q_${idx}"][value="${ans}"]`);
                     if (radio) radio.checked = true;
                 } else if (q.part === 2) {
-                    Object.keys(ans).forEach(sIdx => {
-                        const val = ans[sIdx];
-                        const radio = document.querySelector(`input[name="ans_q_${idx}_${sIdx}"][value="${val}"]`);
-                        if (radio) radio.checked = true;
+                    (q.statements || []).forEach((st, sIdx) => {
+                        const val = ans[st.letter];
+                        if (val) {
+                            const radio = document.querySelector(`input[name="ans_q_${idx}_${sIdx}"][value="${val}"]`);
+                            if (radio) radio.checked = true;
+                        }
                     });
                 } else if (q.part === 3) {
                     const input = document.querySelector(`#q_card_${idx} input[type="text"]`);
@@ -444,7 +384,6 @@
             if (key) localStorage.removeItem(key);
         }
 
-        // ==================== 3. TẢI DỮ LIỆU & XÁC THỰC ====================
         async function loadCloudData() {
             try {
                 const res = await fetch(CLOUD_API_URL);
@@ -465,19 +404,11 @@
 
         function checkAuthAndInit() {
             let studentId = null;
-            // Đọc tương thích cả cấu trúc Object JSON lẫn chuỗi ID thuần túy
             const sessionObj = localStorage.getItem(STUDENT_AUTH_KEY);
             if (sessionObj) {
-                try {
-                    const parsed = JSON.parse(sessionObj);
-                    studentId = parsed.id || parsed;
-                } catch(e) {
-                    studentId = sessionObj;
-                }
+                try { const parsed = JSON.parse(sessionObj); studentId = parsed.id || parsed; } catch(e) { studentId = sessionObj; }
             }
-            if (!studentId) {
-                studentId = localStorage.getItem(ACTIVE_STUDENT_SESSION_KEY);
-            }
+            if (!studentId) studentId = localStorage.getItem(ACTIVE_STUDENT_SESSION_KEY);
 
             if (!studentId) {
                 alert("Vui lòng đăng nhập tại Cổng Học Sinh trước!");
@@ -506,15 +437,20 @@
             container.innerHTML = myExams.map(ex => {
                 const res = (appData.examResults || []).find(r => r.examId === ex.id && r.studentId === currentStudent.id);
                 const isDone = !!res;
+                const isClosed = ex.status === 'CLOSED';
+
+                let statusBadge = '<span class="text-[10px] bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded-full">Đang mở</span>';
+                if (isDone) statusBadge = '<span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Đã làm</span>';
+                else if (isClosed) statusBadge = '<span class="text-[10px] bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded-full">Đã khóa</span>';
 
                 return `
-                    <div class="p-4 rounded-2xl border ${isDone ? 'bg-slate-50 border-slate-200' : 'bg-white border-indigo-200 ring-2 ring-indigo-50'} flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div class="p-4 rounded-2xl border ${isDone || isClosed ? 'bg-slate-50 border-slate-200' : 'bg-white border-indigo-200 ring-2 ring-indigo-50'} flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                         <div class="space-y-1">
                             <div class="flex items-center space-x-2">
                                 <span class="font-bold text-sm text-slate-900">${ex.title}</span>
-                                ${isDone ? '<span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Đã làm</span>' : '<span class="text-[10px] bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded-full">Đang mở</span>'}
+                                ${statusBadge}
                             </div>
-                            <p class="text-[11px] text-slate-500">Thời gian: <b>${ex.duration} phút</b> • Cấu trúc GDPT mới 3 phần: <b>${ex.questions ? ex.questions.length : 0} câu</b></p>
+                            <p class="text-[11px] text-slate-500">Thời gian: <b>${ex.duration} phút</b> • Cấu trúc GDPT mới: <b>${ex.questions ? ex.questions.length : 0} câu</b></p>
                         </div>
                         <div>
                             ${isDone ? `
@@ -522,6 +458,8 @@
                                     <span class="text-xs text-slate-500 font-bold">Điểm đạt:</span>
                                     <span class="text-lg font-black text-emerald-600 block">${res.score.toFixed(1)} đ</span>
                                 </div>
+                            ` : isClosed ? `
+                                <span class="text-xs font-bold text-slate-400 italic">Hết hạn làm bài</span>
                             ` : `
                                 <button onclick="startTakingExam('${ex.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center space-x-1.5">
                                     <span>Vào Làm Bài</span>
@@ -537,7 +475,10 @@
 
         function startTakingExam(examId) {
             activeExam = (appData.exams || []).find(e => e.id === examId);
-            if (!activeExam) return;
+            if (!activeExam || activeExam.status === 'CLOSED') {
+                alert("Đề thi này hiện đang khóa!");
+                return;
+            }
 
             studentAnswers = {};
             flaggedQuestions = {};
@@ -552,35 +493,33 @@
             renderQuestionPalette(activeExam.questions || []);
 
             const restored = restoreExamDraftLocally();
-            if (!restored) {
-                remainingSeconds = (activeExam.duration || 45) * 60;
-            }
+            if (!restored) remainingSeconds = (activeExam.duration || 45) * 60;
 
             requestFullScreenMode();
             startTimer(remainingSeconds);
         }
 
-        // ==================== 4. RENDER CÂU HỎI & PALETTE ====================
         function renderQuestions(questions) {
             const container = document.getElementById('questionsListContainer');
             container.innerHTML = questions.map((q, idx) => {
+                const qKey = q.id || String(idx);
                 let partBadge = '';
                 let bodyHtml = '';
 
                 if (q.part === 1) {
-                    partBadge = 'Phần I: Trắc nghiệm 4 lựa chọn (Chọn 1 đáp án)';
+                    partBadge = 'Phần I: Trắc nghiệm 4 lựa chọn';
                     bodyHtml = `
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
                             ${(q.options || []).map(opt => `
                                 <label class="p-3 bg-white border border-slate-200 rounded-xl flex items-center space-x-2.5 cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/30 transition text-xs font-semibold">
-                                    <input type="radio" name="ans_q_${idx}" value="${opt.letter}" onchange="recordPart1Answer(${idx}, '${opt.letter}')" class="text-indigo-600 w-4 h-4">
+                                    <input type="radio" name="ans_q_${idx}" value="${opt.letter}" onchange="recordPart1Answer('${qKey}', '${opt.letter}')" class="text-indigo-600 w-4 h-4">
                                     <span><b class="text-indigo-900">${opt.letter}.</b>${opt.content}</span>
                                 </label>
                             `).join('')}
                         </div>
                     `;
                 } else if (q.part === 2) {
-                    partBadge = 'Phần II: Câu hỏi Đúng / Sai (Đánh dấu từng ý)';
+                    partBadge = 'Phần II: Câu hỏi Đúng / Sai';
                     bodyHtml = `
                         <div class="space-y-2 pt-2">
                             ${(q.statements || []).map((st, sIdx) => `
@@ -588,11 +527,11 @@
                                     <span class="font-semibold text-slate-800"><b class="text-indigo-900">${st.letter})</b>${st.content}</span>
                                     <div class="flex items-center space-x-4 shrink-0 font-bold bg-white px-3 py-1 rounded-lg border">
                                         <label class="flex items-center space-x-1 cursor-pointer text-emerald-700">
-                                            <input type="radio" name="ans_q_${idx}_${sIdx}" value="Đ" onchange="recordPart2Answer(${idx},'${st.letter}', 'Đ')" class="w-4 h-4 text-emerald-600">
+                                            <input type="radio" name="ans_q_${idx}_${sIdx}" value="Đ" onchange="recordPart2Answer('${qKey}','${st.letter}', 'Đ')" class="w-4 h-4 text-emerald-600">
                                             <span>Đúng</span>
                                         </label>
                                         <label class="flex items-center space-x-1 cursor-pointer text-rose-700">
-                                            <input type="radio" name="ans_q_${idx}_${sIdx}" value="S" onchange="recordPart2Answer(${idx},'${st.letter}', 'S')" class="w-4 h-4 text-rose-600">
+                                            <input type="radio" name="ans_q_${idx}_${sIdx}" value="S" onchange="recordPart2Answer('${qKey}','${st.letter}', 'S')" class="w-4 h-4 text-rose-600">
                                             <span>Sai</span>
                                         </label>
                                     </div>
@@ -601,11 +540,11 @@
                         </div>
                     `;
                 } else if (q.part === 3) {
-                    partBadge = 'Phần III: Trả lời ngắn (Điền số hoặc biểu thức)';
+                    partBadge = 'Phần III: Trả lời ngắn';
                     bodyHtml = `
                         <div class="pt-2 flex items-center space-x-2">
                             <span class="text-xs font-bold text-slate-600">Đáp số của em:</span>
-                            <input type="text" placeholder="Nhập kết quả..." oninput="recordPart3Answer(${idx}, this.value)" class="w-48 sm:w-64 p-2.5 border-2 border-slate-300 rounded-xl text-xs font-bold outline-none focus:border-indigo-600 font-mono">
+                            <input type="text" placeholder="Nhập kết quả..." oninput="recordPart3Answer('${qKey}', this.value)" class="w-48 sm:w-64 p-2.5 border-2 border-slate-300 rounded-xl text-xs font-bold outline-none focus:border-indigo-600 font-mono">
                         </div>
                     `;
                 }
@@ -630,10 +569,7 @@
 
             if (window.renderMathInElement) {
                 renderMathInElement(container, {
-                    delimiters: [
-                        {left: '$$', right: '$$', display: true},
-                        {left: '$', right: '$', display: false}
-                    ],
+                    delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
                     throwOnError: false
                 });
             }
@@ -647,13 +583,9 @@
             const p1Grid = document.getElementById('palettePart1Grid');
             const p2Grid = document.getElementById('palettePart2Grid');
             const p3Grid = document.getElementById('palettePart3Grid');
-
-            p1Grid.innerHTML = '';
-            p2Grid.innerHTML = '';
-            p3Grid.innerHTML = '';
+            p1Grid.innerHTML = ''; p2Grid.innerHTML = ''; p3Grid.innerHTML = '';
 
             let p1C = 0, p2C = 0, p3C = 0;
-
             questions.forEach((q, idx) => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
@@ -670,7 +602,6 @@
             document.getElementById('paletteP1Count').innerText = `${p1C} câu`;
             document.getElementById('paletteP2Count').innerText = `${p2C} câu`;
             document.getElementById('paletteP3Count').innerText = `${p3C} câu`;
-
             updatePaletteStatus();
         }
 
@@ -689,12 +620,12 @@
             let answeredCount = 0;
 
             questions.forEach((q, idx) => {
+                const qKey = q.id || String(idx);
                 const pBtn = document.getElementById(`palette_btn_${idx}`);
                 if (!pBtn) return;
 
                 let isAnswered = false;
-                const ans = studentAnswers[idx];
-
+                const ans = studentAnswers[qKey];
                 if (q.part === 1 && ans) isAnswered = true;
                 else if (q.part === 2 && ans && Object.keys(ans).length === (q.statements || []).length) isAnswered = true;
                 else if (q.part === 3 && ans && String(ans).trim() !== '') isAnswered = true;
@@ -711,44 +642,28 @@
             });
 
             document.getElementById('progressSummaryText').innerText = `${answeredCount} / ${questions.length} câu`;
-            const pct = Math.round((answeredCount / questions.length) * 100);
-            document.getElementById('palettePercent').innerText = `${pct}%`;
+            document.getElementById('palettePercent').innerText = `${Math.round((answeredCount / questions.length) * 100)}%`;
         }
 
-        function recordPart1Answer(qIdx, val) {
-            studentAnswers[qIdx] = val;
-            updatePaletteStatus();
-            saveExamDraftLocally();
+        function recordPart1Answer(qKey, val) { studentAnswers[qKey] = val; updatePaletteStatus(); saveExamDraftLocally(); }
+        function recordPart2Answer(qKey, letter, val) {
+            if (!studentAnswers[qKey]) studentAnswers[qKey] = {};
+            studentAnswers[qKey][letter] = val;
+            updatePaletteStatus(); saveExamDraftLocally();
         }
-
-        function recordPart2Answer(qIdx, letter, val) {
-            if (!studentAnswers[qIdx]) studentAnswers[qIdx] = {};
-            studentAnswers[qIdx][letter] = val;
-            updatePaletteStatus();
-            saveExamDraftLocally();
-        }
-
-        function recordPart3Answer(qIdx, val) {
-            studentAnswers[qIdx] = val;
-            updatePaletteStatus();
-            saveExamDraftLocally();
-        }
+        function recordPart3Answer(qKey, val) { studentAnswers[qKey] = val; updatePaletteStatus(); saveExamDraftLocally(); }
 
         function toggleFlagQuestion(qIdx) {
             flaggedQuestions[qIdx] = !flaggedQuestions[qIdx];
             const btn = document.getElementById(`flag_btn_${qIdx}`);
             if (btn) {
-                if (flaggedQuestions[qIdx]) {
-                    btn.className = "text-amber-500 font-black text-[11px] flex items-center space-x-1 p-1 rounded-lg bg-amber-50";
-                } else {
-                    btn.className = "text-slate-400 hover:text-amber-500 font-bold text-[11px] flex items-center space-x-1 p-1 rounded-lg";
-                }
+                btn.className = flaggedQuestions[qIdx]
+                    ? "text-amber-500 font-black text-[11px] flex items-center space-x-1 p-1 rounded-lg bg-amber-50"
+                    : "text-slate-400 hover:text-amber-500 font-bold text-[11px] flex items-center space-x-1 p-1 rounded-lg";
             }
-            updatePaletteStatus();
-            saveExamDraftLocally();
+            updatePaletteStatus(); saveExamDraftLocally();
         }
 
-        // ==================== 5. ĐỒNG HỒ ĐẾM NGƯỢC ====================
         function startTimer(seconds) {
             remainingSeconds = seconds;
             updateTimerDisplay();
@@ -756,9 +671,7 @@
             timerInterval = setInterval(() => {
                 remainingSeconds--;
                 updateTimerDisplay();
-                if (remainingSeconds % 15 === 0) {
-                    saveExamDraftLocally();
-                }
+                if (remainingSeconds % 15 === 0) saveExamDraftLocally();
                 if (remainingSeconds <= 0) {
                     clearInterval(timerInterval);
                     alert("Đã hết thời gian làm bài! Hệ thống tự động nộp bài.");
@@ -773,26 +686,15 @@
             const timerEl = document.getElementById('examTimerText');
             const timerBox = document.getElementById('examTimerBox');
             if (!timerEl) return;
-
             timerEl.innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-
             if (remainingSeconds <= 300) {
                 timerBox.className = "bg-rose-600 text-white font-mono font-black text-xs sm:text-sm px-2.5 sm:px-3.5 py-1.5 rounded-xl flex items-center space-x-1.5 shadow animate-pulse";
             }
         }
 
-        function openImageZoom(src) {
-            document.getElementById('zoomedImageElement').src = src;
-            document.getElementById('modalImageZoom').classList.remove('hidden');
-        }
-        function closeImageZoom() {
-            document.getElementById('modalImageZoom').classList.add('hidden');
-        }
-
-        function togglePaletteDrawer() {
-            const p = document.getElementById('paletteContainer');
-            p.classList.toggle('hidden');
-        }
+        function openImageZoom(src) { document.getElementById('zoomedImageElement').src = src; document.getElementById('modalImageZoom').classList.remove('hidden'); }
+        function closeImageZoom() { document.getElementById('modalImageZoom').classList.add('hidden'); }
+        function togglePaletteDrawer() { document.getElementById('paletteContainer').classList.toggle('hidden'); }
 
         function handleExitExam() {
             if (activeExam) {
@@ -809,7 +711,8 @@
             const questions = activeExam.questions || [];
             let unanswered = 0;
             questions.forEach((q, idx) => {
-                const ans = studentAnswers[idx];
+                const qKey = q.id || String(idx);
+                const ans = studentAnswers[qKey];
                 if (!ans) unanswered++;
                 else if (q.part === 2 && Object.keys(ans).length < (q.statements || []).length) unanswered++;
                 else if (q.part === 3 && String(ans).trim() === '') unanswered++;
@@ -825,7 +728,25 @@
             }
         }
 
-        // ==================== 6. CHẤM ĐIỂM & NỘP BÀI LÊN CLOUD ====================
+        function isAnswerMathEqual(ans1, ans2) {
+            if (!ans1 || !ans2) return false;
+            const s1 = String(ans1).trim().replace(',', '.').toLowerCase();
+            const s2 = String(ans2).trim().replace(',', '.').toLowerCase();
+            if (s1 === s2) return true;
+            try {
+                const evalFraction = (str) => {
+                    if (str.includes('/')) {
+                        const parts = str.split('/');
+                        if (parts.length === 2) return parseFloat(parts[0]) / parseFloat(parts[1]);
+                    }
+                    return parseFloat(str);
+                };
+                const n1 = evalFraction(s1), n2 = evalFraction(s2);
+                if (!isNaN(n1) && !isNaN(n2) && Math.abs(n1 - n2) < 0.0001) return true;
+            } catch(e) {}
+            return false;
+        }
+
         async function executeSubmitExam() {
             let totalScore = 0;
             const questions = activeExam.questions || [];
@@ -834,39 +755,44 @@
             const p2List = questions.filter(q => q.part === 2);
             const p3List = questions.filter(q => q.part === 3);
 
-            let p1PerQ = p1List.length > 0 ? (p2List.length === 0 && p3List.length === 0 ? 10.0 / p1List.length : 3.0 / p1List.length) : 0;
-            let p2PerQ = p2List.length > 0 ? (p1List.length === 0 && p3List.length === 0 ? 10.0 / p2List.length : 4.0 / p2List.length) : 0;
-            let p3PerQ = p3List.length > 0 ? (p1List.length === 0 && p2List.length === 0 ? 10.0 / p3List.length : 3.0 / p3List.length) : 0;
+            let p1TotalScore = 3.0, p2TotalScore = 4.0, p3TotalScore = 3.0;
+            const hasP1 = p1List.length > 0, hasP2 = p2List.length > 0, hasP3 = p3List.length > 0;
 
-            if (p1List.length > 0 && p2List.length > 0 && p3List.length > 0) {
-                p1PerQ = 3.0 / p1List.length;
-                p2PerQ = 4.0 / p2List.length;
-                p3PerQ = 3.0 / p3List.length;
-            }
+            if (hasP1 && !hasP2 && !hasP3) { p1TotalScore = 10.0; p2TotalScore = 0; p3TotalScore = 0; }
+            else if (!hasP1 && hasP2 && !hasP3) { p1TotalScore = 0; p2TotalScore = 10.0; p3TotalScore = 0; }
+            else if (!hasP1 && !hasP2 && hasP3) { p1TotalScore = 0; p2TotalScore = 0; p3TotalScore = 10.0; }
+            else if (hasP1 && hasP2 && !hasP3) { p1TotalScore = 4.0; p2TotalScore = 6.0; p3TotalScore = 0; }
+            else if (hasP1 && !hasP2 && hasP3) { p1TotalScore = 5.0; p2TotalScore = 0; p3TotalScore = 5.0; }
+            else if (!hasP1 && hasP2 && hasP3) { p1TotalScore = 0; p2TotalScore = 6.0; p3TotalScore = 4.0; }
+
+            const p1PerQ = hasP1 ? (p1TotalScore / p1List.length) : 0;
+            const p2PerQ = hasP2 ? (p2TotalScore / p2List.length) : 0;
+            const p3PerQ = hasP3 ? (p3TotalScore / p3List.length) : 0;
 
             questions.forEach((q, idx) => {
-                const uAns = studentAnswers[idx];
+                const qKey = q.id || String(idx);
+                const uAns = studentAnswers[qKey];
                 if (q.part === 1) {
-                    if (uAns && String(uAns).toUpperCase() === String(q.correct).toUpperCase()) {
-                        totalScore += p1PerQ;
-                    }
+                    if (uAns && String(uAns).toUpperCase() === String(q.correct).toUpperCase()) totalScore += p1PerQ;
                 } else if (q.part === 2) {
                     let stCorrectCount = 0;
                     (q.statements || []).forEach(st => {
-                        if (uAns && uAns[st.letter] === st.correct) stCorrectCount++;
+                        const pick = uAns ? (uAns[st.letter] || uAns[st.letter.toLowerCase()] || uAns[st.letter.toUpperCase()]) : null;
+                        if (pick && String(pick).trim().toUpperCase() === String(st.correct).trim().toUpperCase()) stCorrectCount++;
                     });
                     if (stCorrectCount === 1) totalScore += (p2PerQ * 0.1);
                     else if (stCorrectCount === 2) totalScore += (p2PerQ * 0.25);
                     else if (stCorrectCount === 3) totalScore += (p2PerQ * 0.5);
                     else if (stCorrectCount === 4) totalScore += p2PerQ;
                 } else if (q.part === 3) {
-                    if (uAns && String(uAns).trim().toLowerCase() === String(q.correct).trim().toLowerCase()) {
-                        totalScore += p3PerQ;
-                    }
+                    if (uAns && isAnswerMathEqual(uAns, q.correct)) totalScore += p3PerQ;
                 }
             });
 
             totalScore = Math.min(10, Math.max(0, Math.round(totalScore * 10) / 10));
+
+            const now = new Date();
+            const submittedVN = `${String(now.getDate()).padStart(2,'0')}-${String(now.getMonth()+1).padStart(2,'0')}-${now.getFullYear()}`;
 
             const resultPayload = {
                 id: 'res_' + Date.now(),
@@ -875,25 +801,20 @@
                 score: totalScore,
                 details: studentAnswers,
                 tabSwitchCount: tabSwitchCount,
-                submittedAt: new Date().toISOString()
+                submittedAt: submittedVN
             };
 
             try {
                 await fetch(CLOUD_API_URL, {
                     method: 'POST',
                     headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({ 
-                        action: 'submitExamResult', 
-                        payload: resultPayload,
-                        examResult: resultPayload 
-                    })
+                    body: JSON.stringify({ action: 'submitExamResult', payload: resultPayload, examResult: resultPayload })
                 });
             } catch(e) { console.error("Lỗi gửi điểm cloud:", e); }
 
             if (!appData.examResults) appData.examResults = [];
             appData.examResults.push(resultPayload);
             localStorage.setItem(CACHE_DATA_KEY, JSON.stringify(appData));
-
             clearExamDraftLocally();
 
             document.getElementById('screenExamTaking').classList.add('hidden');

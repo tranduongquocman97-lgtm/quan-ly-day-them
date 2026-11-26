@@ -46,7 +46,9 @@ async function loadDataFromCloud() {
             appData.students = j.Students.slice(1).map(r=>({
                 id:String(r[0]||''), classId:String(r[1]||''), code:String(r[2]||''), 
                 name:String(r[3]||''), phone:String(r[4]||''), joinDate:normalizeCloudDate(r[5]||'01-08-2026'), 
-                customFee:r[6]!==''&&r[6]!==null?parseFloat(r[6]):null, username:String(r[7]||''), password:String(r[8]||'')
+                customFee:r[6]!==''&&r[6]!==null?parseFloat(r[6]):null, username:String(r[7]||''), password:String(r[8]||''),
+                mustChangePassword: r[9] === true || r[9] === 'true',
+                transferInfo: (function(){ try { return r[10] ? JSON.parse(r[10]) : null; } catch(e){ return null; } })()
             }));
         }
         if(j.Attendance && j.Attendance.length > 1) {
@@ -88,7 +90,8 @@ async function loadDataFromCloud() {
         if(j.WeeklyOverrides && j.WeeklyOverrides.length > 1) {
             appData.weeklyOverrides = j.WeeklyOverrides.slice(1).map(r=>({
                 id:String(r[0]||''), classId:String(r[1]||''), date:normalizeCloudDate(r[2]||''), 
-                type:String(r[3]||''), startTime:String(r[4]||''), endTime:String(r[5]||''), note:String(r[6]||'')
+                type:String(r[3]||''), startTime:String(r[4]||''), endTime:String(r[5]||''), 
+                note:String(r[6]||''), newDate:normalizeCloudDate(r[7]||'')
             }));
         }
         if(j.InactiveStudents && j.InactiveStudents.length > 1) {
@@ -122,13 +125,13 @@ async function saveDataToCloud() {
     try {
         const payload = {
             Classes: [['id','name','fee','schedulesJson'], ...(appData.classes||[]).map(c=>[c.id,c.name,c.fee,JSON.stringify(c.schedules||[])])],
-            Students: [['id','classId','code','name','phone','joinDate','customFee','username','password'], ...(appData.students||[]).map(s=>[s.id,s.classId,s.code,s.name,s.phone||'',normalizeCloudDate(s.joinDate)||'',s.customFee!==null?s.customFee:'',s.username||'',s.password||''])],
+            Students: [['id','classId','code','name','phone','joinDate','customFee','username','password','mustChangePassword','transferInfoJson'], ...(appData.students||[]).map(s=>[s.id,s.classId,s.code,s.name,s.phone||'',normalizeCloudDate(s.joinDate)||'',s.customFee!==null?s.customFee:'',s.username||'',s.password||'',s.mustChangePassword?true:false,s.transferInfo?JSON.stringify(s.transferInfo):''])],
             Attendance: [['studentId','classId','date','status','note'], ...(appData.attendance||[]).map(a=>[a.studentId, a.classId||'', normalizeCloudDate(a.date), a.status, a.note||''])],
             Payments: [['id','studentId','classId','cycleIndex','amount','status','method','note','date'], ...(appData.payments||[]).map(p=>[p.id,p.studentId,p.classId,p.cycleIndex,p.amount,p.status,p.method,p.note||'',normalizeCloudDate(p.date)])],
             Documents: [['id','classId','name','category','url'], ...(appData.documents||[]).map(d=>[d.id,d.classId,d.name,d.category||'Chuyên đề chung',d.url])],
             Exams: [['id','title','classId','duration','solutionUrl','questionsJson','matrixJson','status'], ...(appData.exams||[]).map(e=>[e.id, e.title, e.classId, e.duration||45, e.solutionUrl||'', JSON.stringify(e.questions||[]), JSON.stringify(e.matrix||{}), e.status||'OPEN'])],
             ExamResults: [['id','examId','studentId','score','detailsJson','tabSwitchCount','submittedAt'], ...(appData.examResults||[]).map(r=>[r.id,r.examId,r.studentId,r.score,JSON.stringify(r.details||{}),r.tabSwitchCount,r.submittedAt])],
-            WeeklyOverrides: [['id','classId','date','type','startTime','endTime','note'], ...(appData.weeklyOverrides||[]).map(o=>[o.id,o.classId,normalizeCloudDate(o.date),o.type,o.startTime||'',o.endTime||'',o.note||''])],
+            WeeklyOverrides: [['id','classId','date','type','startTime','endTime','note','newDate'], ...(appData.weeklyOverrides||[]).map(o=>[o.id,o.classId,normalizeCloudDate(o.date),o.type,o.startTime||'',o.endTime||'',o.note||'',normalizeCloudDate(o.newDate||'')])],
             InactiveStudents: [['id','studentId','studentCode','studentName','classId','className','phone','joinDate','leaveDate','totalSessions','totalPaid','debtAmount','reason'], ...(appData.inactiveStudents||[]).map(x=>[x.id, x.studentId, x.studentCode, x.studentName, x.classId, x.className, x.phone||'', normalizeCloudDate(x.joinDate), normalizeCloudDate(x.leaveDate), x.totalSessions, x.totalPaid, x.debtAmount, x.reason||''])],
             AppConfig: [['key','value'], ...(appData.appConfig||[]).map(c=>[c.key, c.value])]
         };

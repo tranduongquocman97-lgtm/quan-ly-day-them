@@ -1,15 +1,32 @@
 // ============================================================================
-// MODULE TUITION: KẾ TOÁN FIFO LŨY KẾ, THU TIỀN 2 TRẠNG THÁI & VIETQR (JS/TUITION.JS)
+// MODULE TUITION: KẾ TOÁN FIFO ĐA KỲ KHÔNG GIỚI HẠN & THU TIỀN 2 TRẠNG THÁI
 // ============================================================================
 
-function calculateStudentTuitionLedger(s) {
+let manualExtraCycles = 0;
+
+function addExtraTuitionCycleColumn() {
+    manualExtraCycles++;
+    renderTuitionTable();
+}
+
+function getTotalDisplayCycles(stds) {
+    let maxSessions = 0;
+    (stds || []).forEach(s => {
+        const len = getClassSessionDates(s.classId).length;
+        if (len > maxSessions) maxSessions = len;
+    });
+    const autoCycles = Math.floor(maxSessions / 8) + 1;
+    return Math.max(4, autoCycles) + manualExtraCycles;
+}
+
+function calculateStudentTuitionLedger(s, forceMinCycles = 4) {
     const targetClass = (appData.classes || []).find(c => c.id === s.classId);
     const effFee = getEffectiveStudentFee(s, targetClass);
     const allDates = getClassSessionDates(s.classId);
     const totalTaught = allDates.length;
     
-    const maxCycleIndex = Math.max(3, Math.floor((totalTaught - 1) / 8));
     const activeCycleIndex = Math.max(0, Math.floor((totalTaught - 1) / 8));
+    const maxCycleIndex = Math.max(forceMinCycles - 1, activeCycleIndex + 1);
 
     const skipCount = allDates.filter(d => compareDateDDMMYYYY(d, s.joinDate) < 0).length;
     const joinCycle = Math.floor(skipCount / 8);
@@ -19,7 +36,6 @@ function calculateStudentTuitionLedger(s) {
     let cyclesInfo = [];
 
     for (let i = 0; i <= maxCycleIndex; i++) {
-        // CHỈ LẤY CÁC BẢN GHI ĐÃ THỰC THU (PAID) - TUYỆT ĐỐI KHÔNG CỘNG BẢN GHI KHÁC
         const cyclePayments = (appData.payments || []).filter(p => 
             p.studentId === s.id && 
             p.classId === s.classId && 
@@ -27,19 +43,14 @@ function calculateStudentTuitionLedger(s) {
             p.status === 'PAID'
         );
         const paidAmount = cyclePayments.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
-        
-        // Kiểm tra miễn giảm
         const isExempt = (effFee === 0) || (appData.payments || []).some(p => p.studentId === s.id && p.classId === s.classId && p.cycleIndex === i && p.status === 'EXEMPT');
 
         let baseFee = effFee;
         let isNotJoined = (i < joinCycle);
 
-        if (isExempt) {
-            baseFee = 0;
-        } else if (isNotJoined) {
+        if (isExempt || isNotJoined) {
             baseFee = 0;
         } else if (s.transferInfo && s.transferInfo.newCycleIndex === i && s.transferInfo.targetClassId === s.classId) {
-            // NẾU LÀ KỲ CHUYỂN LỚP: HỌC PHÍ = SỐ BUỔI LỚP MỚI + NỢ CŨ MANG SANG
             baseFee = s.transferInfo.totalTransferFee;
         } else if (i === joinCycle && skipCount > 0) {
             const actualSess = 8 - (skipCount % 8);
@@ -76,14 +87,8 @@ function calculateStudentTuitionLedger(s) {
         }
 
         cyclesInfo.push({
-            cycleIndex: i,
-            baseFee: baseFee,
-            paidAmount: paidAmount,
-            deductedFromPrev: deductedFromPrev,
-            cycleDebt: cycleDebt,
-            surplus: surplus,
-            status: cycleStatus,
-            payments: cyclePayments
+            cycleIndex: i, baseFee, paidAmount, deductedFromPrev,
+            cycleDebt, surplus, status: cycleStatus, payments: cyclePayments
         });
     }
 
@@ -97,16 +102,34 @@ function calculateStudentTuitionLedger(s) {
 
 function renderTuitionTable() {
     const stds = getFilteredStudents();
+    const thead = document.getElementById('tuitionTableHead');
     const tb = document.getElementById('tuitionTableBody');
-    if(!tb) return;
-    if(stds.length === 0) { tb.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Trống</td></tr>`; return; }
+    if (!tb || !thead) return;
+
+    const totalCycles = getTotalDisplayCycles(stds);
+
+    let headHtml = `
+        <tr class="bg-slate-100 font-bold border-b uppercase text-slate-600">
+            <th class="p-2.5 sm:p-3 sticky-col-1 bg-slate-100 border-r min-w-[65px]">Lớp</th>
+            <th class="p-2.5 sm:p-3 sticky-col-2 bg-slate-100 border-r min-w-[130px]">Học Sinh</th>
+    `;
+    for (let i = 0; i < totalCycles; i++) {
+        headHtml += `<th class="p-2.5 sm:p-3 text-center border-r min-w-[130px]">Kỳ ${i + 1} (B${i * 8 + 1}-${(i + 1) * 8})</th>`;
+    }
+    headHtml += `</tr>`;
+    thead.innerHTML = headHtml;
+
+    if (stds.length === 0) {
+        tb.innerHTML = `<tr><td colspan="${totalCycles + 2}" class="p-4 text-center text-slate-400 italic">Trống</td></tr>`;
+        return;
+    }
 
     tb.innerHTML = stds.map(s => {
         try {
-            const ledger = calculateStudentTuitionLedger(s);
+            const ledger = calculateStudentTuitionLedger(s, totalCycles);
             let cells = '';
 
-            for(let i = 0; i < 4; i++) {
+            for (let i = 0; i < totalCycles; i++) {
                 const cInfo = (ledger.cycles && ledger.cycles[i]) ? ledger.cycles[i] : { status: 'FUTURE', baseFee: 0, paidAmount: 0, cycleDebt: 0, surplus: 0 };
                 let stC = 'bg-slate-50 text-slate-400', txt = 'Chưa đến';
 
@@ -126,12 +149,13 @@ function renderTuitionTable() {
                     txt = cInfo.paidAmount > 0 ? `Còn nợ: ${(cInfo.cycleDebt || 0).toLocaleString()}đ` : `Cần thu: ${(cInfo.cycleDebt || 0).toLocaleString()}đ`;
                 }
 
-                cells += `<td class="p-2 border-r text-center cursor-pointer" onclick="openPayModal('${s.id}', ${i})" title="Bấm để thu học phí hoặc xem QR"><div class="p-1.5 sm:p-2 rounded-xl border text-[11px] ${stC}">${txt}</div></td>`;
+                const activeRing = (i === ledger.activeCycleIndex) ? 'ring-2 ring-indigo-400/60' : '';
+                cells += `<td class="p-2 border-r text-center cursor-pointer" onclick="openPayModal('${s.id}', ${i})" title="Bấm để thu học phí hoặc quản lý phiếu thu"><div class="p-1.5 sm:p-2 rounded-xl border text-[11px] ${stC} ${activeRing}">${txt}</div></td>`;
             }
 
             return `<tr><td class="p-2.5 sm:p-3 sticky-col-1 border-r text-[10px] font-bold">${getClassName(s.classId)}</td><td class="p-2.5 sm:p-3 sticky-col-2 border-r font-bold">${s.name}</td>${cells}</tr>`;
-        } catch(err) {
-            return `<tr><td class="p-2.5 border-r">${getClassName(s.classId)}</td><td class="p-2.5 border-r">${s.name}</td><td colspan="4" class="p-2.5 text-center text-slate-400 italic">Lỗi hiển thị</td></tr>`;
+        } catch (err) {
+            return `<tr><td class="p-2.5 border-r">${getClassName(s.classId)}</td><td class="p-2.5 border-r">${s.name}</td><td colspan="${totalCycles}" class="p-2.5 text-center text-slate-400 italic">Lỗi hiển thị</td></tr>`;
         }
     }).join('');
 }
@@ -140,9 +164,8 @@ function openPayModal(sId, cIdx) {
     const s = (appData.students || []).find(x => x.id === sId);
     if (!s) return;
 
-    const ledger = calculateStudentTuitionLedger(s);
+    const ledger = calculateStudentTuitionLedger(s, cIdx + 2);
     const cInfo = (ledger.cycles && ledger.cycles[cIdx]) ? ledger.cycles[cIdx] : { baseFee: 300000, cycleDebt: 300000, paidAmount: 0, deductedFromPrev: 0, status: 'OWE' };
-    
     const paidPayment = (cInfo.payments || []).find(p => p.status === 'PAID');
 
     const formNew = document.getElementById('formPayTuitionNew');
@@ -169,7 +192,6 @@ function openPayModal(sId, cIdx) {
             const otherStudents = (appData.students || []).filter(st => st.classId === s.classId && st.id !== s.id);
             targetSelect.innerHTML = otherStudents.map(st => `<option value="${st.id}">${st.name} (${st.code})</option>`).join('');
         }
-
     } else {
         if (modalTitle) {
             modalTitle.innerText = "Thu Học Phí";
@@ -198,35 +220,24 @@ function openPayModal(sId, cIdx) {
             }
         }
     }
-
     document.getElementById('modalPayTuition')?.classList.remove('hidden');
 }
 
-function closePayModal() { 
-    document.getElementById('modalPayTuition')?.classList.add('hidden'); 
-}
+function closePayModal() { document.getElementById('modalPayTuition')?.classList.add('hidden'); }
 
 function handleSavePayment(e) {
     e.preventDefault();
     const sId = document.getElementById('payStudentId').value;
     const cIdx = parseInt(document.getElementById('payCycleIndex').value);
     const amt = parseFloat(document.getElementById('payAmount').value) || 0;
-    const rawPayDate = document.getElementById('payDate').value;
-    const d = fromIsoDate(rawPayDate) || getTodayVNString();
+    const d = fromIsoDate(document.getElementById('payDate').value) || getTodayVNString();
     const m = document.getElementById('payMethod').value;
     const s = (appData.students || []).find(x => x.id === sId);
 
     appData.payments = (appData.payments || []).filter(p => !(p.studentId === sId && p.classId === s.classId && p.cycleIndex === cIdx));
     appData.payments.push({
-        id: 'p_' + Date.now(),
-        studentId: sId,
-        classId: s.classId,
-        cycleIndex: cIdx,
-        amount: amt,
-        status: 'PAID',
-        method: m,
-        note: '',
-        date: d
+        id: 'p_' + Date.now(), studentId: sId, classId: s.classId,
+        cycleIndex: cIdx, amount: amt, status: 'PAID', method: m, note: '', date: d
     });
 
     saveDataToCloud();
@@ -270,10 +281,7 @@ function handleTransferPaymentToAnotherStudent() {
     const p = (appData.payments || []).find(x => x.id === pId);
     const targetStudent = (appData.students || []).find(x => x.id === targetStudentId);
 
-    if (!p || !targetStudent) {
-        alert("Vui lòng chọn học sinh nhận khoản tiền!");
-        return;
-    }
+    if (!p || !targetStudent) { alert("Vui lòng chọn học sinh nhận khoản tiền!"); return; }
 
     if (confirm(`Chuyển phiếu thu ${p.amount.toLocaleString()}đ này sang cho em "${targetStudent.name}"?`)) {
         p.studentId = targetStudent.id;
@@ -294,7 +302,6 @@ function showAdminVietQR() {
     const className = (c ? c.name : 'LOP').toUpperCase().replace(/[^A-Z0-9]/g, '');
     const rawUsername = (s.username || s.code).toUpperCase().replace(/[^A-Z0-9]/g, '');
     const desc = `HP ${className} ${rawUsername} K${cIdx + 1}`;
-
     const qrUrl = `https://img.vietqr.io/image/${AGRIBANK_BIN}-${AGRIBANK_STK}-compact2.png?amount=${amt}&addInfo=${encodeURIComponent(desc)}&accountName=${encodeURIComponent(AGRIBANK_NAME)}`;
 
     document.getElementById('adminQrImage').src = qrUrl;
@@ -303,14 +310,12 @@ function showAdminVietQR() {
     document.getElementById('modalAdminQR')?.classList.remove('hidden');
 }
 
-function closeAdminQRModal() { 
-    document.getElementById('modalAdminQR')?.classList.add('hidden'); 
-}
+function closeAdminQRModal() { document.getElementById('modalAdminQR')?.classList.add('hidden'); }
 
 function renderPaymentHistory() {
     const pays = getFilteredPayments().sort((a,b)=>compareDateDDMMYYYY(b.date, a.date));
     const revEl = document.getElementById('textTotalClassRevenue');
-    if (revEl) revEl.innerText = 'Doanh thu: ' + pays.reduce((s,p)=>s+p.amount,0).toLocaleString() + ' đ';
+    if (revEl) revEl.innerText = 'Doanh thu: ' + pays.filter(p => p.status === 'PAID').reduce((s,p)=>s+p.amount,0).toLocaleString() + ' đ';
     
     const tbody = document.getElementById('paymentHistoryBody');
     if (!tbody) return;

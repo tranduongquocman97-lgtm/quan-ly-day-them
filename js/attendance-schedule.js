@@ -114,11 +114,9 @@ function handleApplyChangeAttendanceDate() {
     if (!newDate) { alert("Vui lòng chọn ngày mới hợp lệ!"); return; }
     if (newDate === selectedAttDateToChange) { alert("Ngày mới trùng với ngày hiện tại!"); return; }
 
-    let modifiedCount = 0;
     (appData.attendance || []).forEach(a => {
         if ((currentClassId === 'ALL' || a.classId === currentClassId) && normalizeCloudDate(a.date) === selectedAttDateToChange) {
             a.date = newDate;
-            modifiedCount++;
         }
     });
 
@@ -315,9 +313,21 @@ function renderWeeklyOperational(mondayDate) {
             const extras = (appData.weeklyOverrides || []).filter(o => o.date === curDateStr && o.type === 'EXTRA');
             extras.forEach(ex => {
                 const c = (appData.classes || []).find(x => x.id === ex.classId);
+                if (!c || (currentClassId !== 'ALL' && c.id !== currentClassId)) return;
                 lessons.push({
                     classId: ex.classId, className: c ? c.name : 'Lớp', startTime: ex.startTime || '18:00',
                     endTime: ex.endTime || '19:30', originalDate: curDateStr, isExtra: true, overrideData: ex
+                });
+            });
+
+            const rescheduledIn = (appData.weeklyOverrides || []).filter(o => o.type === 'RESCHEDULE' && normalizeCloudDate(o.newDate) === curDateStr);
+            rescheduledIn.forEach(ov => {
+                const c = (appData.classes || []).find(x => x.id === ov.classId);
+                if (!c || (currentClassId !== 'ALL' && c.id !== currentClassId)) return;
+                lessons.push({
+                    classId: ov.classId, className: `${c.name} (Dời từ ${formatDateShortVN(ov.date)})`,
+                    startTime: ov.startTime || '17:30', endTime: ov.endTime || '19:00',
+                    originalDate: curDateStr, isExtra: true, overrideData: ov
                 });
             });
 
@@ -339,7 +349,7 @@ function renderWeeklyOperational(mondayDate) {
                                 <span>Không có ca</span>
                             </div>
                         ` : lessons.map(l => {
-                            const ov = (appData.weeklyOverrides || []).find(o => o.classId === l.classId && o.date === curDateStr);
+                            const ov = !l.isExtra ? (appData.weeklyOverrides || []).find(o => o.classId === l.classId && o.date === curDateStr) : null;
                             
                             if (ov && ov.type === 'CANCEL') {
                                 return `
@@ -478,7 +488,7 @@ async function handleSaveExtraLesson(e) {
 }
 
 function removeExtraLesson(id) {
-    if (confirm("Xóa ca tăng cường này?")) {
+    if (confirm("Xóa ca điều chỉnh/tăng cường này?")) {
         appData.weeklyOverrides = (appData.weeklyOverrides || []).filter(o => o.id !== id);
         saveDataToCloud();
         renderScheduleTab();

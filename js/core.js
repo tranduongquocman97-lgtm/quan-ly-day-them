@@ -42,6 +42,11 @@ function getTodayVNString() {
 
 function normalizeCloudDate(d) {
     if (!d) return '';
+    if (d instanceof Date) {
+        if (isNaN(d.getTime())) return '';
+        const v = new Date(d.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
+        return `${String(v.getDate()).padStart(2, '0')}-${String(v.getMonth() + 1).padStart(2, '0')}-${v.getFullYear()}`;
+    }
     d = String(d).trim();
     if (d.includes('T')) {
         const v = new Date(new Date(d).toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));

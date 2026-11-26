@@ -14,21 +14,28 @@ function renderDashboard() {
         const todayDateEl = document.getElementById('dashTodayDateStr');
         if (todayDateEl) todayDateEl.innerText = `${dayOfWeek}, ${todayStr}`;
 
-        // 1. Ca dạy hôm nay
+        // 1. Ca dạy hôm nay (gồm lịch cố định + ca tăng cường + ca dời đến hôm nay)
         let todayLessons = [];
         const classes = (appData.classes || []).filter(c => currentClassId === 'ALL' || c.id === currentClassId);
         
         classes.forEach(c => {
             const ov = (appData.weeklyOverrides || []).find(o => o.classId === c.id && o.date === todayStr);
-            if (!ov || ov.type !== 'CANCEL') {
+            if (!ov || (ov.type !== 'CANCEL' && ov.type !== 'RESCHEDULE')) {
                 const schs = getSafeClassSchedules(c);
                 schs.filter(sc => sc && sc.day === dayOfWeek).forEach(sc => {
-                    const classSessions = getClassSessionDates(c.id);
-                    const totalSess = classSessions.length;
-                    const curCycle = Math.floor(totalSess / 8) + 1;
-                    const sessInCycle = (totalSess % 8) + 1;
-                    todayLessons.push({ class: c, schedule: sc, totalSess, curCycle, sessInCycle });
+                    const totalSess = getClassSessionDates(c.id).length;
+                    todayLessons.push({ class: c, schedule: sc, totalSess, curCycle: Math.floor(totalSess / 8) + 1, sessInCycle: (totalSess % 8) + 1 });
                 });
+            }
+        });
+
+        (appData.weeklyOverrides || []).forEach(ov => {
+            if ((ov.type === 'EXTRA' && ov.date === todayStr) || (ov.type === 'RESCHEDULE' && normalizeCloudDate(ov.newDate) === todayStr)) {
+                const c = classes.find(x => x.id === ov.classId);
+                if (c) {
+                    const totalSess = getClassSessionDates(c.id).length;
+                    todayLessons.push({ class: c, schedule: { startTime: ov.startTime || '18:00', endTime: ov.endTime || '19:30' }, totalSess, curCycle: Math.floor(totalSess / 8) + 1, sessInCycle: (totalSess % 8) + 1 });
+                }
             }
         });
 
@@ -335,8 +342,29 @@ function triggerTeacherPWAInstall() {
 }
 
 if ('serviceWorker' in navigator) {
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        if (document.visibilityState === 'visible') {
+            const onHidden = () => {
+                if (document.visibilityState === 'hidden' && !refreshing) {
+                    refreshing = true;
+                    document.removeEventListener('visibilitychange', onHidden);
+                    window.location.reload();
+                }
+            };
+            document.addEventListener('visibilitychange', onHidden);
+        } else {
+            refreshing = true;
+            window.location.reload();
+        }
+    });
+
     navigator.serviceWorker.register('sw.js').then((reg) => {
         reg.update();
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') reg.update();
+        });
     }).catch(err => console.log('SW Fail', err));
 }
 

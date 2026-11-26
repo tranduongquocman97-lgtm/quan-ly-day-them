@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v2026.11.03.modular_1';
+const CACHE_VERSION = 'v2026.11.26.stable_1';
 const CACHE_NAME = `sigmath-cache-${CACHE_VERSION}`;
 
 const ASSETS_TO_CACHE = [
@@ -23,35 +23,26 @@ const ASSETS_TO_CACHE = [
   './logo-student-512.png'
 ];
 
-// Cài đặt và nạp tài nguyên vào cache
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    }).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(ASSETS_TO_CACHE))
+      .then(() => self.skipWaiting())
   );
 });
 
-// Kích hoạt phiên bản mới và dọn dẹp các bản cache cũ
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            return caches.delete(cache);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
+    caches.keys()
+      .then((cacheNames) => Promise.all(
+        cacheNames.map((cache) => (cache !== CACHE_NAME ? caches.delete(cache) : null))
+      ))
+      .then(() => self.clients.claim())
   );
 });
 
-// Phản hồi yêu cầu mạng: ưu tiên mạng, lỗi mạng mới dùng cache (Network First)
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
-
-  // Bỏ qua các yêu cầu gọi trực tiếp lên Google Apps Script API
   if (event.request.url.includes('script.google.com') || event.request.url.includes('script.googleusercontent.com')) {
     return;
   }
@@ -61,19 +52,15 @@ self.addEventListener('fetch', (event) => {
       .then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200) {
           const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
         }
         return networkResponse;
       })
-      .catch(() => {
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) return cachedResponse;
-          if (event.request.headers.get('accept')?.includes('text/html')) {
-            return caches.match('./index.html');
-          }
-        });
-      })
+      .catch(() => caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        if (event.request.headers.get('accept')?.includes('text/html')) {
+          return caches.match('./index.html');
+        }
+      }))
   );
 });

@@ -1,5 +1,5 @@
 // ============================================================================
-// MODULE QBANK & ANALYTICS: NGÂN HÀNG ĐỀ THI, RADAR GIAN LẬN & PHỔ ĐIỂM (JS/QBANK.JS)
+// MODULE QBANK & ANALYTICS: NGÂN HÀNG ĐỀ THI, RADAR GIAN LẬN & XEM BÀI LÀM
 // ============================================================================
 
 function setupDirectImagePaste() {
@@ -33,9 +33,8 @@ function parseAdminExamDirect() {
                      .replace(/<p>/gi, '\n')
                      .replace(/<\/p>/gi, '')
                      .replace(/<br\s*[\/]?>/gi, '\n')
-                     .replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$')
-                     .replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$')
-                     .replace(/\$\$/g, '$');
+                     .replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$')
+                     .replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
 
     content = content.replace(/(\[(?:P1|P2|P3|PHẦN\s*[123IV]+)\]|PHẦN\s+[123IV]+[\s:.-])/gi, '\n$1\n');
     content = content.replace(/(Câu\s+\d+[\s:.-])/gi, '\n$1');
@@ -127,7 +126,7 @@ function renderAdminPreview() {
     prev.innerHTML = html;
     if (window.renderMathInElement) {
         try {
-            renderMathInElement(prev, { delimiters: [{left: '$', right: '$', display: false}], throwOnError: false });
+            renderMathInElement(prev, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}], throwOnError: false });
         } catch(e) {}
     }
 }
@@ -139,6 +138,12 @@ async function saveDirectExamToCloud() {
 
     if(!title) { alert("Vui lòng nhập tên đề thi!"); return; }
     if(tempParsedQuestions.length === 0) { alert("Vui lòng bấm '1. Bóc Tách' trước!"); return; }
+
+    const jsonSize = JSON.stringify(tempParsedQuestions).length;
+    if (jsonSize > 48000) {
+        alert(`⚠️ Cảnh báo: Tổng dung lượng đề thi (${Math.round(jsonSize/1024)}KB) vượt giới hạn 1 ô của Google Sheets (50KB) do có ảnh dán trực tiếp quá nặng. Thầy vui lòng thu nhỏ ảnh hoặc chèn link ảnh để tránh mất dữ liệu khi đồng bộ!`);
+        return;
+    }
 
     appData.exams.push({
         id: 'ex_' + Date.now(), title: title, classId: currentClassId, duration: duration,
@@ -213,7 +218,8 @@ function renderAnalyticsReport() {
     if(!sel || !container) return;
 
     const exams = (appData.exams || []).filter(e => currentClassId === 'ALL' || e.classId === currentClassId);
-    sel.innerHTML = exams.map(e => `<option value="${e.id}">${e.title} (${getClassName(e.classId)})</option>`).join('');
+    const prevVal = sel.value;
+    sel.innerHTML = exams.map(e => `<option value="${e.id}" ${e.id === prevVal ? 'selected' : ''}>${e.title} (${getClassName(e.classId)})</option>`).join('');
 
     const exId = sel.value;
     if(!exId) { container.innerHTML = `<div class="text-xs text-slate-400 italic text-center py-4">Chưa có đề thi nào.</div>`; return; }
@@ -235,7 +241,7 @@ function renderAnalyticsReport() {
         </div>
         <div class="overflow-x-auto border rounded-xl">
             <table class="w-full text-left text-xs whitespace-nowrap">
-                <thead><tr class="bg-slate-100 font-bold border-b"><th class="p-2.5">Thí Sinh</th><th class="p-2.5 text-center">Điểm Số</th><th class="p-2.5 text-center">Rời Màn Hình</th><th class="p-2.5 text-center">Thời Gian Nộp</th></tr></thead>
+                <thead><tr class="bg-slate-100 font-bold border-b"><th class="p-2.5">Thí Sinh</th><th class="p-2.5 text-center">Điểm Số</th><th class="p-2.5 text-center">Rời Màn Hình</th><th class="p-2.5 text-center">Thời Gian Nộp</th><th class="p-2.5 text-center">Chi Tiết</th></tr></thead>
                 <tbody class="divide-y">
     `;
 
@@ -247,11 +253,66 @@ function renderAnalyticsReport() {
                 <td class="p-2.5 text-center font-black text-indigo-600">${r.score.toFixed(1)}</td>
                 <td class="p-2.5 text-center font-bold ${r.tabSwitchCount>0?'text-rose-600 bg-rose-50':'text-emerald-600'}">${r.tabSwitchCount>0?`Vi phạm ${r.tabSwitchCount} lần`:'✓ An toàn'}</td>
                 <td class="p-2.5 text-center font-mono text-slate-500">${r.submittedAt ? formatDateVN(r.submittedAt) : '---'}</td>
+                <td class="p-2.5 text-center"><button onclick="openAdminReviewSubmission('${r.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-2.5 py-1 rounded-lg border border-indigo-200 transition">Xem bài</button></td>
             </tr>
         `;
     });
     html += `</tbody></table></div>`;
     container.innerHTML = html;
+}
+
+function openAdminReviewSubmission(resultId) {
+    const res = (appData.examResults || []).find(r => r.id === resultId);
+    if (!res) return;
+    const ex = (appData.exams || []).find(e => e.id === res.examId);
+    const s = (appData.students || []).find(st => st.id === res.studentId) || { name: 'Học sinh', code: '---' };
+    if (!ex) { alert("Không tìm thấy dữ liệu đề thi gốc!"); return; }
+
+    let modal = document.getElementById('modalAdminReviewSub');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalAdminReviewSub';
+        modal.className = 'fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[60] flex items-center justify-center p-4';
+        document.body.appendChild(modal);
+    }
+
+    const details = (typeof res.details === 'string') ? JSON.parse(res.details) : (res.details || {});
+    const bodyHtml = (ex.questions || []).map((q, idx) => {
+        const uAns = details[q.id] !== undefined ? details[q.id] : details[idx];
+        let ansInfo = '';
+        if (q.part === 1) {
+            const ok = uAns && String(uAns).toUpperCase() === String(q.correct).toUpperCase();
+            ansInfo = `<span class="${ok ? 'text-emerald-700' : 'text-rose-600'} font-bold">HS chọn: ${uAns || 'Bỏ trống'}</span> | Đáp án: <b class="text-emerald-700">${q.correct}</b>`;
+        } else if (q.part === 2) {
+            const sub = uAns || {};
+            ansInfo = (q.statements || []).map(st => {
+                const pick = sub[st.letter] || '-';
+                const ok = String(pick).toUpperCase() === String(st.correct).toUpperCase();
+                return `<span class="inline-block mr-2 px-1.5 py-0.5 rounded border ${ok ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-rose-50 border-rose-200 text-rose-700'}">${st.letter}): HS=${pick} (ĐA=${st.correct})</span>`;
+            }).join('');
+        } else {
+            const ok = uAns && isAnswerMathEqual(uAns, q.correct);
+            ansInfo = `<span class="${ok ? 'text-emerald-700' : 'text-rose-600'} font-bold">HS điền: ${uAns || 'Bỏ trống'}</span> | Đáp án: <b class="text-emerald-700">${q.correct}</b>`;
+        }
+        return `<div class="p-3 bg-slate-50 border rounded-xl space-y-1"><div class="font-bold text-indigo-800">Câu ${idx+1} (Phần ${q.part})</div><div class="text-slate-700">${q.prompt}</div><div class="pt-1 text-[11px] font-mono">${ansInfo}</div></div>`;
+    }).join('');
+
+    modal.innerHTML = `
+        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-2xl border w-full max-w-3xl max-h-[88vh] flex flex-col space-y-3 overflow-hidden">
+            <div class="flex justify-between items-center border-b pb-2.5 shrink-0">
+                <div>
+                    <h3 class="font-black text-sm text-slate-900">Bài làm: ${s.name} (${s.code}) - Điểm: <span class="text-indigo-600">${res.score.toFixed(1)} đ</span></h3>
+                    <p class="text-[11px] text-slate-500">${ex.title}</p>
+                </div>
+                <button onclick="document.getElementById('modalAdminReviewSub').classList.add('hidden')" class="p-1.5 bg-slate-100 rounded-xl hover:bg-slate-200">✕</button>
+            </div>
+            <div id="adminReviewSubBody" class="flex-1 overflow-y-auto space-y-2.5 pr-1 text-xs">${bodyHtml}</div>
+        </div>
+    `;
+    modal.classList.remove('hidden');
+    if (window.renderMathInElement) {
+        try { renderMathInElement(document.getElementById('adminReviewSubBody'), { delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}], throwOnError: false }); } catch(e){}
+    }
 }
 
 function renderExamRadar() {

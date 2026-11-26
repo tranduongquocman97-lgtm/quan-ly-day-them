@@ -287,7 +287,8 @@ function handleAddStudent(e) {
         joinDate: joinDate,
         customFee: null,
         username: username,
-        password: defaultPassword
+        password: defaultPassword,
+        mustChangePassword: true
     });
 
     const backfilled = autoBackfillAttendanceForNewStudent(newStudentId, cId, joinDate);
@@ -344,7 +345,6 @@ function openEditStudentModal(id) {
 function closeEditStudentModal() { document.getElementById('modalEditStudent')?.classList.add('hidden'); }
 
 function onEditClassChange() {
-    const studentId = document.getElementById('editStudentId').value;
     const origClassId = document.getElementById('editOriginalClassId').value;
     const newClassId = document.getElementById('editStudentClassId').value;
     const transferArea = document.getElementById('transferSettingsArea');
@@ -422,17 +422,10 @@ function calculateTransferTuition(studentId, oldClassId, newClassId, transferDat
     const totalTransferFee = Math.max(0, newTuitionPortion + oldDebt);
 
     return {
-        attendedInOld,
-        oldDebt,
-        retroSessions,
-        remainingInNewCycle,
-        combinedNewSessions,
-        totalTransferFee,
-        oldClassName: oldClass.name,
-        newClassName: newClass.name,
-        targetClassId: newClassId,
-        newCycleIndex: newActiveCycle,
-        transferDate: transferDateStr
+        attendedInOld, oldDebt, retroSessions, remainingInNewCycle,
+        combinedNewSessions, totalTransferFee,
+        oldClassName: oldClass.name, newClassName: newClass.name,
+        targetClassId: newClassId, newCycleIndex: newActiveCycle, transferDate: transferDateStr
     };
 }
 
@@ -599,7 +592,6 @@ function renderInactiveStudents() {
 function findDuplicateGroups() {
     const students = appData.students || [];
     const groups = {};
-
     const normalizeName = (name) => (name || '').trim().toLowerCase().replace(/\s+/g, ' ');
 
     students.forEach(s => {
@@ -818,7 +810,8 @@ async function confirmImportExcelToSystem() {
         const newStudentId = 's_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
         appData.students.push({
             id: newStudentId, classId: targetClassId, code: item.code, name: item.name,
-            phone: item.phone, joinDate: item.joinDate, customFee: item.customFee, username: item.username, password: item.password
+            phone: item.phone, joinDate: item.joinDate, customFee: item.customFee,
+            username: item.username, password: item.password, mustChangePassword: true
         });
         totalBackfilled += autoBackfillAttendanceForNewStudent(newStudentId, targetClassId, item.joinDate);
     });
